@@ -1,0 +1,13 @@
+{
+  "itemGroup.woot": "Example Mod Tab",
+  "block.woot.example_block": "Example Block",
+  "item.woot.example_item": "Example Item",
+
+  "woot.configuration.title": "Woot Configs",
+  "woot.configuration.section.woot.common.toml": "Woot Configs",
+  "woot.configuration.section.woot.common.toml.title": "Woot Configs",
+  "woot.configuration.items": "Item List",
+  "woot.configuration.logDirtBlock": "Log Dirt Block",
+  "woot.configuration.magicNumberIntroduction": "Magic Number Text",
+  "woot.configuration.magicNumber": "Magic Number"
+}
