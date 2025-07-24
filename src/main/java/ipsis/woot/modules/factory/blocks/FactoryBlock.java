@@ -3,7 +3,7 @@ package ipsis.woot.modules.factory.blocks;
 import ipsis.woot.modules.debug.items.DebugItem;
 import ipsis.woot.modules.factory.FactoryComponent;
 import ipsis.woot.modules.factory.FactoryComponentProvider;
-import ipsis.woot.modules.factory.multiblock.MultiBlockTileEntity;
+import ipsis.woot.modules.factory.multiblock.MultiBlockBlockEntity;
 import ipsis.woot.util.WootDebug;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -75,7 +75,7 @@ public class FactoryBlock extends Block implements FactoryComponentProvider, Woo
     @Nullable
     @Override
     public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-        return new MultiBlockTileEntity();
+        return new MultiBlockBlockEntity();
     }
 
     /**

@@ -4,39 +4,41 @@ import ipsis.woot.Woot;
 import ipsis.woot.setup.ModSetup;
 import ipsis.woot.util.WootDebug;
 import ipsis.woot.util.helper.PlayerHelper;
-import net.minecraft.block.Block;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.client.gui.components.ChatComponent;
+import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
+
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class DebugItem extends Item {
 
     public DebugItem() {
-        super(new Item.Properties().maxStackSize(1).group(Woot.setup.getCreativeTab()));
+        super(new Item.Properties().stacksTo(1));
     }
 
     @Override
-    public ActionResultType onItemUseFirst(ItemStack stack, ItemUseContext context) {
-        if (!context.getWorld().isRemote) {
-            Block b =  context.getWorld().getBlockState(context.getPos()).getBlock();
+    public ItemInteractionResult onItemUseFirst(ItemStack stack, UseOnContext context) {
+        if (!context.getLevel().isClientSide) {
+            Block b =  context.getLevel().getBlockState(context.getClickedPos()).getBlock();
             if (b instanceof WootDebug) {
                 List<String> debug = new ArrayList<>();
                 ((WootDebug)b).getDebugText(debug, context);
                 for (String s : debug)
-                    context.getPlayer().sendStatusMessage(new StringTextComponent(s), false);
+                    context.getPlayer().sendSystemMessage(new ChatComponent(s), false);
             }
         }
-        return ActionResultType.SUCCESS;
+        return ItemInteractionResult.SUCCESS;
     }
 
-    public static List<String> getTileEntityDebug(List<String> debug, ItemUseContext context) {
-        TileEntity te = context.getWorld().getTileEntity(context.getPos());
+    public static List<String> getTileEntityDebug(List<String> debug, UseOnContext context) {
+        BlockEntity te = context.getLevel().getBlockEntity(context.getClickedPos());
         if (te instanceof WootDebug)
             ((WootDebug) te).getDebugText(debug, context);
         return debug;

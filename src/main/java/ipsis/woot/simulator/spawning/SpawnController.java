@@ -5,18 +5,21 @@ import ipsis.woot.config.Config;
 import ipsis.woot.config.ConfigOverride;
 import ipsis.woot.util.FakeMob;
 import ipsis.woot.util.FakeMobKey;
-import net.minecraft.entity.*;
-import net.minecraft.entity.passive.AnimalEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
-import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageType;
+import net.minecraft.world.damagesource.DamageTypes;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.common.Tags;
+import net.neoforged.neoforge.common.util.FakePlayer;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -30,7 +33,7 @@ public class SpawnController {
     static SpawnController INSTANCE;
     static { INSTANCE = new SpawnController(); }
 
-    public void spawnKill(@Nonnull FakeMobKey fakeMobKey, @Nonnull ServerWorld world, @Nonnull BlockPos spawnPos) {
+    public void spawnKill(@Nonnull FakeMobKey fakeMobKey, @Nonnull ServerLevel world, @Nonnull BlockPos spawnPos) {
 
         if (!fakeMobKey.getMob().isValid())
             return;
@@ -40,32 +43,30 @@ public class SpawnController {
             return;
 
         Entity entity = createEntity(fakeMobKey.getMob(), world, spawnPos);
-        if (entity == null || !(entity instanceof MobEntity))
+        if (!(entity instanceof Mob mobEntity))
             return;
 
-        MobEntity mobEntity = (MobEntity)entity;
+        mobEntity.finalizeSpawn(world,
+                world.getCurrentDifficultyAt(new BlockPos(entity.getOnPos())),
+                MobSpawnType.SPAWNER,
+                null);
 
-        mobEntity.onInitialSpawn(world,
-                world.getDifficultyForLocation(new BlockPos(entity.getPosition())),
-                SpawnReason.SPAWNER,
-                null, null);
-
-        mobEntity.recentlyHit = 100;
-        mobEntity.attackingPlayer = fakePlayer;
+        mobEntity.setLastHurtByPlayer(fakePlayer);
+        mobEntity.hurt(fakePlayer.damageSources().playerAttack(fakePlayer), 100);
 
         CustomSpawnController.get().apply(mobEntity, fakeMobKey.getMob(), world);
-        mobEntity.onDeath(DamageSource.causePlayerDamage(fakePlayer));
+        mobEntity.hurt(fakePlayer.damageSources().playerAttack(fakePlayer), Float.MAX_VALUE);
     }
 
-    private @Nullable Entity createEntity(@Nonnull FakeMob fakeMob, @Nonnull World world, @Nonnull BlockPos pos) {
+    private @Nullable Entity createEntity(@Nonnull FakeMob fakeMob, @Nonnull Level world, @Nonnull BlockPos pos) {
 
         ResourceLocation rl = fakeMob.getResourceLocation();
-        if (!ForgeRegistries.ENTITIES.containsKey(rl)) {
+        if (!BuiltInRegistries.ENTITY_TYPE.containsKey(rl)) {
             Woot.setup.getLogger().debug("createEntity: {} not in entity list", rl);
             return null;
         }
 
-        CompoundNBT nbt = new CompoundNBT();
+        CompoundTag nbt = new CompoundTag();
         nbt.putString("id", rl.toString());
         Entity entity = EntityType.loadEntityAndExecute(nbt, world, (xc) -> {
             xc.setLocationAndAngles(pos.getX(), pos.getY(), pos.getZ(), xc.rotationYaw, xc.rotationPitch);
@@ -76,7 +77,7 @@ public class SpawnController {
     }
 
     private static final int UNKNOWN_MOB_HEALTH = 100;
-    public int getMobHealth(@Nonnull FakeMob fakeMob, @Nonnull World world) {
+    public int getMobHealth(@Nonnull FakeMob fakeMob, @Nonnull Level world) {
         if (world.isRemote)
             return UNKNOWN_MOB_HEALTH;
 
@@ -96,7 +97,7 @@ public class SpawnController {
     }
 
     private static final int UNKNOWN_MOB_EXP = 1;
-    public int getMobExperience(@Nonnull FakeMob fakeMob, @Nonnull World world) {
+    public int getMobExperience(@Nonnull FakeMob fakeMob, @Nonnull Level world) {
         if (world.isRemote)
             return UNKNOWN_MOB_EXP;
 
@@ -115,7 +116,7 @@ public class SpawnController {
         return mobCacheEntryHashMap.get(fakeMob.toString()).xp;
     }
 
-    public boolean isAnimal(@Nonnull FakeMob fakeMob, @Nonnull World world) {
+    public boolean isAnimal(@Nonnull FakeMob fakeMob, @Nonnull Level world) {
 
         if (!isCached(fakeMob)) {
             if (!updateCache(fakeMob, world))
@@ -129,7 +130,7 @@ public class SpawnController {
         return mobCacheEntryHashMap.containsKey(fakeMob.toString());
     }
 
-    private boolean updateCache(@Nonnull FakeMob fakeMob, @Nonnull World world) {
+    private boolean updateCache(@Nonnull FakeMob fakeMob, @Nonnull Level world) {
         // Cache miss, create the entity
         Entity entity = createEntity(fakeMob, world, new BlockPos(0, 0, 0));
         if (entity == null || !(entity instanceof LivingEntity))
@@ -137,7 +138,7 @@ public class SpawnController {
 
         int health = (int)((LivingEntity) entity).getMaxHealth();
 
-        FakePlayer fakePlayer = FakePlayerPool.getFakePlayer((ServerWorld)world, 0);
+        FakePlayer fakePlayer = FakePlayerPool.getFakePlayer((ServerLevel)world, 0);
 
         int xp = 1;
         try {
@@ -154,7 +155,7 @@ public class SpawnController {
     }
 
 
-    public boolean isLivingEntity(FakeMob fakeMob, World world) {
+    public boolean isLivingEntity(FakeMob fakeMob, Level world) {
         Entity entity = createEntity(fakeMob, world, new BlockPos(0, 0, 0));
         return entity != null && entity instanceof MobEntity;
     }

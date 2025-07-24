@@ -74,10 +74,10 @@ public class WootTopPlugin {
 
         private void addPerkProbeInfo(ProbeMode probeMode, IProbeInfo iProbeInfo, TileEntity te, PlayerEntity playerEntity, BlockState blockState) {
 
-            if (!(te instanceof UpgradeTileEntity))
+            if (!(te instanceof UpgradeBlockEntity))
                 return;
 
-            UpgradeTileEntity upgrade = (UpgradeTileEntity) te;
+            UpgradeBlockEntity upgrade = (UpgradeBlockEntity) te;
             Perk perk = upgrade.getUpgrade(blockState);
             if (perk == Perk.EMPTY) {
                 iProbeInfo.text(
@@ -177,10 +177,10 @@ public class WootTopPlugin {
 
         private void addControllerProbeInfo(ProbeMode probeMode, IProbeInfo iProbeInfo, TileEntity te, PlayerEntity playerEntity, BlockState blockState) {
 
-            if (!(te instanceof ControllerTileEntity))
+            if (!(te instanceof ControllerBlockEntity))
                 return;
 
-            ControllerTileEntity controller = (ControllerTileEntity) te;
+            ControllerBlockEntity controller = (ControllerBlockEntity) te;
 
             if (controller.getFakeMob().isValid()) {
                 if (probeMode == ProbeMode.DEBUG) {
@@ -205,10 +205,10 @@ public class WootTopPlugin {
         }
 
         private void addHeartProbeInfo(ProbeMode probeMode, IProbeInfo iProbeInfo, TileEntity te, PlayerEntity playerEntity, BlockState blockState) {
-            if (!(te instanceof HeartTileEntity))
+            if (!(te instanceof HeartBlockEntity))
                 return;
 
-            HeartTileEntity heart = (HeartTileEntity) te;
+            HeartBlockEntity heart = (HeartBlockEntity) te;
             if (heart.isFormed()) {
                 // Add tier
                 iProbeInfo.text(

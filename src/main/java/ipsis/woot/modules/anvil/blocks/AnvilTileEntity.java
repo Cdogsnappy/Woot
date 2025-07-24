@@ -4,7 +4,7 @@ import ipsis.woot.crafting.anvil.AnvilRecipe;
 import ipsis.woot.mod.ModNBT;
 import ipsis.woot.modules.anvil.AnvilSetup;
 import ipsis.woot.modules.factory.FactorySetup;
-import ipsis.woot.modules.factory.blocks.ControllerTileEntity;
+import ipsis.woot.modules.factory.blocks.ControllerBlockEntity;
 import ipsis.woot.modules.factory.items.MobShardItem;
 import ipsis.woot.util.FakeMob;
 import ipsis.woot.util.WootDebug;
@@ -131,7 +131,7 @@ public class AnvilTileEntity extends BlockEntity implements WootDebug {
          */
         if (baseItem.getItem() == FactorySetup.MOB_SHARD_ITEM.get()) {
             FakeMob fakeMob = MobShardItem.getProgrammedMob(baseItem);
-            output = ControllerTileEntity.getItemStack(fakeMob);
+            output = ControllerBlockEntity.getItemStack(fakeMob);
         }
 
         baseItem = ItemStack.EMPTY;

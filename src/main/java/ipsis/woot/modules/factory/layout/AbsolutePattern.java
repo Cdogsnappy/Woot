@@ -6,9 +6,10 @@ import ipsis.woot.modules.factory.perks.Perk;
 import ipsis.woot.modules.factory.Tier;
 import ipsis.woot.util.FakeMob;
 import ipsis.woot.util.helper.BlockPosHelper;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.Level;
+
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -51,7 +52,7 @@ public class AbsolutePattern {
     public void clearControllerPos() { this.validControllerPos.clear(); }
     public boolean isValidControllerPos(BlockPos blockPos) { return this.validControllerPos.contains(blockPos); }
 
-    public static AbsolutePattern create(@Nonnull World world, Tier tier, @Nonnull BlockPos origin, Direction facing) {
+    public static AbsolutePattern create(@Nonnull Level world, Tier tier, @Nonnull BlockPos origin, Direction facing) {
 
         PatternRepository.Pattern pattern = PatternRepository.get().getPattern(tier);
         AbsolutePattern absolutePattern = new AbsolutePattern(tier);
@@ -59,7 +60,7 @@ public class AbsolutePattern {
         Direction opposite = facing.getOpposite();
         for (PatternBlock patternBlock : pattern.getPatternBlocks()) {
             BlockPos pos = BlockPosHelper.rotateFromSouth(patternBlock.getBlockPos(), opposite);
-            absolutePattern.addAbsoluteBlock(patternBlock.getFactoryComponent(), origin.add(pos));
+            absolutePattern.addAbsoluteBlock(patternBlock.getFactoryComponent(), origin.offset(pos));
         }
 
         absolutePattern.facing = facing;

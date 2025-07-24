@@ -5,15 +5,17 @@ import ipsis.woot.Woot;
 import ipsis.woot.util.helper.MathHelper;
 import ipsis.woot.util.oss.WootFakePlayer;
 import ipsis.woot.util.oss.WootFakePlayerFactory;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.entity.Entity;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.server.ServerWorld;
-import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.neoforged.neoforge.common.util.FakePlayer;
+
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -38,14 +40,14 @@ public class FakePlayerPool {
     private static void addFakePlayer(@Nonnull WootFakePlayer fakePlayer, int looting, Enchantment enchantment) {
         ItemStack sword = new ItemStack(Items.DIAMOND_SWORD);
         if (looting > 0 && enchantment != null)
-            sword.addEnchantment(enchantment, looting);
-        fakePlayer.setItemStackToSlot(EquipmentSlotType.MAINHAND, sword);
+            sword.enchant(Holder.direct(enchantment), looting);
+        fakePlayer.setItemSlot(EquipmentSlot.MAINHAND, sword);
         fakePlayerMap.put(looting, fakePlayer);
     }
 
-    private static void init(@Nonnull ServerWorld world) {
+    private static void init(@Nonnull ServerLevel world) {
         fakePlayerMap = new HashMap<>();
-        Enchantment enchantment = ForgeRegistries.ENCHANTMENTS.getValue(new ResourceLocation("minecraft", "looting"));
+        Enchantment enchantment = BuiltInRegistries.ENCHANTMENT_EFFECT_COMPONENT_TYPE.get(ResourceLocation.fromNamespaceAndPath("minecraft", "looting"));
         if (enchantment == null)
             Woot.setup.getLogger().warn("FakePlayerPool failed to find looting enchantment");
 
@@ -55,7 +57,7 @@ public class FakePlayerPool {
         addFakePlayer(WootFakePlayerFactory.get(world, GP_LOOT_3), 3, enchantment);
     }
 
-    public static @Nullable FakePlayer getFakePlayer(@Nonnull ServerWorld world, int looting) {
+    public static @Nullable FakePlayer getFakePlayer(@Nonnull ServerLevel world, int looting) {
         if (fakePlayerMap == null)
             init(world);
 
@@ -67,7 +69,7 @@ public class FakePlayerPool {
             return false;
 
         FakePlayer fp = (FakePlayer)entity;
-        UUID uuid = fp.getUniqueID();
+        UUID uuid = fp.getUUID();
         return GP_LOOT_0.getId().equals(uuid) || GP_LOOT_1.getId().equals(uuid) || GP_LOOT_2.getId().equals(uuid) || GP_LOOT_3.getId().equals(uuid);
     }
 

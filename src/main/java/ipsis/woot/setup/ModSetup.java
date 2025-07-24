@@ -25,14 +25,15 @@ import ipsis.woot.modules.factory.layout.PatternRepository;
 import ipsis.woot.mod.ModFiles;
 import ipsis.woot.simulator.MobSimulator;
 import ipsis.woot.simulator.MobSimulatorSetup;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.JSONUtils;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.ItemStack;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.neoforge.common.NeoForge;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.FileReader;
@@ -40,18 +41,18 @@ import java.io.FileReader;
 public class ModSetup {
 
     private Logger logger = LogManager.getLogger();
-    private ItemGroup creativeTab;
+    private CreativeModeTab creativeTab;
 
     public ModSetup() {
-        creativeTab = new ItemGroup(Woot.MODID) {
+        creativeTab = new CreativeModeTab(Woot.MODID) {
             @Override
-            public ItemStack createIcon() {
+            public @NotNull ItemStack getIconItem() {
                 return new ItemStack(FactorySetup.HEART_BLOCK.get());
             }
         };
     }
 
-    public void registrySetup() {
+    public void registrySetup(IEventBus eventBus) {
         InfuserSetup.register();
         SqueezerSetup.register();
         OracleSetup.register();
@@ -67,7 +68,7 @@ public class ModSetup {
 
     public void commonSetup(FMLCommonSetupEvent e) {
 
-        MinecraftForge.EVENT_BUS.register(new ForgeEventHandlers());
+        NeoForge.EVENT_BUS.register(new ForgeEventHandlers());
 
         Advancements.init();
         PolicyRegistry.get().loadFromConfig();
@@ -99,5 +100,5 @@ public class ModSetup {
     }
 
     public Logger getLogger() { return logger; }
-    public ItemGroup getCreativeTab() { return creativeTab; }
+    public CreativeModeTab getCreativeTab() { return creativeTab; }
 }

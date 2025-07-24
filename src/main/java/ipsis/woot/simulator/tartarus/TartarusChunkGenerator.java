@@ -1,42 +1,49 @@
 package ipsis.woot.simulator.tartarus;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.sun.jna.platform.win32.WinBase;
 import ipsis.woot.Woot;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.RegistryLookupCodec;
-import net.minecraft.world.Blockreader;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.BiomeManager;
-import net.minecraft.world.biome.Biomes;
-import net.minecraft.world.biome.provider.SingleBiomeProvider;
-import net.minecraft.world.chunk.IChunk;
-import net.minecraft.world.gen.*;
-import net.minecraft.world.gen.feature.structure.StructureManager;
-import net.minecraft.world.gen.settings.DimensionStructuresSettings;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.core.QuartPos;
+import net.minecraft.core.Registry;
+import net.minecraft.server.level.WorldGenRegion;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.*;
+import net.minecraft.world.level.biome.*;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.*;
+import net.minecraft.world.level.levelgen.*;
+import net.minecraft.world.level.levelgen.blending.Blender;
+import net.minecraft.world.level.levelgen.carver.CarvingContext;
+import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import org.apache.commons.lang3.mutable.MutableObject;
+import org.jetbrains.annotations.NotNull;
 
+
+import javax.annotation.Nullable;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Predicate;
 
 public class TartarusChunkGenerator extends ChunkGenerator {
 
-    public static final Codec<TartarusChunkGenerator> codecTartarusChunk =
-            RegistryLookupCodec.getLookUpCodec(Registry.BIOME_KEY)
-                    .xmap(TartarusChunkGenerator::new, TartarusChunkGenerator::getBiome).stable().codec();
+    public final Holder<NoiseGeneratorSettings> settings;
+    public static final MapCodec<TartarusChunkGenerator> codecTarturusChunk =
+            RecordCodecBuilder.mapCodec((inst) ->
+                inst.group(BiomeSource.CODEC.fieldOf("biome_source").forGetter((i) -> i.biomeSource),
+                        NoiseGeneratorSettings.CODEC.fieldOf("settings").forGetter((j) -> j.settings)).apply(inst, inst.stable(TartarusChunkGenerator::new)));
 
-    private TartarusChunkGenerator(Registry<Biome> biome) {
-        super(new SingleBiomeProvider(biome.getOrThrow(Biomes.PLAINS)), new DimensionStructuresSettings(false));
-        this.biome = biome;
+    public TartarusChunkGenerator(BiomeSource biomeSource, Holder<NoiseGeneratorSettings> settings) {
+        super(biomeSource);
+        this.settings = settings;
+
     }
-
-    public Registry<Biome> getBiome() { return this.biome; }
-
-    private final Registry<Biome> biome;
 
     public static final int WORK_CHUNK_X = 0;
     public static final int WORK_CHUNK_Z = 0;
@@ -89,71 +96,84 @@ public class TartarusChunkGenerator extends ChunkGenerator {
         innerBlocks = null;
     }
 
-    private void buildCell(IChunk iChunk, List<BlockPos> posList, int y, BlockState blockState) {
+    private void buildCell(ChunkAccess iChunk, List<BlockPos> posList, int y, BlockState blockState) {
         for (BlockPos pos : posList)
             iChunk.setBlockState(new BlockPos(pos.getX(), pos.getY() + y, pos.getZ()), blockState, false);
     }
 
-    @OnlyIn(Dist.CLIENT)
     @Override
-    public ChunkGenerator func_230349_a_(long p_230349_1_) {
-        return this;
+    protected MapCodec<? extends ChunkGenerator> codec() {
+        return codecTarturusChunk;
     }
 
     @Override
-    public void generateSurface(WorldGenRegion worldGenRegion, IChunk iChunk) {
+    public void applyCarvers(WorldGenRegion worldGenRegion, long l, RandomState randomState, BiomeManager biomeManager, StructureManager structureManager, ChunkAccess chunkAccess, GenerationStep.Carving carving) {
+    }
 
-        /**
-         * This is all based off chunk coordinates - therefore 0->16
-         */
-        BlockState blockState = Blocks.AIR.getDefaultState();
-        BlockPos.Mutable pos = new BlockPos.Mutable();
+    @Override
+    public void buildSurface(WorldGenRegion worldGenRegion, StructureManager structureManager, RandomState randomState, ChunkAccess chunkAccess) {
+        BlockState blockState = Blocks.AIR.defaultBlockState();
+        BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
         for (int x1 = 0; x1 < 16; x1++) {
             for (int z1 = 0; z1 < 16; z1++) {
                 for (int y1 = 0; y1 < 256; y1++) {
-                    iChunk.setBlockState(pos.setPos(x1, y1, z1), blockState, false);
+                    chunkAccess.setBlockState(pos.set(x1, y1, z1), blockState, false);
                 }
             }
         }
 
-        if (iChunk.getPos().x == WORK_CHUNK_X && iChunk.getPos().z == WORK_CHUNK_Z) {
+        if (chunkAccess.getPos().x == WORK_CHUNK_X && chunkAccess.getPos().z == WORK_CHUNK_Z) {
             Woot.setup.getLogger().debug("generateSurface: work chunk creating cells");
-            BlockState wallState = Blocks.GLASS.getDefaultState();
+            BlockState wallState = Blocks.GLASS.defaultBlockState();
             calcCellStructures();
 
             for (int y = 0; y < 256; y += 8) {
-                buildCell(iChunk, cell0Blocks, y, wallState);
-                buildCell(iChunk, cell1Blocks, y, wallState);
-                buildCell(iChunk, cell2Blocks, y, wallState);
-                buildCell(iChunk, cell3Blocks, y, wallState);
+                buildCell(chunkAccess, cell0Blocks, y, wallState);
+                buildCell(chunkAccess, cell1Blocks, y, wallState);
+                buildCell(chunkAccess, cell2Blocks, y, wallState);
+                buildCell(chunkAccess, cell3Blocks, y, wallState);
             }
         }
     }
 
     @Override
-    public void func_230350_a_(long p_230350_1_, BiomeManager p_230350_3_, IChunk p_230350_4_, GenerationStage.Carving p_230350_5_) {
+    public void spawnOriginalMobs(WorldGenRegion worldGenRegion) {
+
     }
 
     @Override
-    public void func_230351_a_(WorldGenRegion p_230351_1_, StructureManager p_230351_2_) {
-    }
-
-    @Override
-    protected Codec<? extends ChunkGenerator> func_230347_a_() {
-        return codecTartarusChunk;
-    }
-
-    @Override
-    public void func_230352_b_(IWorld p_230352_1_, StructureManager p_230352_2_, IChunk p_230352_3_) {
-    }
-
-    @Override
-    public int getHeight(int i, int i1, Heightmap.Type type) {
+    public int getGenDepth() {
         return 0;
     }
 
     @Override
-    public IBlockReader func_230348_a_(int p_230348_1_, int p_230348_2_) {
-        return new Blockreader((new BlockState[0]));
+    public CompletableFuture<ChunkAccess> fillFromNoise(Blender blender, RandomState randomState, StructureManager structureManager, ChunkAccess chunkAccess) {
+        return null;
     }
+
+    @Override
+    public int getSeaLevel() {
+        return 0;
+    }
+
+    @Override
+    public int getMinY() {
+        return 0;
+    }
+
+    @Override
+    public int getBaseHeight(int i, int i1, Heightmap.Types types, LevelHeightAccessor levelHeightAccessor, RandomState randomState) {
+        return 0;
+    }
+
+    @Override
+    public @NotNull NoiseColumn getBaseColumn(int i, int i1, LevelHeightAccessor levelHeightAccessor, RandomState randomState) {
+        return null;
+    }
+
+    @Override
+    public void addDebugScreenInfo(List<String> list, RandomState randomState, BlockPos blockPos) {
+
+    }
+
 }

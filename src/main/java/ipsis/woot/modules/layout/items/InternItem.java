@@ -1,41 +1,36 @@
 package ipsis.woot.modules.layout.items;
 
-import ipsis.woot.Woot;
 import ipsis.woot.modules.factory.FactoryComponent;
 import ipsis.woot.modules.factory.Tier;
 import ipsis.woot.modules.factory.blocks.HeartBlock;
-import ipsis.woot.modules.factory.blocks.HeartTileEntity;
 import ipsis.woot.modules.factory.layout.FactoryHelper;
 import ipsis.woot.modules.factory.layout.PatternRepository;
-import ipsis.woot.setup.ModSetup;
-import ipsis.woot.util.helper.PlayerHelper;
 import ipsis.woot.util.helper.StringHelper;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.*;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceContext;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.phys.HitResult;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import org.jetbrains.annotations.NotNull;
+
 
 import javax.annotation.Nullable;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * This is the main tool for the mod.
@@ -44,7 +39,7 @@ import java.util.Locale;
 public class InternItem extends Item {
 
     public InternItem() {
-        super(new Item.Properties().maxStackSize(1).group(Woot.setup.getCreativeTab()));
+        super(new Item.Properties().stacksTo(1));
     }
 
     public enum ToolMode {
@@ -79,33 +74,34 @@ public class InternItem extends Item {
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity playerEntity, Hand hand) {
-
-        ItemStack itemStack = playerEntity.getHeldItem(hand);
-        playerEntity.setActiveHand(hand);
-        if (!world.isRemote) {
-            if (playerEntity.isSneaking()) {
-                RayTraceResult rayTraceResult = rayTrace(world, playerEntity, RayTraceContext.FluidMode.NONE);
-                if (rayTraceResult != null && rayTraceResult.getType() == RayTraceResult.Type.BLOCK)
-                    return super.onItemRightClick(world, playerEntity, hand);
+    public @NotNull InteractionResult useOn(UseOnContext context){
+        Player playerEntity = context.getPlayer();
+        Level world = context.getLevel();
+        ItemStack itemStack = context.getItemInHand();
+        playerEntity.startUsingItem(context.getHand());
+        if (!context.getLevel().isClientSide) {
+            if (playerEntity.isCrouching()) {
+                HitResult rayTraceResult = getPlayerPOVHitResult(world, playerEntity, ClipContext.Fluid.NONE);
+                if (rayTraceResult != null && rayTraceResult.getType() == HitResult.Type.BLOCK)
+                    return super.useOn(context);
 
                 ToolMode mode = getToolModeFromStack(itemStack);
                 mode = mode.getNext();
                 setToolModeInStack(itemStack, mode);
                 if (mode.isBuildMode()) {
-                    playerEntity.sendStatusMessage(
-                            new TranslationTextComponent(
+                    playerEntity.sendSystemMessage(
+                            Component.translatable(
                                     "info.woot.intern.mode.build",
-                                    StringHelper.translate(mode.getTier().getTranslationKey())), true);
+                                    StringHelper.translate(mode.getTier().getTranslationKey())));
                 } else if (mode.isValidateMode()) {
-                    playerEntity.sendStatusMessage(
-                            new TranslationTextComponent(
+                    playerEntity.sendSystemMessage(
+                            Component.translatable(
                                     "info.woot.intern.mode.validate",
-                                    StringHelper.translate(mode.getTier().getTranslationKey())), true);
+                                    StringHelper.translate(mode.getTier().getTranslationKey())));
                 }
             }
         }
-        return new ActionResult<>(ActionResultType.SUCCESS, itemStack);
+        return InteractionResult.SUCCESS;
     }
 
     /**
@@ -113,7 +109,7 @@ public class InternItem extends Item {
      */
     private static final String NBT_MODE = "mode";
     private static void setToolModeInStack(ItemStack itemStack, ToolMode toolMode) {
-        CompoundNBT compound = itemStack.getTag();
+        CompoundTag compound = itemStack.save();
         if (compound == null)
             compound = new CompoundNBT();
 
@@ -137,16 +133,16 @@ public class InternItem extends Item {
     }
 
     @Override
-    public ActionResultType onItemUseFirst(ItemStack stack, ItemUseContext context) {
+    public ActionResultType onItemUseFirst(ItemStack stack, UseOnContext context) {
 
         ActionResultType result = ActionResultType.PASS;
         ItemStack itemStack = context.getItem();
 
-        if (!context.getPlayer().isSneaking() && !context.getWorld().isRemote) {
+        if (!context.getPlayer().isCrouching() && !context.getLevel().isClientSide) {
             Block b = context.getWorld().getBlockState(context.getPos()).getBlock();
             if (b instanceof HeartBlock) {
-                BlockState blockState = context.getWorld().getBlockState(context.getPos());
-                Direction facing = blockState.get(BlockStateProperties.HORIZONTAL_FACING);
+                BlockState blockState = context.getLevel().getBlockState(context.getClickedPos());
+                Direction facing = blockState.getValue(BlockStateProperties.HORIZONTAL_FACING);
                 ToolMode toolMode = getToolModeFromStack(itemStack);
                 if (toolMode.isBuildMode() && context.getPlayer().isAllowEdit()) {
                     FactoryHelper.BuildResult buildResult = (FactoryHelper.tryBuild(context.getWorld(), context.getPos(), context.getPlayer(), facing, toolMode.getTier()));
@@ -174,8 +170,8 @@ public class InternItem extends Item {
                     }
                     result = ActionResultType.SUCCESS;
                 } else if (toolMode.isValidateMode()) {
-                    if (!context.getWorld().isRemote)
-                        FactoryHelper.tryValidate(context.getWorld(), context.getPos(), context.getPlayer(), facing, toolMode.getTier());
+                    if (!context.getLevel().isClientSide)
+                        FactoryHelper.tryValidate(context.getLevel(), context.getClickedPos(), context.getPlayer(), facing, toolMode.getTier());
                     result = ActionResultType.SUCCESS;
                 }
             }
@@ -186,7 +182,7 @@ public class InternItem extends Item {
     }
 
     @OnlyIn(Dist.CLIENT)
-    void spawnParticle(World world, BlockPos pos, int amount) {
+    void spawnParticle(Level world, BlockPos pos, int amount) {
         BlockState blockState = world.getBlockState(pos);
         Block b = world.getBlockState(pos).getBlock();
 
@@ -206,15 +202,15 @@ public class InternItem extends Item {
     }
 
     @OnlyIn(Dist.CLIENT)
-    public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-        tooltip.add(new StringTextComponent(StringHelper.translate("info.woot.intern")));
-        tooltip.add(new StringTextComponent(StringHelper.translate("info.woot.intern.0")));
-        tooltip.add(new StringTextComponent(StringHelper.translate("info.woot.intern.1")));
+    public void addInformation(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
+        tooltip.add(Component.translatable(StringHelper.translate("info.woot.intern")));
+        tooltip.add(Component.translatable(StringHelper.translate("info.woot.intern.0")));
+        tooltip.add(Component.translatable(StringHelper.translate("info.woot.intern.1")));
 
         ToolMode toolMode = getToolModeFromStack(stack);
 
         if (toolMode.isBuildMode()) {
-            tooltip.add(new StringTextComponent(StringHelper.translateFormat(
+            tooltip.add(Component.translatable(StringHelper.translateFormat(
                             "info.woot.intern.mode.build",
                             StringHelper.translate(toolMode.getTier().getTranslationKey()))));
             PatternRepository.Pattern pattern = PatternRepository.get().getPattern(toolMode.getTier());
@@ -223,21 +219,21 @@ public class InternItem extends Item {
                     int count = pattern.getFactoryBlockCount((component));
                     if (count > 0) {
                         String key = "info.woot.intern.other.count";
-                        TranslationTextComponent text = new TranslationTextComponent(component.getTranslationKey());
+                        Component text = Component.translatable(component.getTranslationKey());
                         if (component == FactoryComponent.CELL) {
-                            text = new TranslationTextComponent("info.woot.intern.cell");
+                            text = Component.translatable("info.woot.intern.cell");
                         } else if (toolMode == ToolMode.BUILD_1 && component == FactoryComponent.CONTROLLER) {
                             key = "info.woot.intern.controller.count.0";
                         } else if (component == FactoryComponent.CONTROLLER) {
                             key = "info.woot.intern.controller.count.1";
                         }
 
-                        tooltip.add(new TranslationTextComponent(key, count, text));
+                        tooltip.add(Component.translatable(key, count, text));
                     }
                 }
             }
         } else if (toolMode.isValidateMode()) {
-            tooltip.add(new StringTextComponent(StringHelper.translateFormat(
+            tooltip.add(Component.translatable(StringHelper.translateFormat(
                     "info.woot.intern.mode.validate",
                     StringHelper.translate(toolMode.getTier().getTranslationKey()))));
         }

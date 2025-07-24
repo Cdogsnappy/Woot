@@ -2,7 +2,7 @@ package ipsis.woot.compat.bloodmagic;
 
 import ipsis.woot.Woot;
 import ipsis.woot.modules.factory.FormedSetup;
-import ipsis.woot.modules.factory.blocks.HeartTileEntity;
+import ipsis.woot.modules.factory.blocks.HeartBlockEntity;
 import ipsis.woot.modules.factory.perks.Perk;
 import ipsis.woot.util.FakeMob;
 import net.minecraft.tileentity.TileEntity;
@@ -82,10 +82,10 @@ public class RitualInfernalMachine extends Ritual {
             BlockPos heartPos = ritualPos.add(heartOffsetPos);
             TileEntity heartTile = world.getTileEntity(heartPos);
             AreaDescriptor heartRange = iMasterRitualStone.getBlockRange(HEART_RANGE);
-            if (!heartRange.isWithinArea(heartOffsetPos) || !(heartTile instanceof HeartTileEntity)) {
+            if (!heartRange.isWithinArea(heartOffsetPos) || !(heartTile instanceof HeartBlockEntity)) {
                 for (BlockPos pos : heartRange.getContainedPositions(ritualPos)) {
                     TileEntity tile = world.getTileEntity(pos);
-                    if (tile instanceof HeartTileEntity && ((HeartTileEntity) tile).isFormed()) {
+                    if (tile instanceof HeartBlockEntity && ((HeartBlockEntity) tile).isFormed()) {
                         //Woot.setup.getLogger().debug("Found formed factory");
                         heartTile = tile;
                         heartOffsetPos = pos.subtract(ritualPos);
@@ -95,9 +95,9 @@ public class RitualInfernalMachine extends Ritual {
                 }
             }
 
-            if (heartTile instanceof HeartTileEntity) {
+            if (heartTile instanceof HeartBlockEntity) {
 
-                HeartTileEntity heart = (HeartTileEntity)heartTile;
+                HeartBlockEntity heart = (HeartBlockEntity)heartTile;
                 TileAltar altar = (TileAltar)altarTile;
                 FormedSetup formedSetup = heart.getFormedSetup();
                 if (formedSetup != null && heart.couldFinish() && heart.hasFlayedPerk()) {

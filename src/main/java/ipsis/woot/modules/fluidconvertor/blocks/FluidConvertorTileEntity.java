@@ -12,44 +12,35 @@ import ipsis.woot.util.WootDebug;
 import ipsis.woot.util.WootEnergyStorage;
 import ipsis.woot.util.WootFluidTank;
 import ipsis.woot.util.WootMachineTileEntity;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.INamedContainerProvider;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.Constants;
-import net.minecraftforge.common.util.INBTSerializable;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.energy.CapabilityEnergy;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.fluids.capability.templates.FluidTank;
-import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.ItemStackHandler;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.neoforged.neoforge.common.util.INBTSerializable;
+import net.neoforged.neoforge.energy.EnergyStorage;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.items.ItemStackHandler;
+
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import static ipsis.woot.crafting.FluidConvertorRecipe.FLUID_CONV_TYPE;
 
-public class FluidConvertorTileEntity extends WootMachineTileEntity implements WootDebug, INamedContainerProvider {
+public class FluidConvertorTileEntity extends WootMachineTileEntity implements WootDebug, MenuProvider {
 
     public FluidConvertorTileEntity() {
         super(FluidConvertorSetup.FLUID_CONVERTOR_BLOCK_TILE.get());
@@ -158,8 +149,8 @@ public class FluidConvertorTileEntity extends WootMachineTileEntity implements W
 
     //-------------------------------------------------------------------------
     //region Tanks
-    private LazyOptional<FluidTank> inputTank = LazyOptional.of(this::createInputTank);
-    private LazyOptional<WootFluidTank> outputTank = LazyOptional.of(this::createOutputTank);
+    private Optional<FluidTank> inputTank = Optional.of(this::createInputTank);
+    private Optional<WootFluidTank> outputTank = Optional.of(this::createOutputTank);
     private FluidTank createInputTank() {
         return new FluidTank(FluidConvertorConfiguration.FLUID_CONV_INPUT_TANK_CAPACITY.get());
     }
@@ -173,9 +164,9 @@ public class FluidConvertorTileEntity extends WootMachineTileEntity implements W
 
     //-------------------------------------------------------------------------
     //region Energy
-    private LazyOptional<WootEnergyStorage> energyStorage = LazyOptional.of(this::createEnergy);
-    private WootEnergyStorage createEnergy() {
-        return new WootEnergyStorage(FluidConvertorConfiguration.FLUID_CONV_MAX_ENERGY.get(), FluidConvertorConfiguration.FLUID_CONV_MAX_ENERGY_RX.get());
+    private Optional<EnergyStorage> energyStorage = Optional.of(this::createEnergy);
+    private EnergyStorage createEnergy() {
+        return new EnergyStorage(FluidConvertorConfiguration.FLUID_CONV_MAX_ENERGY.get(), FluidConvertorConfiguration.FLUID_CONV_MAX_ENERGY_RX.get());
     }
 
     public int getEnergy() {
@@ -194,50 +185,50 @@ public class FluidConvertorTileEntity extends WootMachineTileEntity implements W
     //-------------------------------------------------------------------------
     //region NBT
     @Override
-    public void deserializeNBT(CompoundNBT compoundNBT) {
+    public void deserializeNBT(CompoundTag compoundNBT) {
         readFromNBT(compoundNBT);
         super.deserializeNBT(compoundNBT);
     }
 
     @Override
-    public void read(BlockState blockState, CompoundNBT compoundNBT) {
+    public void read(BlockState blockState, CompoundTag compoundNBT) {
         readFromNBT(compoundNBT);
         super.read(blockState, compoundNBT);
     }
 
-    private void readFromNBT(CompoundNBT compoundNBT) {
+    private void readFromNBT(CompoundTag compoundNBT) {
         if (compoundNBT.contains(ModNBT.INPUT_INVENTORY_TAG, Constants.NBT.TAG_LIST))
             CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.readNBT(
                     inventory, null, compoundNBT.getList(ModNBT.INPUT_INVENTORY_TAG, Constants.NBT.TAG_COMPOUND));
 
-        CompoundNBT inputTankTag = compoundNBT.getCompound(ModNBT.INPUT_TANK_TAG);
+        CompoundTag inputTankTag = compoundNBT.getCompound(ModNBT.INPUT_TANK_TAG);
         inputTank.ifPresent(h -> h.readFromNBT(inputTankTag));
 
-        CompoundNBT outputTankTag = compoundNBT.getCompound(ModNBT.OUTPUT_TANK_TAG);
+        CompoundTag outputTankTag = compoundNBT.getCompound(ModNBT.OUTPUT_TANK_TAG);
         outputTank.ifPresent(h -> h.readFromNBT(outputTankTag));
 
-        CompoundNBT energyTag = compoundNBT.getCompound(ModNBT.ENERGY_TAG);
-        energyStorage.ifPresent(h -> ((INBTSerializable<CompoundNBT>)h).deserializeNBT(energyTag));
+        CompoundTag energyTag = compoundNBT.getCompound(ModNBT.ENERGY_TAG);
+        energyStorage.ifPresent(h -> ((INBTSerializable<Tag>)h).deserializeNBT(energyTag));
     }
 
     @Override
-    public CompoundNBT write(CompoundNBT compoundNBT) {
+    public CompoundTag write(CompoundTag compoundNBT) {
 
         compoundNBT.put(ModNBT.INPUT_INVENTORY_TAG,
                 Objects.requireNonNull(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.writeNBT(inventory, null)));
 
         inputTank.ifPresent(h -> {
-            CompoundNBT tankTag = h.writeToNBT(new CompoundNBT());
+            CompoundTag tankTag = h.writeToNBT(new CompoundTag());
             compoundNBT.put(ModNBT.INPUT_TANK_TAG, tankTag);
         });
 
         outputTank.ifPresent(h -> {
-            CompoundNBT tankTag = h.writeToNBT(new CompoundNBT());
+            CompoundTag tankTag = h.writeToNBT(new CompoundTag());
             compoundNBT.put(ModNBT.OUTPUT_TANK_TAG, tankTag);
         });
 
         energyStorage.ifPresent(h -> {
-            CompoundNBT energyTag = ((INBTSerializable<CompoundNBT>)h).serializeNBT();
+            CompoundTag energyTag = ((INBTSerializable<CompoundTag>)h).serializeNBT();
             compoundNBT.put(ModNBT.ENERGY_TAG, energyTag);
         });
 
@@ -420,7 +411,7 @@ public class FluidConvertorTileEntity extends WootMachineTileEntity implements W
 
     @Nonnull
     @Override
-    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
+    public <T> Optional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
         if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
             return inventoryGetter.cast();
         } else if (cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
@@ -439,7 +430,7 @@ public class FluidConvertorTileEntity extends WootMachineTileEntity implements W
         return super.getCapability(cap, side);
     }
 
-    public void dropContents(World world, BlockPos pos) {
+    public void dropContents(Level world, BlockPos pos) {
 
         List<ItemStack> drops = new ArrayList<>();
         ItemStack itemStack = inventory.getStackInSlot(INPUT_SLOT);
@@ -448,5 +439,10 @@ public class FluidConvertorTileEntity extends WootMachineTileEntity implements W
             inventory.insertItem(INPUT_SLOT, ItemStack.EMPTY, false);
         }
         super.dropContents(drops);
+    }
+
+    @Override
+    public @org.jetbrains.annotations.Nullable AbstractContainerMenu createMenu(int i, Inventory inventory, Player player) {
+        return null;
     }
 }

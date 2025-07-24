@@ -1,9 +1,10 @@
 package ipsis.woot.util.oss;
 
 import com.mojang.authlib.GameProfile;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.world.server.ServerWorld;
-import net.minecraftforge.common.util.FakePlayer;
+import net.minecraft.client.renderer.EffectInstance;
+import net.minecraft.server.level.ServerLevel;
+import net.neoforged.neoforge.common.util.FakePlayer;
+
 
 /**
  * Darkhax Dark-Utilities
@@ -14,7 +15,7 @@ import net.minecraftforge.common.util.FakePlayer;
 
 public class WootFakePlayer extends FakePlayer {
 
-    public WootFakePlayer(ServerWorld world, GameProfile gameProfile) {
+    public WootFakePlayer(ServerLevel world, GameProfile gameProfile) {
         super(world, gameProfile);
     }
 

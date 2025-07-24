@@ -2,9 +2,9 @@ package ipsis.woot.modules.factory.multiblock;
 
 import com.google.common.collect.Lists;
 import ipsis.woot.Woot;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -39,14 +39,14 @@ public class MultiBlockTracker {
     static { INSTANCE = new MultiBlockTracker(); }
 
     private List<MultiBlock> syncBlocks = new ArrayList<>();
-    public void addEntry(World world, BlockPos pos) {
+    public void addEntry(Level world, BlockPos pos) {
         //LOGGER.info("Adding entry {} at {} to block tracker", world.getDimensionKey(), pos);
         syncBlocks.add(new MultiBlock(pos, world));
     }
 
-    public void run(World world) {
+    public void run(Level world) {
         //LOGGER.info("MultiBlockTracker run world={} blocks={}", world.getDimensionKey(), syncBlocks.size());
-        if (world.isRemote)
+        if (world.isClientSide)
             return;
 
         List<MultiBlock> helloBlocks = Lists.newArrayList();
@@ -65,11 +65,11 @@ public class MultiBlockTracker {
 
         //Woot.setup.getLogger().info("run: {} blocks {}", world.getDimensionKey(), helloBlocks.size());
         for (MultiBlock m : helloBlocks) {
-            if (world.isBlockLoaded(m.pos)) {
+            if (world.isLoaded(m.pos)) {
                 //Woot.setup.getLogger().info("run {}: loaded", world.getDimensionKey());
-                TileEntity te = world.getTileEntity(m.pos);
+                BlockEntity te = world.getBlockEntity(m.pos);
                 if (te instanceof MultiBlockGlueProvider)
-                    ((MultiBlockGlueProvider) te).getGlue().onHello(world, te.getPos());
+                    ((MultiBlockGlueProvider) te).getGlue().onHello(world, te.getBlockPos());
             } else {
                 //Woot.setup.getLogger().info("run {}: not loaded", world.getDimensionKey());
             }
@@ -78,9 +78,9 @@ public class MultiBlockTracker {
 
     private static class MultiBlock {
         BlockPos pos;
-        World world;
+        Level world;
 
-        public MultiBlock(BlockPos pos, World world) {
+        public MultiBlock(BlockPos pos, Level world) {
             this.world = world;
             this.pos = new BlockPos(pos);
         }

@@ -1,7 +1,7 @@
 package ipsis.woot.modules.debug.blocks;
 
 import ipsis.woot.modules.debug.DebugSetup;
-import ipsis.woot.modules.factory.blocks.CellTileEntityBase;
+import ipsis.woot.modules.factory.blocks.CellBlockEntityBase;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
@@ -21,10 +21,10 @@ public class TickConverterTileEntity extends TileEntity implements ITickableTile
     public void tick() {
         for (Direction facing : Direction.values()) {
             TileEntity te = world.getTileEntity(getPos().offset(facing));
-            if (!(te instanceof CellTileEntityBase))
+            if (!(te instanceof CellBlockEntityBase))
                 continue;
 
-            ((CellTileEntityBase) te).fillToCapacity();
+            ((CellBlockEntityBase) te).fillToCapacity();
         }
     }
 }

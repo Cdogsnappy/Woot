@@ -1,21 +1,22 @@
 package ipsis.woot.crafting.anvil;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import ipsis.woot.Woot;
 import ipsis.woot.modules.factory.FactorySetup;
 import ipsis.woot.modules.factory.items.MobShardItem;
 import mezz.jei.api.constants.VanillaTypes;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
-import net.minecraft.data.IFinishedRecipe;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
 
@@ -26,145 +27,68 @@ import java.util.List;
 
 import static ipsis.woot.crafting.anvil.AnvilRecipeBuilder.SERIALIZER;
 
-public class AnvilRecipe implements Recipe<AnvilRecipeInput> {
-
-    private final NonNullList<Ingredient> ingredients;
-    private final Ingredient baseIngredient;
-    private final Item result;
-    private final int count;
-    private final ResourceLocation id;
-    private final RecipeType<?> type;
-
-    public AnvilRecipe(ResourceLocation id, Ingredient baseIngredient, ItemLike result, int count, NonNullList<Ingredient> ingredients) {
-        this.id = id;
-        this.baseIngredient = baseIngredient;
-        this.result = result.asItem();
-        this.count = count;
-        this.ingredients = ingredients;
-        this.type = ANVIL_TYPE;
+public record AnvilRecipe(Ingredient baseItem, ItemStack output) implements Recipe<AnvilRecipeInput> {
 
 
-        if (baseIngredient.getMatchingStacks().length == 1 && baseIngredient.getMatchingStacks()[0].getItem() == FactorySetup.MOB_SHARD_ITEM.get()) {
-            ItemStack itemStack = new ItemStack(FactorySetup.MOB_SHARD_ITEM.get());
-            MobShardItem.setJEIEnderShard(itemStack);
-            inputs.add(Arrays.asList(itemStack));
-        } else {
-            inputs.add(Arrays.asList(baseIngredient.getMatchingStacks()));
+    public NonNullList<Ingredient> getIngredients(){
+        NonNullList<Ingredient> list = NonNullList.create();
+        list.add(baseItem);
+        return list;
+    }
+
+    @Override
+    public boolean matches(AnvilRecipeInput anvilRecipeInput, Level level) {
+        if(level.isClientSide){
+            return false;
         }
 
-        for (Ingredient i : ingredients)
-            inputs.add(Arrays.asList(i.getMatchingStacks()));
-    }
-
-    public Ingredient getBaseIngredient() { return this.baseIngredient; }
-
-    @Override
-    public boolean matches(CraftingContainer craftingContainer, Level level) {
-        return false;
+        return baseItem.test(anvilRecipeInput.getItem(0));
     }
 
     @Override
-    public ItemStack assemble(CraftingContainer craftingContainer, HolderLookup.Provider provider) {
-        return null;
+    public ItemStack assemble(AnvilRecipeInput anvilRecipeInput, HolderLookup.Provider provider) {
+        return output.copy();
     }
 
     @Override
     public boolean canCraftInDimensions(int i, int i1) {
-        return false;
-    }
-
-    @Override
-    public ItemStack getResultItem(HolderLookup.Provider provider) {
-        return null;
-    }
-
-    public NonNullList<Ingredient> getIngredients() { return this.ingredients; }
-    public ItemStack getOutput() { return new ItemStack(result, count); }
-
-    public static final RecipeType<AnvilRecipe> ANVIL_TYPE = RecipeType.register(Woot.MODID + ":anvil");
-
-    /**
-     * Valid inputs
-     */
-    private static List<ItemStack> validInputs = new ArrayList<>();
-    public static void clearValidInputs() { validInputs.clear(); }
-    public static void addValidInput(ItemStack itemStack) { validInputs.add(itemStack); }
-    public static boolean isValidInput(ItemStack itemStack) {
-        for (ItemStack i : validInputs) {
-            if (i.is(itemStack.getItem()))
-                return true;
-        }
-        return false;
-    }
-
-    /**
-     * Jei
-     */
-    private List<List<ItemStack>> inputs = new ArrayList<>();
-    public List<List<ItemStack>> getInputs() { return inputs; }
-
-    /**
-     * IRecipe
-     * Matches base item and all ingredients
-     */
-    @Override
-    public boolean matches(Inventory inv, Level worldIn) {
-        if (!baseIngredient.test(inv.getItem(0)))
-            return false;
-
-        int count = 0;
-        for (int i = 1; i < 4; i++) {
-            if (!inv.getItem(i).isEmpty())
-                count++;
-        }
-
-        if (ingredients.size() != count)
-            return false;
-
-        List<Integer> matchedSlots = new ArrayList<>();
-        for (Ingredient ingredient : ingredients) {
-            for (int i = 1; i < 4; i++) {
-                if (!matchedSlots.contains(i) && ingredient.test(inv.getItem(i))) {
-                    // found ingredient in one of the slots
-                    matchedSlots.add(i);
-                    break;
-                }
-            }
-        }
-
-        if (matchedSlots.size() == ingredients.size())
-            return true;
-
-        return false;
-    }
-
-    @Override
-    public ItemStack getCraftingResult(Inventory inv) {
-        return null;
-    }
-
-    @Override
-    public boolean canFit(int width, int height) {
         return true;
     }
 
     @Override
-    public ItemStack getRecipeOutput() {
-        return ItemStack.EMPTY;
-    }
-
-    @Override
-    public ResourceLocation getId() {
-        return id;
+    public ItemStack getResultItem(HolderLookup.Provider provider) {
+        return output;
     }
 
     @Override
     public RecipeSerializer<?> getSerializer() {
-        return SERIALIZER;
+        return null;
     }
 
     @Override
     public RecipeType<?> getType() {
-        return type;
+        return null;
+    }
+
+    public static class Serializer implements RecipeSerializer<AnvilRecipe> {
+        public static final MapCodec<AnvilRecipe> CODEC = RecordCodecBuilder.mapCodec(inst -> inst.group(
+                Ingredient.CODEC_NONEMPTY.fieldOf("ingredient").forGetter(AnvilRecipe::baseItem),
+                ItemStack.CODEC.fieldOf("result").forGetter(AnvilRecipe::output)
+        ).apply(inst, AnvilRecipe::new));
+
+        public static final StreamCodec<RegistryFriendlyByteBuf, AnvilRecipe> STREAM_CODEC =
+                StreamCodec.composite(
+                        Ingredient.CONTENTS_STREAM_CODEC, AnvilRecipe::baseItem,
+                        ItemStack.STREAM_CODEC, AnvilRecipe::output,
+                        AnvilRecipe::new);
+        @Override
+        public MapCodec<AnvilRecipe> codec() {
+            return CODEC;
+        }
+
+        @Override
+        public StreamCodec<RegistryFriendlyByteBuf, AnvilRecipe> streamCodec() {
+            return STREAM_CODEC;
+        }
     }
 }

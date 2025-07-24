@@ -2,24 +2,27 @@ package ipsis.woot.simulator;
 
 import ipsis.woot.Woot;
 import ipsis.woot.simulator.tartarus.TartarusChunkGenerator;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.world.Dimension;
-import net.minecraft.world.DimensionType;
-import net.minecraft.world.World;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.dimension.DimensionType;
+import net.minecraft.world.level.dimension.LevelStem;
+import net.neoforged.bus.api.IEventBus;
+
 
 public class MobSimulatorSetup {
 
-    public static final RegistryKey<DimensionType> TARTARUS_DIMENSION_TYPE = RegistryKey.getOrCreateKey(
-            Registry.DIMENSION_TYPE_KEY, new ResourceLocation(Woot.MODID + ":mobsimulator"));
-    public static final RegistryKey<World> TARTARUS = RegistryKey.getOrCreateKey(
-            Registry.WORLD_KEY, new ResourceLocation(Woot.MODID + ":tartarus"));
+    public static final ResourceKey<DimensionType> TARTARUS_DIMENSION_TYPE = ResourceKey.create(
+            Registries.DIMENSION_TYPE,  ResourceLocation.fromNamespaceAndPath(Woot.MODID, "mobsimulator"));
+    public static final ResourceKey<LevelStem> TARTARUS = ResourceKey.create(
+            Registries.LEVEL_STEM, ResourceLocation.fromNamespaceAndPath(Woot.MODID, "tartarus"));
 
-    public static void init() {
-        Registry.register(
-                Registry.CHUNK_GENERATOR_CODEC,
+    public static void register(IEventBus bus) {
+        Registries.CHUNK_GENERATOR.registry()
+                Registries.,
                 Woot.MODID + ":simulation_cells",
-                TartarusChunkGenerator.codecTartarusChunk);
+                TartarusChunkGenerator.codecTarturusChunk);
     }
 }

@@ -1,10 +1,11 @@
 package ipsis.woot.util;
 
-import net.minecraft.item.ItemUseContext;
+
+import net.minecraft.world.item.context.UseOnContext;
 
 import java.util.List;
 
 public interface WootDebug {
 
-    List<String> getDebugText(List<String> debug, ItemUseContext itemUseContext);
+    List<String> getDebugText(List<String> debug, UseOnContext itemUseContext);
 }

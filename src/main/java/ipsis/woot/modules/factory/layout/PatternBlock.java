@@ -1,8 +1,8 @@
 package ipsis.woot.modules.factory.layout;
 
 import ipsis.woot.modules.factory.FactoryComponent;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+
 
 public class PatternBlock {
 

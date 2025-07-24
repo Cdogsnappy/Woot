@@ -2,7 +2,6 @@ package ipsis.woot.policy;
 
 import ipsis.woot.config.ConfigPath;
 import ipsis.woot.config.PolicyDefaults;
-import net.minecraftforge.common.ForgeConfigSpec;
 
 import java.util.List;
 

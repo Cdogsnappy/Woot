@@ -7,10 +7,9 @@ import ipsis.woot.simulator.library.LootLibrary;
 import ipsis.woot.simulator.tartarus.Cell;
 import ipsis.woot.util.FakeMob;
 import ipsis.woot.util.FakeMobKey;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -150,7 +149,7 @@ public class MobSimulator {
         return ItemStack.areItemsEqualIgnoreDurability(a, b);
     }
 
-    public void tick(World world) {
+    public void tick(Level world) {
         if (world == null)
             return;
 

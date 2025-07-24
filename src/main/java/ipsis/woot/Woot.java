@@ -22,7 +22,7 @@ public class Woot {
         ModLoadingContext.get().(ModConfig.Type.CLIENT, Config.CLIENT_CONFIG);
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.COMMON_CONFIG);
 
-        setup.registrySetup();
+        setup.registrySetup(NeoForge.EVENT_BUS);
 
         NeoForge.EVENT_BUS.register(new Registration());
 

@@ -1,35 +1,29 @@
 package ipsis.woot.modules.factory.blocks;
 
-import ipsis.woot.Woot;
 import ipsis.woot.modules.debug.DebugSetup;
-import ipsis.woot.modules.factory.FactorySetup;
 import ipsis.woot.modules.layout.LayoutSetup;
-import ipsis.woot.modules.tools.ToolsSetup;
 import ipsis.woot.modules.debug.items.DebugItem;
 import ipsis.woot.modules.factory.FactoryComponent;
 import ipsis.woot.modules.factory.FactoryComponentProvider;
 import ipsis.woot.util.WootDebug;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.container.INamedContainerProvider;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.state.StateContainer;
-import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorldReader;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.network.NetworkHooks;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.phys.BlockHitResult;
+
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -37,18 +31,18 @@ import java.util.List;
 public class HeartBlock extends Block implements FactoryComponentProvider, WootDebug {
 
     public HeartBlock() {
-        super(Properties.create(Material.IRON).sound(SoundType.METAL).hardnessAndResistance(3.5F));
-        setDefaultState(getStateContainer().getBaseState().with(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH));
+        super(Properties.of().sound(SoundType.METAL).strength(3.5F));
+        registerDefaultState(getStateDefinition().any().setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH));
     }
 
     @Nullable
     @Override
-    public BlockState getStateForPlacement(BlockItemUseContext context) {
-        return this.getDefaultState().with(BlockStateProperties.HORIZONTAL_FACING, context.getPlacementHorizontalFacing().getOpposite());
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        return this.defaultBlockState().setValue(BlockStateProperties.HORIZONTAL_FACING, context.getHorizontalDirection().getOpposite());
     }
 
     @Override
-    protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+    protected void fillStateContainer(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(BlockStateProperties.HORIZONTAL_FACING);
     }
 
@@ -57,36 +51,30 @@ public class HeartBlock extends Block implements FactoryComponentProvider, WootD
         return true;
     }
 
-    @Nullable
-    @Override
-    public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-        return new HeartTileEntity();
-    }
 
-    @Override
-    public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult blockRayTraceResult) {
+    public ItemInteractionResult useItemOn(ItemStack stack, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult blockHitResult) {
 
-        if (worldIn.isRemote || handIn == Hand.OFF_HAND)
-            return ActionResultType.SUCCESS;
+        if (worldIn.isClientSide || handIn == InteractionHand.OFF_HAND)
+            return ItemInteractionResult.SUCCESS;
 
-        if (player.isSneaking())
-            return ActionResultType.FAIL;
+        if (player.isCrouching())
+            return ItemInteractionResult.FAIL;
 
-        if (player.getHeldItemMainhand().getItem() == LayoutSetup.INTERN_ITEM.get() || player.getHeldItemMainhand().getItem() == DebugSetup.DEBUG_ITEM.get()) {
+        if (player.getItemInHand(handIn).getItem() == LayoutSetup.INTERN_ITEM.get() || player.getItemInHand(handIn).getItem() == DebugSetup.DEBUG_ITEM.get()) {
                 // intern is used on the heart, so cannot open the gui
-                return ActionResultType.FAIL; // Block was not activated
+                return ItemInteractionResult.FAIL; // Block was not activated
         }
 
-        TileEntity te = worldIn.getTileEntity(pos);
-        if (te instanceof HeartTileEntity && !((HeartTileEntity) te).isFormed())
-                return ActionResultType.FAIL;
+        BlockEntity te = worldIn.getBlockEntity(pos);
+        if (te instanceof HeartBlockEntity && !((HeartBlockEntity) te).isFormed())
+                return ItemInteractionResult.FAIL;
 
-        if (te instanceof INamedContainerProvider)
-            NetworkHooks.openGui((ServerPlayerEntity)player, (INamedContainerProvider)te, te.getPos());
+        if (te instanceof MenuProvider)
+            player.openMenu((MenuProvider)te, te.getBlockPos());
         else
             throw new IllegalStateException("Named container provider is missing");
 
-        return ActionResultType.CONSUME; // Block was activated
+        return ItemInteractionResult.CONSUME; // Block was activated
     }
 
     /**
@@ -101,7 +89,7 @@ public class HeartBlock extends Block implements FactoryComponentProvider, WootD
      * WootDebug
      */
     @Override
-    public List<String> getDebugText(List<String> debug, ItemUseContext itemUseContext) {
+    public List<String> getDebugText(List<String> debug, UseOnContext itemUseContext) {
         debug.add("====> HeartBlock");
         DebugItem.getTileEntityDebug(debug, itemUseContext);
         return debug;

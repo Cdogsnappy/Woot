@@ -1,12 +1,14 @@
 package ipsis.woot.simulator;
 
-import net.minecraft.util.WeightedRandom;
 
-public class DropStackData extends WeightedRandom.Item {
+import net.minecraft.world.entity.ai.behavior.ShufflingList;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+
+public class DropStackData extends ShufflingList.WeightedEntry<ItemStack> {
 
     public int stackSize;
-    public DropStackData(int stackSize, int weight) {
-        super(weight);
+    public DropStackData(ItemStack data, int weight) {
         this.stackSize = stackSize;
     }
 

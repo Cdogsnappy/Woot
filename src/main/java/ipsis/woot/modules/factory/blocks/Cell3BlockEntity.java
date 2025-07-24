@@ -3,9 +3,9 @@ package ipsis.woot.modules.factory.blocks;
 import ipsis.woot.modules.factory.FactoryConfiguration;
 import ipsis.woot.modules.factory.FactorySetup;
 
-public class Cell3TileEntity extends CellTileEntityBase {
+public class Cell3BlockEntity extends CellBlockEntityBase {
 
-    public Cell3TileEntity() {
+    public Cell3BlockEntity() {
         super(FactorySetup.CELL_3_BLOCK_TILE.get());
     }
 

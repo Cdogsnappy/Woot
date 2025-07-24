@@ -10,15 +10,13 @@ import ipsis.woot.modules.factory.perks.Perk;
 import ipsis.woot.simulator.spawning.SpawnController;
 import ipsis.woot.util.FakeMob;
 import ipsis.woot.util.helper.MathHelper;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.items.IItemHandler;
 
 import java.util.*;
 
@@ -32,7 +30,7 @@ public class FormedSetup {
     private List<FakeMob> controllerMobs = new ArrayList<>();
     private HashMap<Perk.Group, Integer> perks = new HashMap<>();
     private HashMap<FakeMob, MobParam> mobParams = new HashMap<>();
-    private World world;
+    private Level world;
     private BlockPos importPos = BlockPos.ZERO;
     private BlockPos exportPos = BlockPos.ZERO;
     private BlockPos cellPos = BlockPos.ZERO;
@@ -45,7 +43,7 @@ public class FormedSetup {
     private Boolean perkCapped = false;
 
     private FormedSetup() {}
-    private FormedSetup(World world, Tier tier) {
+    private FormedSetup(Level world, Tier tier) {
         this.world = world;
         this.tier = tier;
     }
@@ -53,12 +51,13 @@ public class FormedSetup {
     public List<FakeMob> getAllMobs() { return Collections.unmodifiableList(controllerMobs); }
     public Map<FakeMob, MobParam> getAllMobParams() { return Collections.unmodifiableMap(mobParams); }
     public Map<Perk.Group, Integer> getAllPerks() { return Collections.unmodifiableMap(perks); }
-    public LazyOptional<IFluidHandler> getCellFluidHandler() {
+    public Optional<IFluidHandler> getCellFluidHandler() {
         if (world != null) {
-            TileEntity te = world.getTileEntity(cellPos);
-            return te instanceof TileEntity ? te.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) : LazyOptional.empty();
+            BlockEntity te = world.getBlockEntity(cellPos);
+            return te != null ? Optional.ofNullable(world.getCapability(Capabilities.FluidHandler.BLOCK, te.getBlockPos(), null)) : Optional.empty();
+            //return te != null ? te.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) : Optional.empty();
         }
-        return LazyOptional.empty();
+        return Optional.empty();
     }
 
     public boolean isPerkCapped() { return this.perkCapped; }
@@ -77,13 +76,13 @@ public class FormedSetup {
 
     public BlockPos getImportPos() { return this.importPos; }
     public BlockPos getExportPos() { return this.exportPos; }
-    public World getWorld() { return this.world; }
+    public Level getWorld() { return this.world; }
 
     public Tier getTier() { return this.tier; }
     public int getCellCapacity() { return this.cellCapacity; }
     public int getCellType() { return this.cellType; }
     public int getCellFluidAmount() {
-        LazyOptional<IFluidHandler> hdlr = getCellFluidHandler();
+        Optional<IFluidHandler> hdlr = getCellFluidHandler();
         if (hdlr.isPresent()) {
             IFluidHandler iFluidHandler = hdlr.orElseThrow(NullPointerException::new);
             return iFluidHandler.getFluidInTank(0).getAmount();
@@ -92,58 +91,58 @@ public class FormedSetup {
     }
     public int getLootingLevel() { return MathHelper.clampLooting(perks.getOrDefault(Perk.Group.LOOTING, 0)); }
 
-    public List<LazyOptional<IItemHandler>> getImportHandlers() {
-        List<LazyOptional<IItemHandler>> handlers = new ArrayList<>();
+    public List<Optional<IItemHandler>> getImportHandlers() {
+        List<Optional<IItemHandler>> handlers = new ArrayList<>();
         for (Direction facing : Direction.values()) {
-            if (!world.isBlockLoaded(importPos.offset(facing)))
+            if (!world.isLoaded(importPos.offset(facing.getNormal())))
                 continue;
-            TileEntity te = world.getTileEntity(importPos.offset(facing));
-            if (!(te instanceof TileEntity))
+            BlockEntity te = world.getBlockEntity(importPos.offset(facing.getNormal()));
+            if (te == null)
                 continue;
 
-            handlers.add(te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing.getOpposite()));
+            handlers.add(Optional.ofNullable(world.getCapability(Capabilities.ItemHandler.BLOCK, te.getBlockPos(), facing.getOpposite())));
         }
         return handlers;
     }
 
-    public List<LazyOptional<IFluidHandler>> getImportFluidHandlers() {
-        List<LazyOptional<IFluidHandler>> handlers = new ArrayList<>();
+    public List<Optional<IFluidHandler>> getImportFluidHandlers() {
+        List<Optional<IFluidHandler>> handlers = new ArrayList<>();
         for (Direction facing : Direction.values()) {
-            if (!world.isBlockLoaded(importPos.offset(facing)))
+            if (!world.isLoaded(importPos.offset(facing.getNormal())))
                 continue;
-            TileEntity te = world.getTileEntity(importPos.offset(facing));
-            if (!(te instanceof TileEntity))
+            BlockEntity te = world.getBlockEntity(importPos.offset(facing.getNormal()));
+            if (te == null)
                 continue;
 
-            handlers.add(te.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, facing.getOpposite()));
+            handlers.add(Optional.ofNullable(world.getCapability(Capabilities.FluidHandler.BLOCK, te.getBlockPos(), facing.getOpposite())));
         }
         return handlers;
     }
 
-    public List<LazyOptional<IFluidHandler>> getExportFluidHandlers() {
-        List<LazyOptional<IFluidHandler>> handlers = new ArrayList<>();
+    public List<Optional<IFluidHandler>> getExportFluidHandlers() {
+        List<Optional<IFluidHandler>> handlers = new ArrayList<>();
         for (Direction facing : Direction.values()) {
-            if (!world.isBlockLoaded(exportPos.offset(facing)))
+            if (!world.isLoaded(exportPos.offset(facing.getNormal())))
                 continue;
-            TileEntity te = world.getTileEntity(exportPos.offset(facing));
-            if (!(te instanceof TileEntity))
+            BlockEntity te = world.getBlockEntity(exportPos.offset(facing.getNormal()));
+            if (te == null)
                 continue;
 
-            handlers.add(te.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, facing.getOpposite()));
+            handlers.add(Optional.ofNullable(world.getCapability(Capabilities.FluidHandler.BLOCK, te.getBlockPos(), facing.getOpposite())));
         }
         return handlers;
     }
 
-    public List<LazyOptional<IItemHandler>> getExportHandlers() {
-        List<LazyOptional<IItemHandler>> handlers = new ArrayList<>();
+    public List<Optional<IItemHandler>> getExportHandlers() {
+        List<Optional<IItemHandler>> handlers = new ArrayList<>();
         for (Direction facing : Direction.values()) {
-            if (!world.isBlockLoaded(exportPos.offset(facing)))
+            if (!world.isLoaded(importPos.offset(facing.getNormal())))
                 continue;
-            TileEntity te = world.getTileEntity(exportPos.offset(facing));
-            if (!(te instanceof TileEntity))
+            BlockEntity te = world.getBlockEntity(importPos.offset(facing.getNormal()));
+            if (te == null)
                 continue;
 
-            handlers.add(te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing.getOpposite()));
+            handlers.add(Optional.ofNullable(world.getCapability(Capabilities.ItemHandler.BLOCK, te.getBlockPos(), facing.getOpposite())));
         }
         return handlers;
     }
@@ -246,7 +245,7 @@ public class FormedSetup {
                 '}';
     }
 
-    public static FormedSetup createFromValidLayout(World world, Layout layout) {
+    public static FormedSetup createFromValidLayout(Level world, Layout layout) {
         FormedSetup formedSetup = new FormedSetup(world, layout.getAbsolutePattern().getTier());
 
         // Mobs are already validated
@@ -255,9 +254,9 @@ public class FormedSetup {
 
         for (PatternBlock pb : layout.getAbsolutePattern().getBlocks()) {
             if (pb.getFactoryComponent() == FactoryComponent.FACTORY_UPGRADE) {
-                TileEntity te = world.getTileEntity(pb.getBlockPos());
-                if (te instanceof UpgradeTileEntity) {
-                    Perk perk = ((UpgradeTileEntity) te).getUpgrade(world.getBlockState(pb.getBlockPos()));
+                BlockEntity te = world.getBlockEntity(pb.getBlockPos());
+                if (te instanceof UpgradeBlockEntity) {
+                    Perk perk = ((UpgradeBlockEntity) te).getUpgrade(world.getBlockState(pb.getBlockPos()));
                     if (perk != Perk.EMPTY) {
                         Perk.Group group = Perk.getGroup(perk);
                         int perkLevel = Perk.getLevel(perk);
@@ -319,15 +318,15 @@ public class FormedSetup {
             } else if (pb.getFactoryComponent() == FactoryComponent.CELL) {
                 formedSetup.cellPos = new BlockPos(pb.getBlockPos());
                 TileEntity te = world.getTileEntity(pb.getBlockPos());
-                if (te instanceof CellTileEntityBase) {
-                    formedSetup.cellCapacity = ((CellTileEntityBase) te).getCapacity();
-                    if (te instanceof Cell1TileEntity)
+                if (te instanceof CellBlockEntityBase) {
+                    formedSetup.cellCapacity = ((CellBlockEntityBase) te).getCapacity();
+                    if (te instanceof Cell1BlockEntity)
                         formedSetup.cellType = 0;
-                    else if (te instanceof Cell2TileEntity)
+                    else if (te instanceof Cell2BlockEntity)
                         formedSetup.cellType = 1;
-                    else if (te instanceof Cell3TileEntity)
+                    else if (te instanceof Cell3BlockEntity)
                         formedSetup.cellType = 2;
-                    else if (te instanceof Cell4TileEntity)
+                    else if (te instanceof Cell4BlockEntity)
                         formedSetup.cellType = 3;
                 }
             } else if (pb.getFactoryComponent() == FactoryComponent.IMPORT) {

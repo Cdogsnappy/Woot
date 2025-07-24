@@ -5,34 +5,32 @@ import ipsis.woot.advancements.Advancements;
 import ipsis.woot.modules.factory.FactorySetup;
 import ipsis.woot.modules.factory.perks.Perk;
 import ipsis.woot.modules.factory.items.PerkItem;
-import ipsis.woot.modules.factory.multiblock.MultiBlockTileEntity;
+import ipsis.woot.modules.factory.multiblock.MultiBlockBlockEntity;
 import ipsis.woot.modules.factory.multiblock.MultiBlockTracker;
 import ipsis.woot.util.WootDebug;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.InventoryHelper;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class UpgradeTileEntity extends MultiBlockTileEntity implements WootDebug {
+public class UpgradeBlockEntity extends MultiBlockBlockEntity implements WootDebug {
 
-    public UpgradeTileEntity() {
+    public UpgradeBlockEntity() {
         super(FactorySetup.FACTORY_UPGRADE_BLOCK_TILE.get());
     }
 
-    public boolean tryAddUpgrade(World world, PlayerEntity playerEntity, BlockState state, Perk type) {
+    public boolean tryAddUpgrade(Level world, Player playerEntity, BlockState state, Perk type) {
 
-        if (state.get(UpgradeBlock.UPGRADE) == Perk.EMPTY) {
+        if (state.getValue(UpgradeBlock.UPGRADE) == Perk.EMPTY) {
             // Add to empty must be level 1
             if (Perk.LEVEL_1_PERKS.contains(type)) {
-                world.setBlockState(pos,
+                world.setBlock(pos,
                         state.with(UpgradeBlock.UPGRADE, type), 2);
                 glue.onGoodbye();
                 MultiBlockTracker.get().addEntry(world, pos);
@@ -80,8 +78,8 @@ public class UpgradeTileEntity extends MultiBlockTileEntity implements WootDebug
         }
     }
 
-    public void dropItems(BlockState state, World world, BlockPos pos) {
-        Perk upgrade = state.get(UpgradeBlock.UPGRADE);
+    public void dropItems(BlockState state, Level world, BlockPos pos) {
+        Perk upgrade = state.getValue(UpgradeBlock.UPGRADE);
         if (upgrade == Perk.EMPTY)
             return;
 
@@ -100,17 +98,22 @@ public class UpgradeTileEntity extends MultiBlockTileEntity implements WootDebug
 
     public @Nullable
     Perk getUpgrade(BlockState state) {
-        return state.get(UpgradeBlock.UPGRADE);
+        return state.getValue(UpgradeBlock.UPGRADE);
     }
 
     /**
      * WootDebug
      */
     @Override
-    public List<String> getDebugText(List<String> debug, ItemUseContext itemUseContext) {
+    public List<String> getDebugText(List<String> debug, UseOnContext itemUseContext) {
         debug.add("====> UpgradeTileEntity");
         debug.add("      hasMaster: " + glue.hasMaster());
         debug.add("      upgrade: " + world.getBlockState(pos).get(UpgradeBlock.UPGRADE));
         return debug;
+    }
+
+    @Override
+    public List<String> getDebugText(List<String> debug, InteractionResult itemUseContext) {
+        return List.of();
     }
 }

@@ -5,7 +5,7 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import ipsis.woot.Woot;
 import ipsis.woot.fluilds.FluidSetup;
 import ipsis.woot.modules.factory.*;
-import ipsis.woot.modules.factory.blocks.ControllerTileEntity;
+import ipsis.woot.modules.factory.blocks.ControllerBlockEntity;
 import ipsis.woot.modules.factory.blocks.HeartContainer;
 import ipsis.woot.modules.factory.items.PerkItem;
 import ipsis.woot.modules.factory.perks.Perk;
@@ -224,7 +224,7 @@ public class HeartScreen extends WootContainerScreen<HeartContainer> {
 
             idx = 0;
             for (FakeMob fakeMob : clientFactorySetup.controllerMobs) {
-                ItemStack controllerStack = ControllerTileEntity.getItemStack(fakeMob);
+                ItemStack controllerStack = ControllerBlockEntity.getItemStack(fakeMob);
                 List<ITextComponent> tooltip = getTooltipFromItem(controllerStack);
                 mobElements.get(idx).setItemStack(controllerStack);
                 mobElements.get(idx).addToolTip(tooltip);

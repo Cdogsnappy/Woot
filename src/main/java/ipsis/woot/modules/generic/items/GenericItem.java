@@ -1,14 +1,15 @@
 package ipsis.woot.modules.generic.items;
 
 import ipsis.woot.Woot;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+
 
 public class GenericItem extends Item {
 
     final GenericItemType itemType;
     public GenericItem(GenericItemType itemType, int stackSize) {
-        super(new Item.Properties().maxStackSize(stackSize).group(Woot.setup.getCreativeTab()));
+        super(new Item.Properties().stacksTo(stackSize));
         this.itemType = itemType;
     }
 

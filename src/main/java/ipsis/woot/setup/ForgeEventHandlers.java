@@ -23,29 +23,20 @@ import ipsis.woot.util.FakeMobKey;
 import ipsis.woot.util.helper.ItemEntityHelper;
 import ipsis.woot.util.helper.SerializationHelper;
 import ipsis.woot.util.oss.WootFakePlayer;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.DamageSource;
-import net.minecraft.world.DimensionType;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
-import net.minecraftforge.client.event.RecipesUpdatedEvent;
-import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.event.RegisterCommandsEvent;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.event.entity.living.LivingDropsEvent;
-import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
-import net.minecraftforge.eventbus.api.Event;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
-import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
-import net.minecraftforge.fml.event.server.FMLServerStoppingEvent;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.common.util.FakePlayer;
+import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
+import net.neoforged.neoforge.event.tick.LevelTickEvent;
+import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -57,25 +48,25 @@ public class ForgeEventHandlers {
     public void onLivingDropsEvent(LivingDropsEvent event) {
 
         /**
-         * Entity->LivingEntity->MobEntity
+         * Entity->LivingEntity->Mob
          */
 
-        if (!(event.getEntity() instanceof MobEntity))
+        if (!(event.getEntity() instanceof Mob))
             return;
 
-        MobEntity mobEntity = (MobEntity)event.getEntityLiving();
+        Mob mob = (Mob)event.getEntity();
         DamageSource damageSource = event.getSource();
         if (damageSource == null)
             return;
 
-        if (!FakePlayerPool.isFakePlayer(damageSource.getTrueSource()))
+        if (!FakePlayerPool.isFakePlayer(damageSource.getDirectEntity()))
             return;
 
         // Cancel our fake spawns
         event.setCanceled(true);
 
         List<ItemStack> drops = ItemEntityHelper.convertToItemStacks(event.getDrops());
-        FakeMobKey fakeMobKey = new FakeMobKey(new FakeMob(mobEntity), event.getLootingLevel());
+        FakeMobKey fakeMobKey = new FakeMobKey(new FakeMob(mob), event.getLootingLevel());
         if (fakeMobKey.getMob().isValid()) {
             ipsis.woot.simulator.MobSimulator.getInstance().learnSimulatedDrops(fakeMobKey, drops);
         }
@@ -85,14 +76,11 @@ public class ForgeEventHandlers {
     public void onLivingDeathEvent(LivingDeathEvent event) {
 
         // Only player kills
-        if (!(event.getSource().getTrueSource() instanceof PlayerEntity))
+        if (!(event.getSource().getEntity() instanceof Player))
             return;
 
-        if (event.getEntityLiving() == null)
-            return;
-
-        PlayerEntity killer = (PlayerEntity)event.getSource().getTrueSource();
-        LivingEntity victim = event.getEntityLiving();
+        Player killer = (Player)event.getSource().getTrueSource();
+        LivingEntity victim = event.getEntity();
 
         if (ignoreDeathEvent(event.getEntity())) {
             Woot.setup.getLogger().debug("onLivingDeathEvent: duplicate {} {}",
@@ -105,13 +93,13 @@ public class ForgeEventHandlers {
             return;
 
         // Ignore player killing player
-        if (victim instanceof PlayerEntity)
+        if (victim instanceof Player)
             return;
 
-        if (!(victim instanceof MobEntity))
+        if (!(victim instanceof Mob))
             return;
 
-        FakeMob fakeMob = new FakeMob((MobEntity)victim);
+        FakeMob fakeMob = new FakeMob((Mob)victim);
         if (!fakeMob.isValid())
             return;
 
@@ -120,9 +108,9 @@ public class ForgeEventHandlers {
 
     private static final long MULTI_BLOCK_TRACKER_DELAY = 20;
     private static class TickTrack {
-        public World world;
+        public Level world;
         public long lastWorldTick;
-        public TickTrack(World world) {
+        public TickTrack(Level world) {
             this.world = world;
             this.lastWorldTick = 0;
         }
@@ -137,28 +125,26 @@ public class ForgeEventHandlers {
     }
     private static List<TickTrack> tickTracks = new ArrayList<>();
     @SubscribeEvent
-    public void onWorldTick(TickEvent.WorldTickEvent event) {
-        if (event.phase == TickEvent.Phase.START)
-            return;
+    public void onWorldTick(LevelTickEvent event) {
 
         TickTrack currTick = null;
         for (TickTrack tickTrack : tickTracks) {
-            if (tickTrack.world == event.world) {
+            if (tickTrack.world == event.getLevel()) {
                 currTick = tickTrack;
                 break;
             }
         }
 
         if (currTick == null) {
-            currTick = new TickTrack(event.world);
+            currTick = new TickTrack(event.getLevel());
             tickTracks.add(currTick);
         }
 
-        if (event.world.getDimensionKey().equals(MobSimulatorSetup.TARTARUS)) {
-            MobSimulator.getInstance().tick(event.world);
+        if (event.getLevel().getDimensionKey().equals(MobSimulatorSetup.TARTARUS)) {
+            MobSimulator.getInstance().tick(event.getLevel());
         } else {
-            if (currTick.tick(event.world.getGameTime()))
-                MultiBlockTracker.get().run(event.world);
+            if (currTick.tick(event.getLevel().getGameTime()))
+                MultiBlockTracker.get().run(event.level);
         }
     }
 

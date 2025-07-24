@@ -13,8 +13,9 @@ import ipsis.woot.simulator.SimulatedMobDropSummary;
 import ipsis.woot.util.FakeMob;
 import ipsis.woot.util.FakeMobKey;
 import ipsis.woot.util.helper.MathHelper;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.JSONUtils;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.world.item.ItemStack;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -65,7 +66,7 @@ public class SimulatedMob {
         if (itemStack.isEmpty() || itemStack.getCount() == 0)
             return;
 
-        if (!PolicyRegistry.get().canLearnItem(itemStack.getItem().getRegistryName()))
+        if (!PolicyRegistry.get().canLearnItem(BuiltInRegistries.ITEM.getKey(itemStack.getItem())))
             return;
 
         SimulatedMobDrop simulatedMobDrop = getOrCreateSimulatedMobDrop(itemStack);
@@ -99,7 +100,7 @@ public class SimulatedMob {
         looting = MathHelper.clampLooting(looting);
         for (SimulatedMobDrop drop : simulatedMobDrops) {
             ItemStack itemStack = drop.getRolledDrop(looting);
-            if (!itemStack.isEmpty() && PolicyRegistry.get().canGenerateItem(itemStack.getItem().getRegistryName()))
+            if (!itemStack.isEmpty() && PolicyRegistry.get().canGenerateItem(BuiltInRegistries.ITEM.getKey(itemStack.getItem())))
                 drops.add(itemStack);
         }
         return drops;
@@ -133,7 +134,7 @@ public class SimulatedMob {
     }
 
     public static @Nullable SimulatedMob fromJson(JsonObject jsonObject) {
-        String mob = JSONUtils.getString(jsonObject, TAG_MOB);
+        String mob = GsonHelper.convertToString(jsonObject, TAG_MOB);
         FakeMob fakeMob = new FakeMob(mob);
         if (!fakeMob.isValid()) {
             Woot.setup.getLogger().info("SimulatedMob:fromJson invalid mob {}", mob);
@@ -145,7 +146,7 @@ public class SimulatedMob {
             return null;
         }
 
-        JsonArray killsArray = JSONUtils.getJsonArray(jsonObject, TAG_SIM_KILLS);
+        JsonArray killsArray = GsonHelper.getAsJsonArray(jsonObject, TAG_SIM_KILLS);
         if (killsArray.size() != 4)
             throw new JsonSyntaxException("Simulated kills array must be of size 4");
 
@@ -153,13 +154,13 @@ public class SimulatedMob {
         for (int i = 0; i < 4; i++)
             simulatedMob.simulatedKills[i] = killsArray.get(i).getAsInt();
 
-        for (JsonElement jsonElement : JSONUtils.getJsonArray(jsonObject, TAG_DROPS)) {
+        for (JsonElement jsonElement : GsonHelper.getAsJsonArray(jsonObject, TAG_DROPS)) {
             if (jsonElement == null || !jsonElement.isJsonObject())
                 throw new JsonSyntaxException("Simulated drop must be an object");
 
             SimulatedMobDrop simulatedMobDrop = SimulatedMobDrop.fromJson(simulatedMob, (JsonObject)jsonElement);
             if (simulatedMobDrop != null) {
-                if (PolicyRegistry.get().canLearnItem(simulatedMobDrop.itemStack.getItem().getRegistryName())) {
+                if (PolicyRegistry.get().canLearnItem(BuiltInRegistries.ITEM.getKey(simulatedMobDrop.itemStack.getItem()))) {
                     if (fakeMob.isSheep() && !WoolGenerator.isWoolDrop(simulatedMobDrop.itemStack))
                         simulatedMob.simulatedMobDrops.add(simulatedMobDrop);
                     else

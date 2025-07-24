@@ -5,7 +5,6 @@ import ipsis.woot.modules.factory.FactoryComponent;
 import ipsis.woot.modules.factory.FactoryComponentProvider;
 import ipsis.woot.modules.factory.FactoryConfiguration;
 import ipsis.woot.modules.factory.FactorySetup;
-import ipsis.woot.modules.infuser.blocks.InfuserTileEntity;
 import ipsis.woot.util.WootDebug;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -38,8 +37,8 @@ import java.util.List;
 
 public class CellBlock extends Block implements WootDebug, FactoryComponentProvider {
 
-    final Class<? extends CellTileEntityBase> tileEntityClazz;
-    public CellBlock(Class<? extends CellTileEntityBase> clazz) {
+    final Class<? extends CellBlockEntityBase> tileEntityClazz;
+    public CellBlock(Class<? extends CellBlockEntityBase> clazz) {
         super(Properties.create(Material.IRON).sound(SoundType.METAL).hardnessAndResistance(3.5F));
         setDefaultState(getStateContainer().getBaseState().with(BlockStateProperties.ATTACHED, false));
         this.tileEntityClazz = clazz;
@@ -70,7 +69,7 @@ public class CellBlock extends Block implements WootDebug, FactoryComponentProvi
         if (worldIn.isRemote)
             return ActionResultType.SUCCESS;
 
-        if (!(worldIn.getTileEntity(pos) instanceof CellTileEntityBase))
+        if (!(worldIn.getTileEntity(pos) instanceof CellBlockEntityBase))
             throw new IllegalStateException("Tile entity is missing");
 
 

@@ -9,8 +9,8 @@ import ipsis.woot.policy.PolicyRegistry;
 import ipsis.woot.simulator.SimulatedMobDropSummary;
 import ipsis.woot.util.FakeMob;
 import ipsis.woot.util.FakeMobKey;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.JSONUtils;
+import net.minecraft.world.item.ItemStack;
+
 
 import javax.annotation.Nonnull;
 import java.util.*;

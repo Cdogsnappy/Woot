@@ -1,90 +1,65 @@
 package ipsis.woot.modules.factory.blocks;
 
-import ipsis.woot.config.Config;
 import ipsis.woot.modules.debug.items.DebugItem;
 import ipsis.woot.modules.factory.FactoryComponent;
 import ipsis.woot.modules.factory.FactoryComponentProvider;
 import ipsis.woot.modules.factory.Tier;
-import ipsis.woot.util.FakeMob;
 import ipsis.woot.util.WootDebug;
-import ipsis.woot.util.helper.PlayerHelper;
-import ipsis.woot.util.helper.StringHelper;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.state.StateContainer;
-import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nullable;
+
 import java.util.List;
 
 public class ControllerBlock extends Block implements FactoryComponentProvider, WootDebug {
 
     public ControllerBlock() {
 
-        super(Properties.create(Material.IRON) .sound(SoundType.METAL).hardnessAndResistance(3.5F));
-        setDefaultState(getStateContainer().getBaseState().with(BlockStateProperties.ATTACHED, false));
+        super(Properties.of().sound(SoundType.METAL).strength(3.5F));
+        registerDefaultState(getStateDefinition().any().setValue(BlockStateProperties.ATTACHED, false));
     }
 
     @Override
-    protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(BlockStateProperties.ATTACHED);
-    }
-
-    @Override
-    public boolean hasTileEntity(BlockState state) {
-        return true;
-    }
-
-    @Nullable
-    @Override
-    public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-        return new ControllerTileEntity();
     }
 
     /**
      * Block display since we are less than a full block
      */
-    private final VoxelShape shape = Block.makeCuboidShape(1.0D, 1.0D, 1.0D, 15.0D, 15.0D, 15.0D);
+    private final VoxelShape shape = Shapes.box(1.0D, 1.0D, 1.0D, 15.0D, 15.0D, 15.0D);
     @Override
-    public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
-        if (state.get(BlockStateProperties.ATTACHED))
-            return VoxelShapes.fullCube();
+    public @NotNull VoxelShape getCollisionShape(BlockState state, @NotNull BlockGetter level, @NotNull BlockPos pos, @NotNull CollisionContext context) {
+        if (state.getValue(BlockStateProperties.ATTACHED))
+            return Shapes.block();
         else
             return shape;
     }
 
     @Override
-    public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-        if (worldIn.isRemote)
-            return super.onBlockActivated(state, worldIn, pos, player, handIn, hit);
+    public @NotNull ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult){
+        if (level.isClientSide)
+            return super.useItemOn(stack, state,level, pos, player, hand, hitResult);
 
-        TileEntity te = worldIn.getTileEntity(pos);
-        if (te instanceof ControllerTileEntity) {
-            Tier tier = ((ControllerTileEntity) te).getTier();
+        BlockEntity te = level.getBlockEntity(pos);
+        if (te instanceof ControllerBlockEntity) {
+            Tier tier = ((ControllerBlockEntity) te).getTier();
             if (tier != Tier.UNKNOWN)
                 player.sendStatusMessage(new TranslationTextComponent(tier.getTranslationKey()), true);
         }

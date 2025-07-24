@@ -4,7 +4,6 @@ import ipsis.woot.modules.factory.Exotic;
 import ipsis.woot.modules.factory.FactoryConfiguration;
 import ipsis.woot.modules.factory.FactorySetup;
 import ipsis.woot.util.WootDebug;
-import ipsis.woot.util.helper.StringHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
@@ -34,8 +33,8 @@ public class ExoticBlock extends Block implements WootDebug {
         super.onBlockPlacedBy(worldIn, pos, state, placer, stack);
         if (!worldIn.isRemote) {
             TileEntity te = worldIn.getTileEntity(pos.down());
-            if (te instanceof HeartTileEntity)
-                ((HeartTileEntity) te).interrupt();
+            if (te instanceof HeartBlockEntity)
+                ((HeartBlockEntity) te).interrupt();
         }
     }
 
@@ -44,8 +43,8 @@ public class ExoticBlock extends Block implements WootDebug {
         super.onBlockHarvested(worldIn, pos, state, player);
         if (!worldIn.isRemote) {
             TileEntity te = worldIn.getTileEntity(pos.down());
-            if (te instanceof HeartTileEntity)
-                ((HeartTileEntity) te).interrupt();
+            if (te instanceof HeartBlockEntity)
+                ((HeartBlockEntity) te).interrupt();
         }
     }
 

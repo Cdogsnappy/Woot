@@ -7,42 +7,39 @@ import ipsis.woot.modules.factory.multiblock.MultiBlockGlueProvider;
 import ipsis.woot.modules.factory.multiblock.MultiBlockMaster;
 import ipsis.woot.util.helper.PlayerHelper;
 import ipsis.woot.util.helper.StringHelper;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
-import net.minecraftforge.common.util.BlockSnapshot;
-import net.minecraftforge.event.ForgeEventFactory;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class FactoryHelper {
 
-    public static void disconnectOld(World world, AbsolutePattern absolutePattern) {
+    public static void disconnectOld(Level world, AbsolutePattern absolutePattern) {
         for (PatternBlock pb : absolutePattern.getBlocks()) {
-            if (world.isBlockLoaded(pb.getBlockPos())) {
-                TileEntity te = world.getTileEntity(pb.getBlockPos());
+            if (world.isLoaded(pb.getBlockPos())) {
+                BlockEntity te = world.getBlockEntity(pb.getBlockPos());
                 if (te instanceof MultiBlockGlueProvider)
                     ((MultiBlockGlueProvider)te).getGlue().clearMaster();
             }
         }
     }
 
-    public static void connectNew(World world, AbsolutePattern absolutePattern, MultiBlockMaster master) {
+    public static void connectNew(Level world, AbsolutePattern absolutePattern, MultiBlockMaster master) {
         for (PatternBlock pb : absolutePattern.getBlocks()) {
             if (pb.getFactoryComponent() == FactoryComponent.CONTROLLER && !absolutePattern.isValidControllerPos(pb.getBlockPos()))
                 continue;
 
-            if (world.isBlockLoaded(pb.getBlockPos())) {
-                TileEntity te = world.getTileEntity(pb.getBlockPos());
+            if (world.isLoaded(pb.getBlockPos())) {
+                BlockEntity te = world.getBlockEntity(pb.getBlockPos());
                 if (te instanceof MultiBlockGlueProvider)
                     ((MultiBlockGlueProvider)te).getGlue().setMaster(master);
             }
@@ -60,10 +57,10 @@ public class FactoryHelper {
         NO_BLOCK_IN_INV,
         ALL_BLOCKS_PLACED
     }
-    public static BuildResult tryBuild(World world, BlockPos pos, PlayerEntity playerEntity, Direction facing, Tier tier) {
-        if (!playerEntity.isAllowEdit()) {
-            playerEntity.sendStatusMessage(
-                    new TranslationTextComponent("chat.woot.intern.noedit"), false);
+    public static BuildResult tryBuild(Level world, BlockPos pos, Player playerEntity, Direction facing, Tier tier) {
+        if (!playerEntity.mayBuild()) {
+            playerEntity.sendSystemMessage(
+                    Component.translatable("chat.woot.intern.noedit"));
             return BuildResult.ERROR;
         }
 

@@ -1,10 +1,10 @@
 package ipsis.woot.modules.factory.generators;
 
 import ipsis.woot.util.FakeMob;
-import net.minecraft.item.DyeColor;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 
 import java.util.Random;
 
@@ -59,15 +59,12 @@ public class WoolGenerator {
             return false;
 
         Item item = itemStack.getItem();
-        if (item == Items.BLACK_WOOL || item == Items.BLUE_WOOL || item == Items.BROWN_WOOL ||
-            item == Items.CYAN_WOOL || item == Items.GRAY_WOOL || item == Items.GREEN_WOOL ||
-            item == Items.LIGHT_BLUE_WOOL || item == Items.LIGHT_GRAY_WOOL || item == Items.LIME_WOOL ||
-            item == Items.MAGENTA_WOOL || item == Items.ORANGE_WOOL || item == Items.PINK_WOOL ||
-            item == Items.PURPLE_WOOL || item == Items.RED_WOOL || item == Items.WHITE_WOOL ||
-            item == Items.YELLOW_WOOL)
-            return true;
-
-        return false;
+        return item == Items.BLACK_WOOL || item == Items.BLUE_WOOL || item == Items.BROWN_WOOL ||
+                item == Items.CYAN_WOOL || item == Items.GRAY_WOOL || item == Items.GREEN_WOOL ||
+                item == Items.LIGHT_BLUE_WOOL || item == Items.LIGHT_GRAY_WOOL || item == Items.LIME_WOOL ||
+                item == Items.MAGENTA_WOOL || item == Items.ORANGE_WOOL || item == Items.PINK_WOOL ||
+                item == Items.PURPLE_WOOL || item == Items.RED_WOOL || item == Items.WHITE_WOOL ||
+                item == Items.YELLOW_WOOL;
     }
 
 }

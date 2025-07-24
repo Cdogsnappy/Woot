@@ -7,7 +7,7 @@ import ipsis.woot.modules.factory.blocks.ExoticBlock;
 import ipsis.woot.modules.factory.blocks.UpgradeBlock;
 import ipsis.woot.modules.factory.perks.Perk;
 import ipsis.woot.policy.PolicyRegistry;
-import ipsis.woot.modules.factory.blocks.ControllerTileEntity;
+import ipsis.woot.modules.factory.blocks.ControllerBlockEntity;
 import ipsis.woot.util.FakeMob;
 import ipsis.woot.util.helper.StringHelper;
 import net.minecraft.block.Block;
@@ -138,8 +138,8 @@ public class FactoryScanner {
              */
             if (p.getFactoryComponent() == FactoryComponent.CONTROLLER) {
                 TileEntity te = world.getTileEntity(p.getBlockPos());
-                if (te instanceof ControllerTileEntity) {
-                    FakeMob fakeMob = ((ControllerTileEntity) te).getFakeMob();
+                if (te instanceof ControllerBlockEntity) {
+                    FakeMob fakeMob = ((ControllerBlockEntity) te).getFakeMob();
                     if (fakeMob.isValid()) {
                         Tier mobTier = Config.OVERRIDE.getMobTier(fakeMob, world);
 

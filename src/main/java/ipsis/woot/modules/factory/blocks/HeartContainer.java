@@ -1,6 +1,5 @@
 package ipsis.woot.modules.factory.blocks;
 
-import ipsis.woot.Woot;
 import ipsis.woot.fluilds.network.TankPacket;
 import ipsis.woot.modules.factory.FactorySetup;
 import ipsis.woot.modules.factory.client.ClientFactorySetup;
@@ -23,11 +22,11 @@ import net.minecraftforge.fml.network.NetworkDirection;
 
 public class HeartContainer extends WootContainer implements TankPacketHandler  {
 
-    private HeartTileEntity tileEntity;
+    private HeartBlockEntity tileEntity;
 
     public HeartContainer(int windowId, World world, BlockPos pos, PlayerInventory playerInventory, PlayerEntity playerEntity) {
         super(FactorySetup.HEART_BLOCK_CONTAINER.get(), windowId);
-        tileEntity = (HeartTileEntity)world.getTileEntity(pos);
+        tileEntity = (HeartBlockEntity)world.getTileEntity(pos);
         addListeners();
 
         /**
@@ -93,7 +92,7 @@ public class HeartContainer extends WootContainer implements TankPacketHandler  
         });
     }
 
-    public  HeartTileEntity getTileEntity() { return tileEntity; }
+    public HeartBlockEntity getTileEntity() { return tileEntity; }
 
     /**
      * Client sync

@@ -2,7 +2,7 @@ package ipsis.woot.modules.factory.blocks;
 
 import ipsis.woot.fluilds.FluidSetup;
 import ipsis.woot.mod.ModNBT;
-import ipsis.woot.modules.factory.multiblock.MultiBlockTileEntity;
+import ipsis.woot.modules.factory.multiblock.MultiBlockBlockEntity;
 import ipsis.woot.util.WootDebug;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -16,12 +16,12 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 
-public abstract class CellTileEntityBase extends MultiBlockTileEntity implements WootDebug {
+public abstract class CellBlockEntityBase extends MultiBlockBlockEntity implements WootDebug {
 
     protected FluidTank tank = new FluidTank(FluidAttributes.BUCKET_VOLUME);
     private final LazyOptional<IFluidHandler> holder = LazyOptional.of(() -> tank);
 
-    public CellTileEntityBase(TileEntityType<?> tileEntityType) {
+    public CellBlockEntityBase(TileEntityType<?> tileEntityType) {
         super(tileEntityType);
         tank.setCapacity(getCapacity());
         tank.setValidator(e -> e.getFluid() == FluidSetup.CONATUS_FLUID.get().getFluid());

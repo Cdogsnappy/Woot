@@ -1,8 +1,11 @@
 package ipsis.woot.simulator.library;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.JsonOps;
 import ipsis.woot.Woot;
 import ipsis.woot.simulator.DropStackData;
 import ipsis.woot.simulator.MobSimulator;
@@ -10,10 +13,9 @@ import ipsis.woot.simulator.SimulatedMobDropSummary;
 import ipsis.woot.util.helper.JsonHelper;
 import ipsis.woot.util.helper.MathHelper;
 import ipsis.woot.util.helper.RandomHelper;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.JSONUtils;
-import net.minecraft.util.WeightedRandom;
-import net.minecraftforge.common.crafting.CraftingHelper;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.util.random.WeightedRandom;
+import net.minecraft.world.item.ItemStack;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -192,7 +194,14 @@ public class SimulatedMobDrop {
     public JsonObject toJson() {
         JsonObject jsonObject = new JsonObject();
         {
-            jsonObject.add(TAG_DROPPED_ITEM, JsonHelper.toJsonObject(itemStack));
+            // Use ItemStack codec to serialize the ItemStack
+            DataResult<JsonElement> itemResult = ItemStack.CODEC.encodeStart(JsonOps.INSTANCE, itemStack);
+            if (itemResult.result().isPresent()) {
+                jsonObject.add(TAG_DROPPED_ITEM, itemResult.result().get());
+            } else {
+                // Handle error case - you might want to log this
+                jsonObject.add(TAG_DROPPED_ITEM, new JsonObject()); // or however you want to handle errors
+            }
             JsonArray simulatedArray = new JsonArray();
             for (int i = 0; i < 4; i++)
                 simulatedArray.add(simulatedDropCount[i]);
@@ -211,15 +220,20 @@ public class SimulatedMobDrop {
     }
 
     public static @Nullable SimulatedMobDrop fromJson(SimulatedMob simulatedMob, JsonObject jsonObject) {
-        ItemStack itemStack;
+        ItemStack itemStack = null;
         try {
-            itemStack = CraftingHelper.getItemStack(jsonObject.getAsJsonObject(TAG_DROPPED_ITEM), false);
+            JsonElement itemElement = jsonObject.get(TAG_DROPPED_ITEM);
+            DataResult<ItemStack> itemResult = ItemStack.CODEC.parse(JsonOps.INSTANCE, itemElement);
+
+            if (itemResult.result().isPresent()) {
+                itemStack = itemResult.result().get();
+            }
         } catch (JsonSyntaxException e) {
             Woot.setup.getLogger().error("Failed to parse itemstack");
             return null;
         }
 
-        JsonArray dropsArray = JSONUtils.getJsonArray(jsonObject, TAG_SIM_KILLS);
+        JsonArray dropsArray = GsonHelper.getAsJsonArray(jsonObject, TAG_SIM_KILLS);
         if (dropsArray.size() != 4)
             throw new JsonSyntaxException("Simulated count array must be of size 4");
 
@@ -228,8 +242,8 @@ public class SimulatedMobDrop {
             simulatedMobDrop.simulatedDropCount[i] = dropsArray.get(i).getAsInt();
 
         for (int i = 0; i < 4; i++) {
-            JsonArray sizesArray = JSONUtils.getJsonArray(jsonObject, TAG_STACK_SIZES[i]);
-            if (sizesArray.size() > 0 && sizesArray.size() % 2 == 0) {
+            JsonArray sizesArray = GsonHelper.getAsJsonArray(jsonObject, TAG_STACK_SIZES[i]);
+            if (!sizesArray.isEmpty() && sizesArray.size() % 2 == 0) {
                 for (int j = 0; j < sizesArray.size() / 2; j += 2) {
                     int size = sizesArray.get(j).getAsInt();
                     int count = sizesArray.get(j + 1).getAsInt();

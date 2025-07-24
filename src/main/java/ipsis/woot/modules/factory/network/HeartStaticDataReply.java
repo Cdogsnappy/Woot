@@ -13,11 +13,12 @@ import ipsis.woot.util.FakeMob;
 import ipsis.woot.util.NetworkHelper;
 import ipsis.woot.util.oss.NetworkTools;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.world.item.ItemStack;
+import net.neoforged.api.distmarker.Dist;
+
 
 import java.util.List;
 import java.util.Map;
@@ -41,7 +42,7 @@ public class HeartStaticDataReply {
         return pkt;
     }
 
-    public void toBytes(ByteBuf buf) {
+    public void toBytes(RegistryFriendlyByteBuf buf) {
 
         buf.writeInt(formedSetup.getTier().ordinal());
         buf.writeInt(formedSetup.getCellCapacity());
@@ -107,8 +108,8 @@ public class HeartStaticDataReply {
 
     public void handle(Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> {
-            final ClientPlayerEntity player = Minecraft.getInstance().player;
-            if (player.openContainer instanceof HeartContainer)
+            final LocalPlayer player = Minecraft.getInstance().player;
+            if (player.containerMenu instanceof HeartContainer)
                 ((HeartContainer) player.openContainer).handleStaticDataReply(clientFactorySetup);
             ctx.get().setPacketHandled(true);
         })) ;

@@ -1,6 +1,6 @@
 package ipsis.woot.modules.factory.layout;
 
-import ipsis.woot.modules.factory.blocks.HeartTileEntity;
+import ipsis.woot.modules.factory.blocks.HeartBlockEntity;
 import ipsis.woot.modules.factory.multiblock.MultiBlockMaster;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -62,7 +62,7 @@ public class Layout {
         }
     }
 
-    public void tick(HeartTileEntity.TickTracker tickTracker, MultiBlockMaster master) {
+    public void tick(HeartBlockEntity.TickTracker tickTracker, MultiBlockMaster master) {
 
         if (!tickTracker.hasStructureTickExpired())
             return;

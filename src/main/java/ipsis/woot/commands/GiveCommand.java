@@ -3,8 +3,7 @@ package ipsis.woot.commands;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
-import ipsis.woot.modules.factory.FactoryConfiguration;
-import ipsis.woot.modules.factory.blocks.ControllerTileEntity;
+import ipsis.woot.modules.factory.blocks.ControllerBlockEntity;
 import ipsis.woot.simulator.spawning.SpawnController;
 import ipsis.woot.util.FakeMob;
 import net.minecraft.command.CommandSource;
@@ -59,7 +58,7 @@ public class GiveCommand {
         else
             fakeMob = new FakeMob(resourceLocation.toString() + "," + tag);
         if (fakeMob.isValid() && SpawnController.get().isLivingEntity(fakeMob, source.getWorld())) {
-            ItemStack itemStack = ControllerTileEntity.getItemStack(fakeMob);
+            ItemStack itemStack = ControllerBlockEntity.getItemStack(fakeMob);
 
             /**
              * Straight from vanilla GiveCommand

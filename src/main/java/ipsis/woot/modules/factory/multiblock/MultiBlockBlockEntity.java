@@ -2,18 +2,18 @@ package ipsis.woot.modules.factory.multiblock;
 
 import ipsis.woot.modules.factory.FactorySetup;
 import ipsis.woot.util.WootDebug;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nonnull;
 import java.util.List;
 
-public class MultiBlockTileEntity extends BlockEntity implements MultiBlockGlueProvider, WootDebug {
+public class MultiBlockBlockEntity extends BlockEntity implements MultiBlockGlueProvider, WootDebug {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -21,12 +21,12 @@ public class MultiBlockTileEntity extends BlockEntity implements MultiBlockGlueP
 
     protected MultiBlockGlue glue;
 
-    public MultiBlockTileEntity(BlockEntityType type) {
-        super(type);
+    public MultiBlockBlockEntity(BlockEntityType type, BlockPos pos, BlockState state) {
+        super(type, pos, state);
         glue = new Glue(this, this);
     }
 
-    public MultiBlockTileEntity() {
+    public MultiBlockBlockEntity() {
         this(FactorySetup.MULTIBLOCK_BLOCK_TILE.get());
     }
 
@@ -64,4 +64,8 @@ public class MultiBlockTileEntity extends BlockEntity implements MultiBlockGlueP
     }
 
 
+    @Override
+    public List<String> getDebugText(List<String> debug, UseOnContext itemUseContext) {
+        return List.of();
+    }
 }

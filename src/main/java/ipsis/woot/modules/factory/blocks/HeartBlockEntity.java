@@ -16,28 +16,25 @@ import ipsis.woot.util.FakeMob;
 import ipsis.woot.util.WootDebug;
 import ipsis.woot.util.helper.StorageHelper;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.TickingBlockEntity;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * The factory is formed manually by the user via the intern -> interrupt
  * When an attached block is removed or unloaded it should inform the heart -> interrupt
  */
-public class HeartTileEntity extends BlockEntity implements TickingBlockEntity, MultiBlockMaster, WootDebug {
+public class HeartBlockEntity extends BlockEntity implements TickingBlockEntity, MultiBlockMaster, WootDebug {
 
     static final Logger LOGGER = LogManager.getLogger();
 
@@ -51,7 +48,7 @@ public class HeartTileEntity extends BlockEntity implements TickingBlockEntity, 
     TickTracker tickTracker = new TickTracker();
     boolean loadedFromNBT = false;
 
-    public HeartTileEntity() {
+    public HeartBlockEntity() {
         super(FactorySetup.HEART_BLOCK_TILE.get());
         tickTracker.setStructureTickCount(20);
     }
@@ -127,7 +124,7 @@ public class HeartTileEntity extends BlockEntity implements TickingBlockEntity, 
                List<FluidStack> fluids = createFluidIngredients(recipe, formedSetup);
 
                if (hasItemIngredients(items, formedSetup) && hasFluidIngredients(fluids, formedSetup)) {
-                   LazyOptional<IFluidHandler> hdlr = formedSetup.getCellFluidHandler();
+                   Optional<IFluidHandler> hdlr = formedSetup.getCellFluidHandler();
                    if (hdlr.isPresent()) {
                        IFluidHandler iFluidHandler = hdlr.orElseThrow(NullPointerException::new);
                        FluidStack fluidStack = iFluidHandler.drain(recipe.getNumUnits(), IFluidHandler.FluidAction.SIMULATE);

@@ -4,19 +4,18 @@ import ipsis.woot.config.Config;
 import ipsis.woot.mod.ModNBT;
 import ipsis.woot.modules.factory.FactorySetup;
 import ipsis.woot.modules.factory.Tier;
-import ipsis.woot.modules.factory.multiblock.MultiBlockTileEntity;
+import ipsis.woot.modules.factory.multiblock.MultiBlockBlockEntity;
 import ipsis.woot.util.FakeMob;
 import ipsis.woot.util.WootDebug;
-import net.minecraft.block.BlockState;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
 
 import java.util.List;
 
-public class ControllerTileEntity extends MultiBlockTileEntity implements WootDebug {
+public class ControllerBlockEntity extends MultiBlockBlockEntity implements WootDebug {
 
-    public ControllerTileEntity() {
+    public ControllerBlockEntity() {
         super(FactorySetup.CONTROLLER_BLOCK_TILE.get());
     }
 
@@ -70,18 +69,16 @@ public class ControllerTileEntity extends MultiBlockTileEntity implements WootDe
         /**
          * setTileEntityNBT
          */
-        CompoundNBT compoundNBT = itemStack.getOrCreateChildTag("BlockEntityTag");
-        CompoundNBT nbt = new CompoundNBT();
+        CompoundTag compoundNBT = itemStack.save("BlockEntityTag");
+        CompoundTag nbt = new CompoundTag();
         FakeMob.writeToNBT(fakeMob, nbt);
         compoundNBT.put(ModNBT.Controller.MOB_TAG, nbt);
         return itemStack;
     }
 
-    /**
-     * WootDebug
-     */
+
     @Override
-    public List<String> getDebugText(List<String> debug, ItemUseContext itemUseContext) {
+    public List<String> getDebugText(List<String> debug, UseOnContext itemUseContext) {
         debug.add("====> ControllerTileEntity");
         debug.add("      hasMaster: " + glue.hasMaster());
         debug.add("      mob: " + fakeMob);

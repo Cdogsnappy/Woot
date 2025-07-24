@@ -46,8 +46,8 @@ public class UpgradeBlock extends FactoryBlock {
                 PerkItem perkItem = (PerkItem)itemStack.getItem();
 
                 TileEntity te = worldIn.getTileEntity(pos);
-                if (te instanceof UpgradeTileEntity) {
-                    if (((UpgradeTileEntity) te).tryAddUpgrade(worldIn, player, state, perkItem.getFactoryUpgrade())) {
+                if (te instanceof UpgradeBlockEntity) {
+                    if (((UpgradeBlockEntity) te).tryAddUpgrade(worldIn, player, state, perkItem.getFactoryUpgrade())) {
                         if (!player.isCreative())
                             itemStack.shrink(1);
                     }
@@ -63,8 +63,8 @@ public class UpgradeBlock extends FactoryBlock {
         // This is how the chest, hopper etc drop their contents
         if (state.getBlock() != newState.getBlock()) {
             TileEntity te = worldIn.getTileEntity(pos);
-            if (te instanceof UpgradeTileEntity) {
-                ((UpgradeTileEntity) te).dropItems(state, worldIn, pos);
+            if (te instanceof UpgradeBlockEntity) {
+                ((UpgradeBlockEntity) te).dropItems(state, worldIn, pos);
             }
             super.onReplaced(state, worldIn, pos, newState, isMoving);
         }
@@ -73,6 +73,6 @@ public class UpgradeBlock extends FactoryBlock {
     @Nullable
     @Override
     public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-        return new UpgradeTileEntity();
+        return new UpgradeBlockEntity();
     }
 }

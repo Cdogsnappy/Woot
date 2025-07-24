@@ -1,7 +1,9 @@
 package ipsis.woot.util.helper;
 
-import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.item.ItemStack;
+
+
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.ItemStack;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;

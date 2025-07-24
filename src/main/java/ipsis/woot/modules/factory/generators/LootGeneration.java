@@ -2,7 +2,7 @@ package ipsis.woot.modules.factory.generators;
 
 import ipsis.woot.compat.reliquary.ReliquaryPlugin;
 import ipsis.woot.modules.factory.FormedSetup;
-import ipsis.woot.modules.factory.blocks.HeartTileEntity;
+import ipsis.woot.modules.factory.blocks.HeartBlockEntity;
 import ipsis.woot.modules.factory.items.XpShardBaseItem;
 import ipsis.woot.modules.factory.perks.Perk;
 import ipsis.woot.modules.generic.items.GenericItem;
@@ -13,21 +13,14 @@ import ipsis.woot.util.FakeMob;
 import ipsis.woot.util.FakeMobKey;
 import ipsis.woot.util.helper.RandomHelper;
 import ipsis.woot.util.helper.StorageHelper;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.WeightedRandom;
-import net.minecraft.util.math.MathHelper;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.items.IItemHandler;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.items.IItemHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class LootGeneration {
@@ -44,13 +37,13 @@ public class LootGeneration {
         SKULL_GENERATOR.loadFromConfig(PolicyConfiguration.MOB_PERK_HEADLESS_SKULLS.get());
     }
 
-    public void generate(HeartTileEntity heartTileEntity, FormedSetup setup) {
+    public void generate(HeartBlockEntity heartTileEntity, FormedSetup setup) {
 
         /**
          * Get the output options
          */
-        List<LazyOptional<IItemHandler>> itemHandlers = setup.getExportHandlers();
-        List<LazyOptional<IFluidHandler>> fluidHandlers = setup.getExportFluidHandlers();
+        List<Optional<IItemHandler>> itemHandlers = setup.getExportHandlers();
+        List<Optional<IFluidHandler>> fluidHandlers = setup.getExportFluidHandlers();
 
         int looting = setup.getLootingLevel();
 
@@ -77,16 +70,16 @@ public class LootGeneration {
             rolledDrops.addAll(charmStacks);
 
             for (ItemStack itemStack : rolledDrops) {
-                if (itemStack.isDamageable()) {
+                if (itemStack.isDamageableItem()) {
                     int dmg = RandomHelper.RANDOM.nextInt(itemStack.getMaxDamage() + 1);
-                    dmg = MathHelper.clamp(dmg, 1, itemStack.getMaxDamage());
-                    itemStack.setDamage(dmg);
+                    dmg = Math.clamp(dmg, 1, itemStack.getMaxDamage());
+                    itemStack.setDamageValue(dmg);
                 }
                 if (itemStack.isEnchanted()) {
-                    if (itemStack.hasTag())
-                        itemStack.getTag().remove("ench");
+                    if (itemStack.has(DataComponents.ENCHANTMENTS))
+                        itemStack.remove(DataComponents.ENCHANTMENTS);
 
-                    float f = setup.getWorld().getDifficultyForLocation(heartTileEntity.getPos()).getClampedAdditionalDifficulty();
+                    float f = setup.getWorld().getCurrentDifficultyAt(heartTileEntity.getPos()).getEffectiveDifficulty();
                     boolean allowTreasure = false;
                     EnchantmentHelper.addRandomEnchantment(RandomHelper.RANDOM, itemStack,
                             (int)(5.0F + f * (float)RandomHelper.RANDOM.nextInt(18)), allowTreasure);

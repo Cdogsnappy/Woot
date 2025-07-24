@@ -1,10 +1,9 @@
 package ipsis.woot.modules.factory.multiblock;
 
 import ipsis.woot.util.helper.WorldHelper;
-import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import org.apache.logging.log4j.LogManager;
@@ -70,7 +69,7 @@ public class Glue implements MultiBlockGlue {
     }
 
     @Override
-    public void onHello(World world, BlockPos pos) {
+    public void onHello(Level world, BlockPos pos) {
         if (!hasMaster()) {
             //LOGGER.debug("onHello: {} find master", te.getPos());
             MultiBlockMaster tmpMaster = GlueHelper.findMaster(world, iMultiBlockGlueProvider);
@@ -86,6 +85,6 @@ public class Glue implements MultiBlockGlue {
 
     @Override
     public BlockPos getPos() {
-        return te.getPos();
+        return te.getBlockPos();
     }
 }

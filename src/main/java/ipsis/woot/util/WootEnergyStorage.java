@@ -1,28 +1,15 @@
 package ipsis.woot.util;
 
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraftforge.common.util.INBTSerializable;
-import net.minecraftforge.energy.EnergyStorage;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.neoforged.neoforge.common.util.INBTSerializable;
+import net.neoforged.neoforge.energy.EnergyStorage;
+import net.neoforged.neoforge.energy.IEnergyStorage;
 
-public class WootEnergyStorage extends EnergyStorage implements INBTSerializable<CompoundNBT> {
+public class WootEnergyStorage extends EnergyStrage implements IEnergyStorage {
 
-    public WootEnergyStorage(int capacity, int maxTransfer) {
-        super(capacity, maxTransfer);
-    }
 
-    public void setEnergy(int energy) {
-        this.energy = energy;
-    }
-
-    @Override
-    public CompoundNBT serializeNBT() {
-        CompoundNBT tag = new CompoundNBT();
-        tag.putInt("energy", getEnergyStored());
-        return tag;
-    }
-
-    @Override
-    public void deserializeNBT(CompoundNBT nbt) {
-        setEnergy(nbt.getInt("energy"));
+    public WootEnergyStorage(int capacity) {
+        super(capacity);
     }
 }

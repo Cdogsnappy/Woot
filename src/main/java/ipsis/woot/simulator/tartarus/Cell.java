@@ -2,14 +2,16 @@ package ipsis.woot.simulator.tartarus;
 
 import ipsis.woot.simulator.spawning.SpawnController;
 import ipsis.woot.util.FakeMobKey;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.entity.EntityTypeTest;
+import net.minecraft.world.phys.AABB;
+
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -20,12 +22,12 @@ public class Cell {
 
     private BlockPos origin; // Bottom left-hand block position of cell
     private BlockPos spawnPos;
-    private AxisAlignedBB axisAlignedBB;
+    private AABB axisAlignedBB;
     private FakeMobKey fakeMobKey;
 
     public Cell(BlockPos origin) {
         this.origin = origin;
-        spawnPos = origin.add(4, 4, 4);
+        spawnPos = origin.offset(4, 4, 4);
         fakeMobKey = null;
         axisAlignedBB = null;
     }
@@ -40,24 +42,24 @@ public class Cell {
 
         this.fakeMobKey = fakeMobKey;
         if (axisAlignedBB == null)
-            axisAlignedBB = new AxisAlignedBB(spawnPos).grow(3); // 6x6x6 cell
+            axisAlignedBB = new AABB(spawnPos).inflate(3); // 6x6x6 cell
         return true;
     }
 
-    public void clean(@Nonnull World world) {
+    public void clean(@Nonnull Level world) {
         /**
          * Remove everything from the cell.
          * This should catch any entity that spawns entities on death
          */
-        for (LivingEntity livingEntity : world.getEntitiesWithinAABB(LivingEntity.class, axisAlignedBB, x -> x.isAlive())) {
-            livingEntity.remove();
+        for (LivingEntity livingEntity : world.getEntities(EntityTypeTest.forClass(LivingEntity.class), axisAlignedBB, Entity::isAlive)) {
+            livingEntity.remove(Entity.RemovalReason.DISCARDED);
         }
     }
 
-    public @Nonnull List<ItemStack> sweep(@Nonnull World world) {
+    public @Nonnull List<ItemStack> sweep(@Nonnull Level world) {
         List<ItemStack> drops = new ArrayList<>();
         if (isOccupied()) {
-            for (ItemEntity itemEntity : world.getEntitiesWithinAABB(ItemEntity.class, axisAlignedBB, x -> x.isAlive())) {
+            for (ItemEntity itemEntity : world.getEntities(EntityTypeTest.forClass(ItemEntity.class), axisAlignedBB, Entity::isAlive)) {
                 drops.add(itemEntity.getItem().copy());
                 itemEntity.lifespan = 0;
             }
@@ -65,9 +67,9 @@ public class Cell {
         return drops;
     }
 
-    public void run(@Nonnull World world) {
-        if (isOccupied() && world instanceof ServerWorld)
-            SpawnController.get().spawnKill(fakeMobKey, (ServerWorld)world, spawnPos);
+    public void run(@Nonnull Level world) {
+        if (isOccupied() && world instanceof ServerLevel)
+            SpawnController.get().spawnKill(fakeMobKey, (ServerLevel) world, spawnPos);
     }
 
 }

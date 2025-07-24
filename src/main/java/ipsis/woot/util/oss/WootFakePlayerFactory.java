@@ -3,12 +3,12 @@ package ipsis.woot.util.oss;
 import com.google.common.collect.Maps;
 import com.mojang.authlib.GameProfile;
 import ipsis.woot.Woot;
-import net.minecraft.world.server.ServerWorld;
-import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.event.world.WorldEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.minecraft.server.level.ServerLevel;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.level.LevelEvent;
+
 
 import java.util.Map;
 
@@ -18,12 +18,12 @@ import java.util.Map;
  * Currently Forge 6358 causes a NPE when potion effects
  * are applied to FakePlayer
  */
-@Mod.EventBusSubscriber(modid = Woot.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+@Mod.EventBusSubscriber(modid = Woot.MODID, bus = EventBusSubscriber.Bus.MOD)
 public class WootFakePlayerFactory {
 
     private static Map<GameProfile, WootFakePlayer> fakePlayers = Maps.newHashMap();
 
-    public static WootFakePlayer get(ServerWorld world, GameProfile username) {
+    public static WootFakePlayer get(ServerLevel world, GameProfile username) {
 
         if (!fakePlayers.containsKey(username)) {
 
@@ -34,17 +34,17 @@ public class WootFakePlayerFactory {
         return fakePlayers.get(username);
     }
 
-    public static void unloadWorld (ServerWorld world) {
+    public static void unloadLevel (ServerLevel world) {
 
-        fakePlayers.entrySet().removeIf(entry -> entry.getValue().world == world);
+        fakePlayers.entrySet().removeIf(entry -> entry.getValue().level() == world);
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public static void onDimensionUnload (WorldEvent.Unload event) {
+    public static void onDimensionUnload (LevelEvent.Unload event) {
 
-        if (event.getWorld() instanceof ServerWorld) {
+        if (event.getLevel() instanceof ServerLevel) {
 
-            unloadWorld((ServerWorld) event.getWorld());
+            unloadLevel((ServerLevel) event.getLevel());
         }
     }
 }

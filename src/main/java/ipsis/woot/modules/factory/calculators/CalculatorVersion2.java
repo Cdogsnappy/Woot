@@ -4,7 +4,7 @@ import ipsis.woot.Woot;
 import ipsis.woot.crafting.FactoryRecipe;
 import ipsis.woot.modules.factory.FactoryConfiguration;
 import ipsis.woot.modules.factory.FormedSetup;
-import ipsis.woot.modules.factory.blocks.ControllerTileEntity;
+import ipsis.woot.modules.factory.blocks.ControllerBlockEntity;
 import ipsis.woot.modules.factory.blocks.HeartRecipe;
 import ipsis.woot.modules.factory.perks.Perk;
 import ipsis.woot.util.FakeMob;
@@ -160,7 +160,7 @@ public class CalculatorVersion2 {
          * Impacted by exotic A and exotic B
          */
         for (FakeMob fakeMob : setup.getAllMobs()) {
-            ItemStack controller = ControllerTileEntity.getItemStack(fakeMob);
+            ItemStack controller = ControllerBlockEntity.getItemStack(fakeMob);
             List<FactoryRecipe> recipes = setup.getWorld().getRecipeManager().getRecipes(
                     FactoryRecipe.FACTORY_TYPE,
                     new Inventory(controller), setup.getWorld());

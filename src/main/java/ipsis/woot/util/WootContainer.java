@@ -1,9 +1,8 @@
 package ipsis.woot.util;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.ContainerType;
-import net.minecraft.util.IntReferenceHolder;
+
+
+import net.minecraft.world.Container;
 
 import javax.annotation.Nullable;
 

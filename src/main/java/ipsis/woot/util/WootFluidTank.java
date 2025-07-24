@@ -1,9 +1,12 @@
 package ipsis.woot.util;
 
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.IFluidTank;
-import net.minecraftforge.fluids.capability.IFluidHandler;
+
+
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.IFluidTank;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 
 import javax.annotation.Nonnull;
 import java.util.function.Predicate;
@@ -65,6 +68,7 @@ public class WootFluidTank implements IFluidHandler, IFluidTank {
         return capacity;
     }
 
+
     @Nonnull
     public FluidStack getFluid()
     {
@@ -74,20 +78,6 @@ public class WootFluidTank implements IFluidHandler, IFluidTank {
     public int getFluidAmount()
     {
         return fluid.getAmount();
-    }
-
-    public WootFluidTank readFromNBT(CompoundNBT nbt) {
-
-        FluidStack fluid = FluidStack.loadFluidStackFromNBT(nbt);
-        setFluid(fluid);
-        return this;
-    }
-
-    public CompoundNBT writeToNBT(CompoundNBT nbt) {
-
-        fluid.writeToNBT(nbt);
-
-        return nbt;
     }
 
     @Override
@@ -135,7 +125,7 @@ public class WootFluidTank implements IFluidHandler, IFluidTank {
             {
                 return Math.min(capacity, resource.getAmount());
             }
-            if (!fluid.isFluidEqual(resource))
+            if (!fluid.is(resource.getFluid()))
             {
                 return 0;
             }
@@ -143,11 +133,11 @@ public class WootFluidTank implements IFluidHandler, IFluidTank {
         }
         if (fluid.isEmpty())
         {
-            fluid = new FluidStack(resource, Math.min(capacity, resource.getAmount()));
+            fluid = new FluidStack(resource.getFluidHolder(), Math.min(capacity, resource.getAmount()));
             onContentsChanged();
             return fluid.getAmount();
         }
-        if (!fluid.isFluidEqual(resource))
+        if (!fluid.is(resource.getFluid()))
         {
             return 0;
         }
@@ -170,13 +160,13 @@ public class WootFluidTank implements IFluidHandler, IFluidTank {
     @Nonnull
     @Override
     public FluidStack drain(int maxDrain, FluidAction action) {
-        return externalDrain == true ? internalDrain(maxDrain, action) : null;
+        return externalDrain ? internalDrain(maxDrain, action) : null;
     }
 
     @Nonnull
     @Override
     public FluidStack drain(FluidStack resource, FluidAction action) {
-        return externalDrain == true ? internalDrain(resource, action) : null;
+        return externalDrain ? internalDrain(resource, action) : null;
     }
 
     @Nonnull
@@ -197,7 +187,7 @@ public class WootFluidTank implements IFluidHandler, IFluidTank {
         {
             drained = fluid.getAmount();
         }
-        FluidStack stack = new FluidStack(fluid, drained);
+        FluidStack stack = new FluidStack(fluid.getFluidHolder(), drained);
         if (action.execute() && drained > 0)
         {
             fluid.shrink(drained);
