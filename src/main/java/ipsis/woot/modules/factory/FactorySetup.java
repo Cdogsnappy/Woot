@@ -3,7 +3,7 @@ package ipsis.woot.modules.factory;
 import ipsis.woot.Woot;
 import ipsis.woot.modules.factory.blocks.*;
 import ipsis.woot.modules.factory.blocks.HeartBlock;
-import ipsis.woot.modules.factory.blocks.HeartContainer;
+import ipsis.woot.modules.factory.blocks.HeartMenu;
 import ipsis.woot.modules.factory.blocks.HeartBlockEntity;
 import ipsis.woot.modules.factory.blocks.Cell1BlockEntity;
 import ipsis.woot.modules.factory.blocks.Cell2BlockEntity;
@@ -15,44 +15,46 @@ import ipsis.woot.modules.factory.items.PerkItem;
 import ipsis.woot.modules.factory.items.XpShardBaseItem;
 import ipsis.woot.modules.factory.multiblock.MultiBlockBlockEntity;
 import ipsis.woot.modules.factory.perks.Perk;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 
 public class FactorySetup {
 
-    public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, Woot.MODID);
-    public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, Woot.MODID);
-    public static final DeferredRegister<BlockEntityType<?>> BLOCKENTITIES = DeferredRegister.create(ForgeRegistries.TILE_ENTITIES, Woot.MODID);
-    public static final DeferredRegister<MenuType<?>> CONTAINERS = DeferredRegister.create(ForgeRegistries.CONTAINERS, Woot.MODID);
+    public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(BuiltInRegistries.ITEM, Woot.MODID);
+    public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(BuiltInRegistries.BLOCK, Woot.MODID);
+    public static final DeferredRegister<BlockEntityType<?>> BLOCKENTITIES = DeferredRegister.create(BuiltInRegistries.BLOCK_ENTITY_TYPE, Woot.MODID);
+    public static final DeferredRegister<MenuType<?>> CONTAINERS = DeferredRegister.create(BuiltInRegistries.MENU, Woot.MODID);
 
-    public static void register() {
+    public static void register(IEventBus eventBus) {
         Woot.setup.getLogger().info("FactorySetup: register");
-        BLOCKS.register(FMLJavaModLoadingContext.get().getModEventBus());
-        ITEMS.register(FMLJavaModLoadingContext.get().getModEventBus());
-        BLOCKENTITIES.register(FMLJavaModLoadingContext.get().getModEventBus());
-        CONTAINERS.register(FMLJavaModLoadingContext.get().getModEventBus());
+        BLOCKS.register(eventBus);
+        ITEMS.register(eventBus);
+        BLOCKENTITIES.register(eventBus);
+        CONTAINERS.register(eventBus);
     }
 
     public static final String HEART_TAG = "heart";
-    public static final DeferredHolder<HeartBlock> HEART_BLOCK = BLOCKS.register(
-            HEART_TAG, () -> new HeartBlock());
-    public static final DeferredHolder<Item> HEART_BLOCK_ITEM = ITEMS.register(
+    public static final DeferredHolder<Block, HeartBlock> HEART_BLOCK = BLOCKS.register(
+            HEART_TAG, HeartBlock::new);
+    public static final DeferredHolder<Item, Item> HEART_BLOCK_ITEM = ITEMS.register(
             HEART_TAG, () ->
                     new BlockItem(HEART_BLOCK.get(), Woot.createStandardProperties()));
-    public static final DeferredHolder<BlockEntityType<?>> HEART_BLOCK_TILE = BLOCKENTITIES.register(
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<HeartBlockEntity>> HEART_BLOCK_TILE = BLOCKENTITIES.register(
             HEART_TAG, () ->
-                    BlockEntityType.Builder.create(HeartBlockEntity::new, HEART_BLOCK.get()).build(null));
+                    BlockEntityType.Builder.of(HeartBlockEntity::new, HEART_BLOCK.get()).build(null));
 
-    public static final DeferredHolder<ContainerType<HeartContainer>> HEART_BLOCK_CONTAINER = CONTAINERS.register(
+    public static final DeferredHolder<MenuType<HeartMenu>> HEART_BLOCK_CONTAINER = CONTAINERS.register(
             HEART_TAG, () ->
                     IForgeContainerType.create((windowId, inv, data) -> {
-                        return new HeartContainer(
+                        return new HeartMenu(
                                 windowId,
                                 Woot.proxy.getClientWorld(),
                                 data.readBlockPos(),

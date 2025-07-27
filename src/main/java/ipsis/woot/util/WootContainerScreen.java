@@ -1,41 +1,37 @@
 package ipsis.woot.util;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+
 import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.vertex.BufferBuilder;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.inventory.ContainerScreen;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.texture.AtlasTexture;
+import net.minecraft.client.gui.GuiGraphics;
+
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraftforge.fluids.FluidStack;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.neoforged.neoforge.fluids.FluidStack;
 import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public abstract class WootContainerScreen<T extends Container> extends ContainerScreen<T> {
+public abstract class WootContainerScreen<T extends AbstractContainerMenu> extends Screen {
 
-    public WootContainerScreen(T container, PlayerInventory playerInventory, ITextComponent name) {
-        super(container, playerInventory, name);
+    public WootContainerScreen(Component name) {
+        super(name);
     }
 
     /**
      * x1, y1 is the bottom right of the energy bar
      */
-    public void renderEnergyBar(MatrixStack matrixStack, int x1, int y1, int height, int width, int curr, int max) {
+    public void renderEnergyBar(GuiGraphics matrixStack, int x1, int y1, int height, int width, int curr, int max) {
         int filled = 0;
         if (max > 0)
             filled = curr * 100 / max;
-        filled = MathHelper.clamp(filled, 0, 100);
+        filled = Math.clamp(filled, 0, 100);
         int h = filled * height / 100;
         fill(matrixStack,
                 guiLeft + x1,
@@ -51,9 +47,9 @@ public abstract class WootContainerScreen<T extends Container> extends Container
         int filled = 0;
         if (max > 0)
             filled = curr * 100 / max;
-        filled = MathHelper.clamp(filled, 0, 100);
+        filled = Math.clamp(filled, 0, 100);
         int h = filled * height / 100;
-        drawFluid(guiLeft + x1, guiTop + y1 - h + 1, fluidStack, width,  h);
+        drawFluid(this.getRectangle().left() + x1, getRectangle().top() + y1 - h + 1, fluidStack, width,  h);
     }
 
     public void renderFluidTank(MatrixStack matrixStack, int x1, int y1, int height, int width, int max, FluidStack fluidStack)  {

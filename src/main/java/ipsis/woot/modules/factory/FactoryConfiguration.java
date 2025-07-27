@@ -4,84 +4,84 @@ import ipsis.woot.config.ConfigDefaults;
 import ipsis.woot.config.ConfigOverride;
 import ipsis.woot.config.ConfigPath;
 import ipsis.woot.modules.factory.perks.Perk;
-import net.minecraftforge.common.ForgeConfigSpec;
 
 import ipsis.woot.config.ConfigDefaults.Factory;
+import net.neoforged.neoforge.common.ModConfigSpec;
 
 import java.util.List;
 
 public class FactoryConfiguration {
 
-    public static ForgeConfigSpec.BooleanValue TICK_ACCEL;
+    public static ModConfigSpec.BooleanValue TICK_ACCEL;
 
-    public static ForgeConfigSpec.IntValue CELL_1_CAPACITY;
-    public static ForgeConfigSpec.IntValue CELL_1_MAX_TRANSFER;
-    public static ForgeConfigSpec.IntValue CELL_2_CAPACITY;
-    public static ForgeConfigSpec.IntValue CELL_2_MAX_TRANSFER;
-    public static ForgeConfigSpec.IntValue CELL_3_CAPACITY;
-    public static ForgeConfigSpec.IntValue CELL_3_MAX_TRANSFER;
-    public static ForgeConfigSpec.IntValue CELL_4_CAPACITY;
-    public static ForgeConfigSpec.IntValue CELL_4_MAX_TRANSFER;
+    public static ModConfigSpec.IntValue CELL_1_CAPACITY;
+    public static ModConfigSpec.IntValue CELL_1_MAX_TRANSFER;
+    public static ModConfigSpec.IntValue CELL_2_CAPACITY;
+    public static ModConfigSpec.IntValue CELL_2_MAX_TRANSFER;
+    public static ModConfigSpec.IntValue CELL_3_CAPACITY;
+    public static ModConfigSpec.IntValue CELL_3_MAX_TRANSFER;
+    public static ModConfigSpec.IntValue CELL_4_CAPACITY;
+    public static ModConfigSpec.IntValue CELL_4_MAX_TRANSFER;
 
-    public static ForgeConfigSpec.IntValue MASS_COUNT;
-    public static ForgeConfigSpec.IntValue SPAWN_TICKS;
-    public static ForgeConfigSpec.IntValue UNITS_PER_HEALTH;
-    public static ForgeConfigSpec.IntValue MOB_SHARD_KILLS;
-    public static ForgeConfigSpec.IntValue TIER_1_MAX_UNITS;
-    public static ForgeConfigSpec.IntValue TIER_2_MAX_UNITS;
-    public static ForgeConfigSpec.IntValue TIER_3_MAX_UNITS;
-    public static ForgeConfigSpec.IntValue TIER_4_MAX_UNITS;
-    public static ForgeConfigSpec.IntValue TIER_5_MAX_UNITS;
+    public static ModConfigSpec.IntValue MASS_COUNT;
+    public static ModConfigSpec.IntValue SPAWN_TICKS;
+    public static ModConfigSpec.IntValue UNITS_PER_HEALTH;
+    public static ModConfigSpec.IntValue MOB_SHARD_KILLS;
+    public static ModConfigSpec.IntValue TIER_1_MAX_UNITS;
+    public static ModConfigSpec.IntValue TIER_2_MAX_UNITS;
+    public static ModConfigSpec.IntValue TIER_3_MAX_UNITS;
+    public static ModConfigSpec.IntValue TIER_4_MAX_UNITS;
+    public static ModConfigSpec.IntValue TIER_5_MAX_UNITS;
 
-    public static ForgeConfigSpec.DoubleValue EXOTIC_A;
-    public static ForgeConfigSpec.DoubleValue EXOTIC_B;
-    public static ForgeConfigSpec.DoubleValue EXOTIC_C;
-    public static ForgeConfigSpec.IntValue EXOTIC_D;
-    public static ForgeConfigSpec.IntValue EXOTIC_E;
-    public static ForgeConfigSpec.DoubleValue EXOTIC;
+    public static ModConfigSpec.DoubleValue EXOTIC_A;
+    public static ModConfigSpec.DoubleValue EXOTIC_B;
+    public static ModConfigSpec.DoubleValue EXOTIC_C;
+    public static ModConfigSpec.IntValue EXOTIC_D;
+    public static ModConfigSpec.IntValue EXOTIC_E;
+    public static ModConfigSpec.DoubleValue EXOTIC;
 
-    public static ForgeConfigSpec.IntValue EFFICIENCY_1;
-    public static ForgeConfigSpec.IntValue EFFICIENCY_2;
-    public static ForgeConfigSpec.IntValue EFFICIENCY_3;
-    public static ForgeConfigSpec.IntValue MASS_COUNT_1;
-    public static ForgeConfigSpec.IntValue MASS_COUNT_2;
-    public static ForgeConfigSpec.IntValue MASS_COUNT_3;
-    public static ForgeConfigSpec.IntValue RATE_1;
-    public static ForgeConfigSpec.IntValue RATE_2;
-    public static ForgeConfigSpec.IntValue RATE_3;
-    public static ForgeConfigSpec.IntValue XP_1;
-    public static ForgeConfigSpec.IntValue XP_2;
-    public static ForgeConfigSpec.IntValue XP_3;
-    public static ForgeConfigSpec.IntValue TIER_SHARD_1;
-    public static ForgeConfigSpec.IntValue TIER_SHARD_2;
-    public static ForgeConfigSpec.IntValue TIER_SHARD_3;
-    public static ForgeConfigSpec.IntValue HEADLESS_1;
-    public static ForgeConfigSpec.IntValue HEADLESS_2;
-    public static ForgeConfigSpec.IntValue HEADLESS_3;
-    public static ForgeConfigSpec.IntValue SLAUGHTER_1;
-    public static ForgeConfigSpec.IntValue SLAUGHTER_2;
-    public static ForgeConfigSpec.IntValue SLAUGHTER_3;
-    public static ForgeConfigSpec.IntValue CRUSHER_1;
-    public static ForgeConfigSpec.IntValue CRUSHER_2;
-    public static ForgeConfigSpec.IntValue CRUSHER_3;
-    public static ForgeConfigSpec.IntValue LASER_1;
-    public static ForgeConfigSpec.IntValue LASER_2;
-    public static ForgeConfigSpec.IntValue LASER_3;
-    public static ForgeConfigSpec.IntValue FLAYED_1;
-    public static ForgeConfigSpec.IntValue FLAYED_2;
-    public static ForgeConfigSpec.IntValue FLAYED_3;
-    public static ForgeConfigSpec.DoubleValue T1_FARM_DROP_CHANCE;
-    public static ForgeConfigSpec.ConfigValue<List<Integer>> T1_FARM_DROP_SHARD_WEIGHTS;
-    public static ForgeConfigSpec.DoubleValue T2_FARM_DROP_CHANCE;
-    public static ForgeConfigSpec.ConfigValue<List<Integer>> T2_FARM_DROP_SHARD_WEIGHTS;
-    public static ForgeConfigSpec.DoubleValue T3_FARM_DROP_CHANCE;
-    public static ForgeConfigSpec.ConfigValue<List<Integer>> T3_FARM_DROP_SHARD_WEIGHTS;
-    public static ForgeConfigSpec.DoubleValue T4_FARM_DROP_CHANCE;
-    public static ForgeConfigSpec.ConfigValue<List<Integer>> T4_FARM_DROP_SHARD_WEIGHTS;
-    public static ForgeConfigSpec.DoubleValue T5_FARM_DROP_CHANCE;
-    public static ForgeConfigSpec.ConfigValue<List<Integer>> T5_FARM_DROP_SHARD_WEIGHTS;
+    public static ModConfigSpec.IntValue EFFICIENCY_1;
+    public static ModConfigSpec.IntValue EFFICIENCY_2;
+    public static ModConfigSpec.IntValue EFFICIENCY_3;
+    public static ModConfigSpec.IntValue MASS_COUNT_1;
+    public static ModConfigSpec.IntValue MASS_COUNT_2;
+    public static ModConfigSpec.IntValue MASS_COUNT_3;
+    public static ModConfigSpec.IntValue RATE_1;
+    public static ModConfigSpec.IntValue RATE_2;
+    public static ModConfigSpec.IntValue RATE_3;
+    public static ModConfigSpec.IntValue XP_1;
+    public static ModConfigSpec.IntValue XP_2;
+    public static ModConfigSpec.IntValue XP_3;
+    public static ModConfigSpec.IntValue TIER_SHARD_1;
+    public static ModConfigSpec.IntValue TIER_SHARD_2;
+    public static ModConfigSpec.IntValue TIER_SHARD_3;
+    public static ModConfigSpec.IntValue HEADLESS_1;
+    public static ModConfigSpec.IntValue HEADLESS_2;
+    public static ModConfigSpec.IntValue HEADLESS_3;
+    public static ModConfigSpec.IntValue SLAUGHTER_1;
+    public static ModConfigSpec.IntValue SLAUGHTER_2;
+    public static ModConfigSpec.IntValue SLAUGHTER_3;
+    public static ModConfigSpec.IntValue CRUSHER_1;
+    public static ModConfigSpec.IntValue CRUSHER_2;
+    public static ModConfigSpec.IntValue CRUSHER_3;
+    public static ModConfigSpec.IntValue LASER_1;
+    public static ModConfigSpec.IntValue LASER_2;
+    public static ModConfigSpec.IntValue LASER_3;
+    public static ModConfigSpec.IntValue FLAYED_1;
+    public static ModConfigSpec.IntValue FLAYED_2;
+    public static ModConfigSpec.IntValue FLAYED_3;
+    public static ModConfigSpec.DoubleValue T1_FARM_DROP_CHANCE;
+    public static ModConfigSpec.ConfigValue<List<Integer>> T1_FARM_DROP_SHARD_WEIGHTS;
+    public static ModConfigSpec.DoubleValue T2_FARM_DROP_CHANCE;
+    public static ModConfigSpec.ConfigValue<List<Integer>> T2_FARM_DROP_SHARD_WEIGHTS;
+    public static ModConfigSpec.DoubleValue T3_FARM_DROP_CHANCE;
+    public static ModConfigSpec.ConfigValue<List<Integer>> T3_FARM_DROP_SHARD_WEIGHTS;
+    public static ModConfigSpec.DoubleValue T4_FARM_DROP_CHANCE;
+    public static ModConfigSpec.ConfigValue<List<Integer>> T4_FARM_DROP_SHARD_WEIGHTS;
+    public static ModConfigSpec.DoubleValue T5_FARM_DROP_CHANCE;
+    public static ModConfigSpec.ConfigValue<List<Integer>> T5_FARM_DROP_SHARD_WEIGHTS;
 
-    public static ForgeConfigSpec.IntValue getPerkIntValue(Perk.Group group, int level) {
+    public static ModConfigSpec.IntValue getPerkIntValue(Perk.Group group, int level) {
         if (group == Perk.Group.EFFICIENCY && level == 1) return EFFICIENCY_1;
         if (group == Perk.Group.EFFICIENCY && level == 2) return EFFICIENCY_2;
         if (group == Perk.Group.EFFICIENCY && level == 3) return EFFICIENCY_3;
@@ -115,7 +115,7 @@ public class FactoryConfiguration {
         return null; // Some don't have config values
     }
 
-    public static void init(ForgeConfigSpec.Builder COMMON_BUILDER, ForgeConfigSpec.Builder CLIENT_BUILDER) {
+    public static void init(ModConfigSpec.Builder COMMON_BUILDER, ModConfigSpec.Builder CLIENT_BUILDER) {
 
         COMMON_BUILDER.comment("Settings for the factory").push(ConfigPath.Factory.CATEGORY);
         CLIENT_BUILDER.comment("Settings for the factory").push(ConfigPath.Factory.CATEGORY);

@@ -1,9 +1,11 @@
 package ipsis.woot.util.helper;
 
 
-import net.minecraft.item.EnchantedBookItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
+
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.EnchantedBookItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 
 import javax.annotation.Nullable;
 
@@ -17,10 +19,9 @@ import javax.annotation.Nullable;
 public class EnchantmentHelper {
 
     public static boolean isEnchanted(@Nullable ItemStack itemStack) {
-
-        if (itemStack.getItem() == Items.ENCHANTED_BOOK)
-            return !EnchantedBookItem.getEnchantments(itemStack).isEmpty();
-        else
-            return itemStack.isEnchanted();
+        if(itemStack == null){
+            return false;
+        }
+        return itemStack.isEnchanted();
     }
 }

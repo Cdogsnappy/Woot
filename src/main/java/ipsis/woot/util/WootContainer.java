@@ -3,8 +3,14 @@ package ipsis.woot.util;
 
 
 import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.DataSlot;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.ItemStack;
 
 import javax.annotation.Nullable;
+
 
 /**
  * This is from McJty. src/main/java/mcjty/lib/container/GenericContainer.java
@@ -12,18 +18,18 @@ import javax.annotation.Nullable;
  * Vanilla does not send integer data over for the containrs
  */
 
-public class WootContainer extends Container {
+public class WootContainer extends AbstractContainerMenu {
 
-    protected WootContainer(@Nullable ContainerType<?> type, int id) {
+    protected WootContainer(@Nullable MenuType<?> type, int id) {
         super(type, id);
     }
 
-    public void addShortListener(IntReferenceHolder holder) {
-        trackInt(holder);
+    public void addShortListener(DataSlot holder) {
+        addDataSlot(holder);
     }
 
-    public void addIntegerListener(IntReferenceHolder holder) {
-        trackInt(new IntReferenceHolder() {
+    public void addIntegerListener(DataSlot holder) {
+        addDataSlot(new DataSlot() {
             private int lastKnown;
 
             @Override
@@ -38,14 +44,15 @@ public class WootContainer extends Container {
             }
 
             @Override
-            public boolean isDirty() {
+            public boolean checkAndClearUpdateFlag() {
                 int i = this.get();
                 boolean flag = i != this.lastKnown;
                 this.lastKnown = i;
                 return flag;
             }
+
         });
-        trackInt(new IntReferenceHolder() {
+        addDataSlot(new DataSlot() {
             private int lastKnown;
 
             @Override
@@ -60,7 +67,7 @@ public class WootContainer extends Container {
             }
 
             @Override
-            public boolean isDirty() {
+            public boolean checkAndClearUpdateFlag() {
                 int i = this.get();
                 boolean flag = i != this.lastKnown;
                 this.lastKnown = i;
@@ -69,8 +76,15 @@ public class WootContainer extends Container {
         });
     }
 
+
+
     @Override
-    public boolean canInteractWith(PlayerEntity playerIn) {
+    public ItemStack quickMoveStack(Player player, int i) {
+        return null;
+    }
+
+    @Override
+    public boolean stillValid(Player player) {
         return true;
     }
 }

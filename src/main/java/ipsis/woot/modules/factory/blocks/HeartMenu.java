@@ -6,27 +6,27 @@ import ipsis.woot.modules.factory.client.ClientFactorySetup;
 import ipsis.woot.setup.NetworkChannel;
 import ipsis.woot.util.TankPacketHandler;
 import ipsis.woot.util.WootContainer;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.IContainerListener;
-import net.minecraft.util.IWorldPosCallable;
-import net.minecraft.util.IntReferenceHolder;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fml.network.NetworkDirection;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.ContainerListener;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.ContainerLevelAccess;
+import net.minecraft.world.inventory.DataSlot;
+import net.minecraft.world.level.Level;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.network.PacketDistributor;
 
-public class HeartContainer extends WootContainer implements TankPacketHandler  {
+
+public class HeartMenu extends WootContainer implements TankPacketHandler  {
 
     private HeartBlockEntity tileEntity;
 
-    public HeartContainer(int windowId, World world, BlockPos pos, PlayerInventory playerInventory, PlayerEntity playerEntity) {
+    public HeartMenu(int windowId, Level world, BlockPos pos, Inventory playerInventory, Player playerEntity) {
         super(FactorySetup.HEART_BLOCK_CONTAINER.get(), windowId);
-        tileEntity = (HeartBlockEntity)world.getTileEntity(pos);
+        tileEntity = (HeartBlockEntity)world.getBlockEntity(pos);
         addListeners();
 
         /**
@@ -40,22 +40,21 @@ public class HeartContainer extends WootContainer implements TankPacketHandler  
 
 
     @Override
-    public boolean canInteractWith(PlayerEntity playerIn) {
-        return isWithinUsableDistance(IWorldPosCallable.of(tileEntity.getWorld(), tileEntity.getPos()),
+    public boolean stillValid(Player playerIn) {
+        return stillValid(ContainerLevelAccess.create(tileEntity.getLevel(), tileEntity.getPos()),
                 playerIn, FactorySetup.HEART_BLOCK.get());
     }
 
     @Override
-    public void detectAndSendChanges() {
-        super.detectAndSendChanges();
+    public void broadcastChanges() {
+        super.broadcastChanges();
 
-        if (!inputFluid.isFluidStackIdentical(tileEntity.getTankFluid())) {
+        if (!inputFluid.is(tileEntity.getTankFluid().getFluid())) {
             inputFluid = tileEntity.getTankFluid().copy();
             TankPacket tankPacket = new TankPacket(0, inputFluid);
-            for (IContainerListener l : listeners) {
-                if (l instanceof ServerPlayerEntity) {
-                    NetworkChannel.channel.sendTo(tankPacket, ((ServerPlayerEntity) l).connection.netManager,
-                            NetworkDirection.PLAY_TO_CLIENT);
+            for (ContainerListener l : this.) {
+                if (l instanceof ServerPlayer) {
+                    PacketDistributor.sendToPlayer(((ServerPlayer) l), tankPacket);
                 }
             }
         }
@@ -74,14 +73,14 @@ public class HeartContainer extends WootContainer implements TankPacketHandler  
 
 
     private void addListeners() {
-        addShortListener(new IntReferenceHolder() {
+        addShortListener(new DataSlot() {
             @Override
             public int get() { return tileEntity.getProgress(); }
 
             @Override
             public void set(int i) { progress = i; }
         });
-        addIntegerListener(new IntReferenceHolder() {
+        addIntegerListener(new DataSlot() {
             @Override
             public int get() {
                 return tileEntity.getCellType();

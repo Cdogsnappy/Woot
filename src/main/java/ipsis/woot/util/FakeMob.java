@@ -4,6 +4,10 @@ package ipsis.woot.util;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.monster.Creeper;
@@ -13,6 +17,7 @@ import net.minecraft.world.entity.monster.Slime;
 import javax.annotation.Nonnull;
 import java.util.Objects;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 public class FakeMob {
 
@@ -22,6 +27,12 @@ public class FakeMob {
     private String entityKey;
     private String tag;
     private String name;
+
+    public static final StreamCodec<RegistryFriendlyByteBuf, FakeMob> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.STRING_UTF8, FakeMob::getEntityKey,
+            ByteBufCodecs.STRING_UTF8, FakeMob::getTag,
+            FakeMob::new
+    );
 
     public FakeMob() {
         this(INVALID_ENTITY_KEY, EMPTY_TAG);

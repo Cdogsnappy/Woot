@@ -6,55 +6,29 @@ import ipsis.woot.fluilds.network.TankPacket;
 import ipsis.woot.modules.factory.network.HeartStaticDataReply;
 import ipsis.woot.modules.oracle.network.SimulatedMobDropsSummaryReply;
 import ipsis.woot.modules.oracle.network.SimulatedMobsReply;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.network.NetworkRegistry;
-import net.minecraftforge.fml.network.simple.SimpleChannel;
+import net.minecraft.resources.ResourceLocation;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.registration.PayloadRegistrar;
+import net.neoforged.neoforge.network.registration.PayloadRegistration;
 
 import java.util.Objects;
 
+@Mod(Woot.MODID)
 public class NetworkChannel {
 
-    private static ResourceLocation resourceLocation = new ResourceLocation(Woot.MODID, "net");
+    private static ResourceLocation resourceLocation = ResourceLocation.fromNamespaceAndPath(Woot.MODID, "net");
+    static PayloadRegistrar payloadRegistrar;
 
-    public static void init(){}
+    @SubscribeEvent
+    public static void registerPayloads(RegisterPayloadHandlersEvent event) {
+        PayloadRegistrar registrar = event.registrar(Woot.MODID);
 
-    public static SimpleChannel channel;
-    static {
-        channel = NetworkRegistry.ChannelBuilder.named(resourceLocation)
-                .clientAcceptedVersions(s -> Objects.equals(s, "1"))
-                .serverAcceptedVersions(s -> Objects.equals(s, "1"))
-                .networkProtocolVersion(() -> "1")
-                .simpleChannel();
-
-        channel.registerMessage(
-                1,
-                ServerDataRequest.class,
-                ServerDataRequest::toByte, ServerDataRequest::fromBytes,
-                ServerDataRequest::handle);
-
-        channel.registerMessage(
-                2,
-                HeartStaticDataReply.class,
-                HeartStaticDataReply::toBytes, HeartStaticDataReply::fromBytes, HeartStaticDataReply::handle);
-
-        channel.registerMessage(
-                3,
-                SimulatedMobsReply.class,
-                SimulatedMobsReply::toBytes, SimulatedMobsReply::fromBytes, SimulatedMobsReply::handle);
-
-        channel.registerMessage(
-                4,
-                SimulatedMobDropsSummaryReply.class,
-                SimulatedMobDropsSummaryReply::toBytes, SimulatedMobDropsSummaryReply::fromBytes, SimulatedMobDropsSummaryReply::handle);
-
-        channel.registerMessage(
-                5,
-                FluidStackPacket.class,
-                FluidStackPacket::toBytes, FluidStackPacket::fromBytes, FluidStackPacket::handle);
-
-        channel.registerMessage(
-                6,
-                TankPacket.class,
-                TankPacket::toBytes, TankPacket::fromBytes, TankPacket::handle);
+        registrar
+                .playToClient(TankPacket.TYPE, TankPacket.STREAM_CODEC, TankPacket::handle)
+                .playToClient(SimulatedMobDropsSummaryReply.TYPE, SimulatedMobDropsSummaryReply.STREAM_CODEC, SimulatedMobDropsSummaryReply::handle)
+                .playToClient(SimulatedMobsReply.TYPE, SimulatedMobsReply.STREAM_CODEC, SimulatedMobsReply::handle);
     }
 }

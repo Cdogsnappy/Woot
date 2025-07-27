@@ -1,9 +1,8 @@
 package ipsis.woot.modules.factory;
 
 import ipsis.woot.util.helper.StringHelper;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.Locale;
 
@@ -39,12 +38,12 @@ public enum Exotic {
     public static int getExoticCount() { return VALUES.length - 1; }
 
     public static Exotic getExotic(int index) {
-        index = MathHelper.clamp(index, 0, VALUES.length);
+        index = Math.clamp(index, 0, VALUES.length);
         return VALUES[index];
     }
 
-    public TranslationTextComponent getTooltip() {
-        return new TranslationTextComponent("info.woot.exotic." + getName());
+    public Component getTooltip() {
+        return Component.translatable("info.woot.exotic." + getName());
     }
 
     public ItemStack getItemStack() {

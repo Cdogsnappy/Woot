@@ -31,7 +31,7 @@ public class OracleBlock extends Block {
 
     @Nullable
     @Override
-    public BlockEntity createTileEntity(BlockState state, IBlockReader world) {
+    public BlockEntity createTileEntity(BlockState state, BlockReader world) {
         return new OracleTileEntity();
     }
 

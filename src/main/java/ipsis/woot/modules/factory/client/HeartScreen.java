@@ -1,12 +1,12 @@
 package ipsis.woot.modules.factory.client;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+
 import com.mojang.blaze3d.platform.GlStateManager;
 import ipsis.woot.Woot;
 import ipsis.woot.fluilds.FluidSetup;
 import ipsis.woot.modules.factory.*;
 import ipsis.woot.modules.factory.blocks.ControllerBlockEntity;
-import ipsis.woot.modules.factory.blocks.HeartContainer;
+import ipsis.woot.modules.factory.blocks.HeartMenu;
 import ipsis.woot.modules.factory.items.PerkItem;
 import ipsis.woot.modules.factory.perks.Perk;
 import ipsis.woot.setup.NetworkChannel;
@@ -14,21 +14,6 @@ import ipsis.woot.setup.ServerDataRequest;
 import ipsis.woot.util.FakeMob;
 import ipsis.woot.util.WootContainerScreen;
 import ipsis.woot.util.helper.StringHelper;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.Util;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,11 +25,11 @@ import java.util.List;
  */
 
 @OnlyIn(Dist.CLIENT)
-public class HeartScreen extends WootContainerScreen<HeartContainer> {
+public class HeartScreen extends WootContainerScreen<HeartMenu> {
 
     private ResourceLocation GUI = new ResourceLocation(Woot.MODID, "textures/gui/heart.png");
 
-    public HeartScreen(HeartContainer container, PlayerInventory inv, ITextComponent name) {
+    public HeartScreen(HeartMenu container, PlayerInventory inv, ITextComponent name) {
         super(container, inv, name);
         xSize = GUI_WIDTH;
         ySize = GUI_HEIGHT;

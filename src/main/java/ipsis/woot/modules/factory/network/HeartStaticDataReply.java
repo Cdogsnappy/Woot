@@ -3,7 +3,7 @@ package ipsis.woot.modules.factory.network;
 import io.netty.buffer.ByteBuf;
 import ipsis.woot.modules.factory.FormedSetup;
 import ipsis.woot.modules.factory.perks.Perk;
-import ipsis.woot.modules.factory.blocks.HeartContainer;
+import ipsis.woot.modules.factory.blocks.HeartMenu;
 import ipsis.woot.modules.factory.blocks.HeartRecipe;
 import ipsis.woot.modules.factory.client.ClientFactorySetup;
 import ipsis.woot.modules.factory.perks.Helper;
@@ -14,23 +14,23 @@ import ipsis.woot.util.NetworkHelper;
 import ipsis.woot.util.oss.NetworkTools;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
-public class HeartStaticDataReply {
+public record HeartStaticDataReply(FormedSetup formedSetup, HeartRecipe recipe, ClientFactorySetup clientFactorySetup) {
 
-    public FormedSetup formedSetup;
-    public HeartRecipe recipe;
-    public ClientFactorySetup clientFactorySetup;
+
 
     public HeartStaticDataReply() { }
+
+
     public HeartStaticDataReply(FormedSetup formedSetup, HeartRecipe recipe) {
         this.formedSetup = formedSetup;
         this.recipe = recipe;
@@ -85,10 +85,10 @@ public class HeartStaticDataReply {
             List<SimulatedMobDropSummary> drops = MobSimulator.getInstance().getDropSummary(fakeMob);
             buf.writeInt(drops.size());
             for (SimulatedMobDropSummary drop : drops) {
-                ItemStack itemStack = drop.itemStack.copy();
-                itemStack.setCount((int)(drop.chanceToDrop[formedSetup.getLootingLevel()] * 1000.0F));
+                ItemStack itemStack = drop.stack().copy();
+                itemStack.setCount((int)(drop.chanceToDrop().get(formedSetup.getLootingLevel()) * 1000.0F));
                 NetworkTools.writeItemStack(buf, itemStack);
-                buf.writeFloat(drop.chanceToDrop[formedSetup.getLootingLevel()]);
+                buf.writeFloat(drop.chanceToDrop().get(formedSetup.getLootingLevel()));
             }
         }
 
@@ -106,12 +106,9 @@ public class HeartStaticDataReply {
         recipe.recipeFluids.forEach(i -> NetworkHelper.writeFluidStack(buf, i));
     }
 
-    public void handle(Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> {
+    public void handle(HeartStaticDataReply reply, IPayloadContext ctx) {
             final LocalPlayer player = Minecraft.getInstance().player;
-            if (player.containerMenu instanceof HeartContainer)
-                ((HeartContainer) player.openContainer).handleStaticDataReply(clientFactorySetup);
-            ctx.get().setPacketHandled(true);
-        })) ;
+            if (player.containerMenu instanceof HeartMenu)
+                ((HeartMenu) player.containerMenu).handleStaticDataReply(clientFactorySetup);
     }
 }

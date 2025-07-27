@@ -1,7 +1,7 @@
 package ipsis.woot.util.helper;
 
 import ipsis.woot.Woot;
-import net.minecraft.util.math.MathHelper;
+
 
 import java.util.Random;
 
@@ -12,7 +12,7 @@ public class RandomHelper {
     private static final float PERCENT_MIN = 0.0F;
     private static final float PERCENT_MAX = 100.0F;
     public static boolean rollPercentage(double limit, String context) {
-        limit = MathHelper.clamp(limit, PERCENT_MIN, PERCENT_MAX);
+        limit = Math.clamp(limit, PERCENT_MIN, PERCENT_MAX);
         if (limit == PERCENT_MAX) {
             //Woot.setup.getLogger().debug("rollPercentage: {} guaranteed drop", context);
             return true;

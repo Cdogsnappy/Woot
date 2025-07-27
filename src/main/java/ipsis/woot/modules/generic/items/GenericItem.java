@@ -3,6 +3,7 @@ package ipsis.woot.modules.generic.items;
 import ipsis.woot.Woot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 
 public class GenericItem extends Item {
@@ -20,7 +21,7 @@ public class GenericItem extends Item {
     public GenericItemType genericItemType() { return this.itemType; }
 
     @Override
-    public boolean hasEffect(ItemStack stack) {
+    public boolean isFoil(@NotNull ItemStack stack) {
         return itemType == GenericItemType.ENCH_PLATE_1 || itemType == GenericItemType.ENCH_PLATE_2 || itemType == GenericItemType.ENCH_PLATE_3;
     }
 

@@ -5,6 +5,7 @@ import ipsis.woot.modules.generic.items.GenericItem;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -15,10 +16,10 @@ public class GenericSetup {
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(BuiltInRegistries.ITEM, Woot.MODID);
     public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(BuiltInRegistries.BLOCK, Woot.MODID);
 
-    public static void register() {
+    public static void register(IEventBus eventBus) {
         Woot.setup.getLogger().info("GenericSetup: register");
-        BLOCKS.register(FMLJavaModLoadingContext.get().getModEventBus());
-        ITEMS.register(FMLJavaModLoadingContext.get().getModEventBus());
+        BLOCKS.register(eventBus);
+        ITEMS.register(eventBus);
     }
 
     public static final DeferredHolder<Item,GenericItem> SI_INGOT_ITEM = ITEMS.register(

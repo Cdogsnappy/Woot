@@ -8,8 +8,8 @@ import ipsis.woot.modules.factory.Tier;
 import ipsis.woot.util.FakeMob;
 import ipsis.woot.util.NetworkHelper;
 import ipsis.woot.util.oss.NetworkTools;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.fluids.FluidStack;
+import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.fluids.FluidStack;
 
 import java.util.ArrayList;
 import java.util.HashMap;

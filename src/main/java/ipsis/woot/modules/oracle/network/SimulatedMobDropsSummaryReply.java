@@ -1,55 +1,53 @@
 package ipsis.woot.modules.oracle.network;
 
 import io.netty.buffer.ByteBuf;
+import ipsis.woot.Woot;
+import ipsis.woot.fluilds.network.TankPacket;
 import ipsis.woot.modules.oracle.blocks.OracleContainer;
 import ipsis.woot.simulator.MobSimulator;
 import ipsis.woot.simulator.SimulatedMobDropSummary;
 import ipsis.woot.util.FakeMob;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.util.profiling.jfr.event.NetworkSummaryEvent;
-import net.neoforged.api.distmarker.Dist;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
-public class SimulatedMobDropsSummaryReply {
+public record SimulatedMobDropsSummaryReply(List<SimulatedMobDropSummary> drops) implements CustomPacketPayload {
 
-    public List<SimulatedMobDropSummary> drops = new ArrayList<>();
+    public static final CustomPacketPayload.Type<SimulatedMobDropsSummaryReply> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(Woot.MODID, "simmobdropsummaryreply"));
+    public static final StreamCodec<RegistryFriendlyByteBuf, SimulatedMobDropsSummaryReply> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.collection(ArrayList::new, SimulatedMobDropSummary.STREAM_CODEC), SimulatedMobDropsSummaryReply::drops,
+            SimulatedMobDropsSummaryReply::new
+            );
 
-    // Required
-    public SimulatedMobDropsSummaryReply() {}
 
-    public static SimulatedMobDropsSummaryReply fromBytes(ByteBuf buf) {
-       SimulatedMobDropsSummaryReply reply = new SimulatedMobDropsSummaryReply();
-       int numDrops = buf.readInt();
-       for (int i = 0; i < numDrops; i++)
-           reply.drops.add(SimulatedMobDropSummary.readFromPacket(buf));
-
-       return reply;
-    }
 
     public static SimulatedMobDropsSummaryReply fromMob(String entityKey) {
-        SimulatedMobDropsSummaryReply reply = new SimulatedMobDropsSummaryReply();
+        SimulatedMobDropsSummaryReply reply = new SimulatedMobDropsSummaryReply(new ArrayList<>());
         FakeMob fakeMob = new FakeMob(entityKey);
         if (fakeMob.isValid())
             reply.drops.addAll(MobSimulator.getInstance().getDropSummary(fakeMob));
         return reply;
     }
 
-    public void toBytes(ByteBuf buf) {
-        buf.writeInt(drops.size());
-        drops.forEach(d -> d.writeToPacket(buf));
-    }
+    public static void handle(SimulatedMobDropsSummaryReply packet, IPayloadContext ctx) {
 
-    public void handle(Supplier<Network> ctx) {
-        ctx.get().enqueueWork(() -> DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> {
             final LocalPlayer player = Minecraft.getInstance().player;
             if (player.containerMenu instanceof OracleContainer)
-                ((OracleContainer) player.openContainer).handleSimulatedMobDropsSummaryReply(this);
-            ctx.get().setPacketHandled(true);
-        })) ;
+                ((OracleContainer) player.containerMenu).handleSimulatedMobDropsSummaryReply(packet);
+    }
+
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 }

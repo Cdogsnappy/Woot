@@ -1,81 +1,75 @@
 package ipsis.woot.setup;
 
 import io.netty.buffer.ByteBuf;
+import ipsis.woot.Woot;
 import ipsis.woot.modules.factory.blocks.HeartBlockEntity;
 import ipsis.woot.modules.oracle.blocks.OracleTileEntity;
 import ipsis.woot.modules.oracle.network.SimulatedMobDropsSummaryReply;
 import ipsis.woot.modules.oracle.network.SimulatedMobsReply;
 import ipsis.woot.util.oss.NetworkTools;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraftforge.fml.network.NetworkDirection;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
+import org.apache.logging.log4j.core.jmx.Server;
 
+import java.util.ArrayList;
 import java.util.function.Supplier;
 
 /**
  * Client request for information
  */
-public class ServerDataRequest {
+public record ServerDataRequest(String s, BlockPos pos, int requestType) implements CustomPacketPayload{
 
-    public String s;
-    public BlockPos pos;
-    public Type requestType;
-    public ServerDataRequest(Type requestType, BlockPos pos, String s) {
-        this.requestType = requestType;
-        this.pos = new BlockPos(pos);
-        this.s = s;
-    }
 
-    public static ServerDataRequest fromBytes(ByteBuf buf) {
-        return new ServerDataRequest(Type.fromIndex(buf.readInt()),
-                new BlockPos(buf.readInt(), buf.readInt(), buf.readInt()), NetworkTools.readString(buf));
-    }
+    public static final StreamCodec STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.STRING_UTF8, ServerDataRequest::s,
+            BlockPos.STREAM_CODEC, ServerDataRequest::pos,
+            ByteBufCodecs.VAR_INT, ServerDataRequest::requestType,
+            ServerDataRequest::new
+    );
 
-    public void toByte(ByteBuf buf) {
-        buf.writeInt(requestType.ordinal());
-        buf.writeInt(pos.getX());
-        buf.writeInt(pos.getY());
-        buf.writeInt(pos.getZ());
-        NetworkTools.writeString(buf, s);
-    }
+    public static final CustomPacketPayload.Type<ServerDataRequest> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(Woot.MODID, "datarequest"));
 
-    public void handle(Supplier<NetworkEvent.Context> ctx) {
-        final ServerPlayerEntity serverPlayerEntity = ctx.get().getSender();
-        if (serverPlayerEntity != null) {
-            ctx.get().enqueueWork(() -> {
-                TileEntity te = serverPlayerEntity.world.getTileEntity(pos);
-                if (requestType == Type.DROP_REGISTRY_STATUS) {
+    public static void handle(ServerDataRequest request, IPayloadContext ctx) {
+        final Player serverPlayerEntity = ctx.player();
+        ctx.enqueueWork(() -> {
+            BlockEntity te = serverPlayerEntity.level().getBlockEntity(request.pos);
+            switch(Type.fromIndex(request.requestType)){
+                case DROP_REGISTRY_STATUS:
                     if (te instanceof OracleTileEntity) {
-                        NetworkChannel.channel.sendTo(new SimulatedMobsReply(),
-                                serverPlayerEntity.connection.netManager,
-                                NetworkDirection.PLAY_TO_CLIENT);
-                        ctx.get().setPacketHandled(true);
+                        PacketDistributor.sendToPlayer((ServerPlayer)serverPlayerEntity, new SimulatedMobsReply(new ArrayList<>()));
+                        break;
                     }
-                } else if (requestType == Type.SIMULATED_MOB_DROPS) {
+                case SIMULATED_MOB_DROPS:
                     if (te instanceof OracleTileEntity) {
-                        NetworkChannel.channel.sendTo(SimulatedMobDropsSummaryReply.fromMob(s),
-                                serverPlayerEntity.connection.netManager,
-                                NetworkDirection.PLAY_TO_CLIENT);
-                        ctx.get().setPacketHandled(true);
+                        PacketDistributor.sendToPlayer((ServerPlayer)serverPlayerEntity,  SimulatedMobDropsSummaryReply.fromMob(request.s));
+                        break;
                     }
-                } else if (requestType == Type.HEART_STATIC_DATA) {
+                case HEART_STATIC_DATA:
                     if (te instanceof HeartBlockEntity) {
-                        NetworkChannel.channel.sendTo((((HeartBlockEntity) te).createStaticDataReply2()),
-                                serverPlayerEntity.connection.netManager,
-                                NetworkDirection.PLAY_TO_CLIENT);
-                        ctx.get().setPacketHandled(true);
+                        PacketDistributor.sendToPlayer((ServerPlayer)serverPlayerEntity, (((HeartBlockEntity) te).createStaticDataReply2()));
+                        break;
                     }
-                }
-            });
-        }
+            }
+
+        });
     }
 
     @Override
     public String toString() {
         return requestType + " " + pos.toString() + "(" + s + ")";
+    }
+
+    @Override
+    public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 
     public enum Type {
@@ -85,7 +79,7 @@ public class ServerDataRequest {
 
         static Type[] VALUES = values();
         public static Type fromIndex(int index) {
-            index = MathHelper.clamp(index, 0, VALUES.length -1);
+            index = Math.clamp(index, 0, VALUES.length -1);
             return VALUES[index];
         }
     }

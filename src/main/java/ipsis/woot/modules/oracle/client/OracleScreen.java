@@ -7,6 +7,7 @@ import ipsis.woot.modules.oracle.blocks.OracleContainer;
 import ipsis.woot.simulator.SimulatedMobDropSummary;
 import ipsis.woot.util.FakeMob;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.MenuScreens;
@@ -23,7 +24,9 @@ import org.jetbrains.annotations.NotNull;
 import net.minecraft.world.item.ItemStack;
 
 
+import java.awt.font.FontRenderContext;
 import java.util.List;
+import java.util.Optional;
 
 import static net.neoforged.neoforge.common.util.FakePlayerFactory.getMinecraft;
 
@@ -51,7 +54,7 @@ public class OracleScreen extends AbstractContainerScreen<OracleContainer> {
             FakeMob fakeMob = menu.simulatedMobs.get(mobIndex);
             EntityType<?> entityType = BuiltInRegistries.ENTITY_TYPE.get(fakeMob.getResourceLocation());
             if (entityType != null) {
-                String mob = new TranslationComponent(entityType.toShortString()).getString();
+                String mob = Component.literal(entityType.toShortString()).getString();
                 if (fakeMob.hasTag())
                     mob += "[" + fakeMob.getTag() + "]";
                 guiGraphics.drawString(this.font, mob, (this.imageWidth / 2 - this.font.width(mob) / 2), 25, 4210752);
@@ -68,15 +71,13 @@ public class OracleScreen extends AbstractContainerScreen<OracleContainer> {
 
 
                 if (mouseX - leftPos > stackX && mouseX - leftPos <= stackX + 20 && mouseY - topPos >= stackY && mouseY - topPos <= stackY + 20) {
-                    FontRenderContext fontRenderer = summary.itemStack.getItem().getFontRenderer(summary.itemStack);
-                    if (fontRenderer == null)
-                        fontRenderer = font;
-                    List<Component> tooltip = getTooltipFromItem(Minecraft.getInstance(), summary.itemStack);
-                    tooltip.add(new TranslationTextComponent("gui.woot.oracle.looting.0", summary.chanceToDrop[0]));
-                    tooltip.add(new TranslationTextComponent("gui.woot.oracle.looting.1", summary.chanceToDrop[1]));
-                    tooltip.add(new TranslationTextComponent("gui.woot.oracle.looting.2", summary.chanceToDrop[2]));
-                    tooltip.add(new TranslationTextComponent("gui.woot.oracle.looting.3", summary.chanceToDrop[3]));
-                    func_243308_b(matrixStack, tooltip, mouseX - leftPos, mouseY - topPos);
+                    Font fontRenderer = Minecraft.getInstance().font;
+                    List<Component> tooltip = getTooltipFromItem(Minecraft.getInstance(), summary.stack());
+                    tooltip.add(Component.translatable("gui.woot.oracle.looting.0", summary.chanceToDrop().getFirst()));
+                    tooltip.add(Component.translatable("gui.woot.oracle.looting.1", summary.chanceToDrop().get(1)));
+                    tooltip.add(Component.translatable("gui.woot.oracle.looting.2", summary.chanceToDrop().get(2)));
+                    tooltip.add(Component.translatable("gui.woot.oracle.looting.3", summary.chanceToDrop().get(3)));
+                    guiGraphics.renderTooltip(fontRenderer, tooltip, summary.stack().getTooltipImage(), summary.stack(), mouseX - leftPos, mouseY - topPos);
                     break;
                 }
 

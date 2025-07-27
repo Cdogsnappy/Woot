@@ -17,10 +17,14 @@ import ipsis.woot.util.WootDebug;
 import ipsis.woot.util.helper.StorageHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.TickingBlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import org.apache.logging.log4j.LogManager;
@@ -48,8 +52,8 @@ public class HeartBlockEntity extends BlockEntity implements TickingBlockEntity,
     TickTracker tickTracker = new TickTracker();
     boolean loadedFromNBT = false;
 
-    public HeartBlockEntity() {
-        super(FactorySetup.HEART_BLOCK_TILE.get());
+    public HeartBlockEntity(BlockPos pos, BlockState blockState) {
+        super(FactorySetup.HEART_BLOCK_TILE.get(), pos, blockState);
         tickTracker.setStructureTickCount(20);
     }
 
@@ -315,6 +319,11 @@ public class HeartBlockEntity extends BlockEntity implements TickingBlockEntity,
         markDirty();
     }
 
+    @Override
+    public List<String> getDebugText(List<String> debug, UseOnContext itemUseContext) {
+        return List.of();
+    }
+
     /**
      * Tick Tracker
      */
@@ -380,7 +389,7 @@ public class HeartBlockEntity extends BlockEntity implements TickingBlockEntity,
     @Nullable
     @Override
     public Container createMenu(int windowId, PlayerInventory playerInventory, PlayerEntity playerEntity) {
-        return new HeartContainer(windowId, world, pos, playerInventory, playerEntity);
+        return new HeartMenu(windowId, world, pos, playerInventory, playerEntity);
     }
 
     public int getFluidCapacity() {
