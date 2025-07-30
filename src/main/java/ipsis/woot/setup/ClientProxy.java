@@ -1,18 +1,19 @@
 package ipsis.woot.setup;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+
 
 public class ClientProxy implements IProxy {
 
     @Override
-    public PlayerEntity getClientPlayer() {
+    public Player getClientPlayer() {
         return Minecraft.getInstance().player;
     }
 
     @Override
-    public World getClientWorld() {
-        return Minecraft.getInstance().world;
+    public Level getClientWorld() {
+        return Minecraft.getInstance().level;
     }
 }

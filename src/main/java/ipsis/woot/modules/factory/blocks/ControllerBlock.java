@@ -6,6 +6,7 @@ import ipsis.woot.modules.factory.FactoryComponentProvider;
 import ipsis.woot.modules.factory.Tier;
 import ipsis.woot.util.WootDebug;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -61,10 +62,10 @@ public class ControllerBlock extends Block implements FactoryComponentProvider, 
         if (te instanceof ControllerBlockEntity) {
             Tier tier = ((ControllerBlockEntity) te).getTier();
             if (tier != Tier.UNKNOWN)
-                player.sendStatusMessage(new TranslationTextComponent(tier.getTranslationKey()), true);
+                player.sendSystemMessage(Component.translatable(tier.getTranslationKey()));
         }
 
-        return ActionResultType.SUCCESS;
+        return ItemInteractionResult.SUCCESS;
     }
 
     /**

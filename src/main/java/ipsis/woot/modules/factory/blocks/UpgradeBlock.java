@@ -3,20 +3,20 @@ package ipsis.woot.modules.factory.blocks;
 import ipsis.woot.modules.factory.FactoryComponent;
 import ipsis.woot.modules.factory.perks.Perk;
 import ipsis.woot.modules.factory.items.PerkItem;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.state.EnumProperty;
-import net.minecraft.state.StateContainer;
-import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.phys.BlockHitResult;
+
 
 import javax.annotation.Nullable;
 
@@ -24,7 +24,7 @@ public class UpgradeBlock extends FactoryBlock {
 
     public UpgradeBlock(FactoryComponent component) {
         super(component);
-        this.setDefaultState(getStateContainer().getBaseState().with(UPGRADE, Perk.EMPTY).with(BlockStateProperties.ATTACHED, false));
+        this.registerDefaultState(this.getStateDefinition().any().setValue(UPGRADE, Perk.EMPTY).setValue(BlockStateProperties.ATTACHED, false));
     }
 
     public static final EnumProperty<Perk> UPGRADE_TYPE;
@@ -33,46 +33,44 @@ public class UpgradeBlock extends FactoryBlock {
     public static final EnumProperty<Perk> UPGRADE = UPGRADE_TYPE;
 
     @Override
-    protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(UPGRADE, BlockStateProperties.ATTACHED);
     }
 
     @Override
-    public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult blockRayTraceResult) {
+    public ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
 
-        if (!worldIn.isRemote) {
-            ItemStack itemStack = player.getHeldItem(handIn);
-            if (!itemStack.isEmpty() && itemStack.getItem() instanceof PerkItem) {
-                PerkItem perkItem = (PerkItem)itemStack.getItem();
+        if (!level.isClientSide) {
+            if (!stack.isEmpty() && stack.getItem() instanceof PerkItem perkItem) {
 
-                TileEntity te = worldIn.getTileEntity(pos);
+                BlockEntity te = level.getBlockEntity(pos);
                 if (te instanceof UpgradeBlockEntity) {
-                    if (((UpgradeBlockEntity) te).tryAddUpgrade(worldIn, player, state, perkItem.getFactoryUpgrade())) {
+                    if (((UpgradeBlockEntity) te).tryAddUpgrade(level, player, state, perkItem.getFactoryUpgrade())) {
                         if (!player.isCreative())
-                            itemStack.shrink(1);
+                            stack.shrink(1);
                     }
                 }
             }
         }
 
-        return super.onBlockActivated(state, worldIn, pos, player, handIn, blockRayTraceResult);
+        return super.useItemOn(stack, state,level, pos, player, hand, hitResult);
     }
 
     @Override
-    public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
+    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
         // This is how the chest, hopper etc drop their contents
         if (state.getBlock() != newState.getBlock()) {
-            TileEntity te = worldIn.getTileEntity(pos);
+            BlockEntity te = level.getBlockEntity(pos);
             if (te instanceof UpgradeBlockEntity) {
-                ((UpgradeBlockEntity) te).dropItems(state, worldIn, pos);
+                ((UpgradeBlockEntity) te).dropItems(state, level, pos);
             }
-            super.onReplaced(state, worldIn, pos, newState, isMoving);
+            super.onRemove(state, level, pos, newState, isMoving);
         }
     }
 
     @Nullable
     @Override
-    public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-        return new UpgradeBlockEntity();
+    public BlockEntity newBlockEntity(BlockPos pos,BlockState state) {
+        return new UpgradeBlockEntity(pos, state);
     }
 }

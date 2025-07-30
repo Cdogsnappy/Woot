@@ -7,14 +7,13 @@ import ipsis.woot.Woot;
 import ipsis.woot.modules.factory.Exotic;
 import ipsis.woot.modules.factory.FactoryConfiguration;
 import ipsis.woot.util.helper.RandomHelper;
-import net.minecraft.item.ItemStack;
-import net.minecraft.loot.LootContext;
-import net.minecraft.loot.conditions.ILootCondition;
-import net.minecraft.util.JSONUtils;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.WeightedRandom;
-import net.minecraftforge.common.loot.GlobalLootModifierSerializer;
-import net.minecraftforge.common.loot.LootModifier;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.util.random.WeightedRandom;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.storage.loot.LootContext;
+import net.neoforged.neoforge.common.loot.LootModifier;
+
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -35,7 +34,7 @@ public class ExoticDropsLootModifier extends LootModifier {
 
     private List<DropWeighted> drops = new ArrayList<>();
 
-    public ExoticDropsLootModifier(ILootCondition[] conditions, int rolls, double chance, int[] weights) {
+    public ExoticDropsLootModifier(LootCondition[] conditions, int rolls, double chance, int[] weights) {
         super(conditions);
         // pull the rolls and drop chances from the config
         this.rolls = rolls;
@@ -80,13 +79,13 @@ public class ExoticDropsLootModifier extends LootModifier {
 
         @Override
         public ExoticDropsLootModifier read(ResourceLocation location, JsonObject object, ILootCondition[] conditions) {
-            int rolls = JSONUtils.getInt(object, "rolls");
-            double chance = JSONUtils.getFloat(object, "dropChance");
+            int rolls = GsonHelper.convertToInt(object, "rolls");
+            double chance = GsonHelper.convertToDouble(object, "dropChance");
             int[] weights = new int[Exotic.getExoticCount()];
             for (int i = 0; i < weights.length; i++)
                 weights[i] = 1;
 
-            JsonArray jsonArray = JSONUtils.getJsonArray(object, "weights");
+            JsonArray jsonArray = GsonHelper.getAsJsonArray(object, "weights");
             if (jsonArray.isJsonArray() && jsonArray.size() == Exotic.getExoticCount()) {
                 for (int i = 0; i < jsonArray.size(); i++) {
                     JsonElement element = jsonArray.get(i);

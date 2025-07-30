@@ -5,24 +5,18 @@ import ipsis.woot.modules.factory.FactoryComponent;
 import ipsis.woot.modules.factory.FactoryComponentProvider;
 import ipsis.woot.modules.factory.multiblock.MultiBlockBlockEntity;
 import ipsis.woot.util.WootDebug;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.state.StateContainer;
-import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.world.IBlockReader;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+
 
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class FactoryBlock extends Block implements FactoryComponentProvider, WootDebug {
+public class FactoryBlock extends Block implements FactoryComponentProvider, WootDebug, EntityBlock {
 
     private final FactoryComponent component;
 
@@ -85,13 +79,17 @@ public class FactoryBlock extends Block implements FactoryComponentProvider, Woo
         return this.component;
     }
 
-    /**
-     * WootDebug
-     */
+
+
     @Override
-    public List<String> getDebugText(List<String> debug, ItemUseContext itemUseContext) {
+    public List<String> getDebugText(List<String> debug, UseOnContext itemUseContext) {
         debug.add("====> FactoryBlock (" + component + ")");
         DebugItem.getTileEntityDebug(debug, itemUseContext);
         return debug;
+    }
+
+    @Override
+    public @org.jetbrains.annotations.Nullable BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {
+        return null;
     }
 }

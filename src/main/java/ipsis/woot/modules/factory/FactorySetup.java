@@ -176,17 +176,17 @@ public class FactorySetup {
                             ).build(null));
 
     public static final String FACTORY_UPGRADE_TAG = "factory_upgrade";
-    public static final DeferredHolder<UpgradeBlock> FACTORY_UPGRADE_BLOCK = BLOCKS.register(
+    public static final DeferredHolder<Block, UpgradeBlock> FACTORY_UPGRADE_BLOCK = BLOCKS.register(
             FACTORY_UPGRADE_TAG, () -> new UpgradeBlock(FactoryComponent.FACTORY_UPGRADE));
-    public static final DeferredHolder<Item> FACTORY_UPGRADE_BLOCK_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item, Item> FACTORY_UPGRADE_BLOCK_ITEM = ITEMS.register(
             FACTORY_UPGRADE_TAG, () ->
                     new BlockItem(FACTORY_UPGRADE_BLOCK.get(), Woot.createStandardProperties()));
-    public static final DeferredHolder<BlockEntityType<?>> FACTORY_UPGRADE_BLOCK_TILE = BLOCKENTITIES.register(
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<UpgradeBlockEntity>> FACTORY_UPGRADE_BLOCK_TILE = BLOCKENTITIES.register(
             FACTORY_UPGRADE_TAG, () ->
-                    BlockEntityType.Builder.create(UpgradeBlockEntity::new, FACTORY_UPGRADE_BLOCK.get()).build(null));
+                    BlockEntityType.Builder.of(UpgradeBlockEntity::new, FACTORY_UPGRADE_BLOCK.get()).build(null));
 
     public static final String CELL_1_TAG = "cell_1";
-    public static final DeferredHolder<CellBlock> CELL_1_BLOCK = BLOCKS.register(
+    public static final DeferredHolder<Block, CellBlock> CELL_1_BLOCK = BLOCKS.register(
             CELL_1_TAG, () -> new CellBlock(Cell1BlockEntity.class));
     public static final DeferredHolder<Item> CELL_1_BLOCK_ITEM = ITEMS.register(
             CELL_1_TAG, () ->

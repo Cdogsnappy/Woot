@@ -1,11 +1,12 @@
 package ipsis.woot.modules.factory.perks;
 
-import net.minecraft.util.IStringSerializable;
-import net.minecraft.util.math.MathHelper;
+
+
+import net.minecraft.util.StringRepresentable;
 
 import java.util.*;
 
-public enum Perk implements IStringSerializable {
+public enum Perk implements StringRepresentable {
 
     EMPTY(null),
     EFFICIENCY_1(Group.EFFICIENCY),
@@ -53,7 +54,7 @@ public enum Perk implements IStringSerializable {
     public String getString() { return getLowerCaseName(); }
 
     public static Perk byIndex(int index) {
-        index = MathHelper.clamp(index, 0, VALUES.length - 1);
+        index = Math.clamp(index, 0, VALUES.length - 1);
         return VALUES[index];
     }
 
@@ -109,6 +110,11 @@ public enum Perk implements IStringSerializable {
         return level;
     }
 
+    @Override
+    public String getSerializedName() {
+        return this.name();
+    }
+
     public enum Group {
         EFFICIENCY,
         LOOTING,
@@ -125,9 +131,9 @@ public enum Perk implements IStringSerializable {
         FLAYED
         ;
 
-        private static final Group VALUES[] = Group.values();
+        private static final Group[] VALUES = Group.values();
         public static Group byIndex(int index) {
-            index = MathHelper.clamp(index, 0, VALUES.length - 1);
+            index = Math.clamp(index, 0, VALUES.length - 1);
             return VALUES[index];
         }
 

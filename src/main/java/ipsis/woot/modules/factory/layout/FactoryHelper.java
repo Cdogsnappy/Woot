@@ -10,12 +10,14 @@ import ipsis.woot.util.helper.StringHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.common.util.BlockSnapshot;
 
 
 import java.util.ArrayList;
@@ -84,17 +86,17 @@ public class FactoryHelper {
 
             Block placeBlock = correctBlocks.get(0);
             if (!PlayerHelper.playerHasFactoryComponent(playerEntity, correctItemStacks)) {
-                playerEntity.sendStatusMessage(
-                        new TranslationTextComponent("chat.woot.intern.missingblock",
+                playerEntity.sendSystemMessage(
+                        Component.translatable("chat.woot.intern.missingblock",
                                 StringHelper.translate(pb.getFactoryComponent().getTranslationKey())), false);
                 return BuildResult.NO_BLOCK_IN_INV;
             }
-            if (world.isBlockModifiable(playerEntity, pb.getBlockPos()) && (world.isAirBlock(pb.getBlockPos()) || currState.getMaterial().isReplaceable())) {
+            if (world.isModifiable(playerEntity, pb.getBlockPos()) && (world.isAirBlock(pb.getBlockPos()) || currState.getMaterial().isReplaceable())) {
                 ItemStack takenStack = PlayerHelper.takeFactoryComponent(playerEntity, correctItemStacks);
                 if (!takenStack.isEmpty()) {
 
-                    BlockSnapshot blockSnapshot = BlockSnapshot.create(world.getDimensionKey(), world, pos);
-                    world.setBlockState(pb.getBlockPos(), placeBlock.getDefaultState(), 11);
+                    BlockSnapshot blockSnapshot = BlockSnapshot.create(world.dimension(), world, pos);
+                    world.setBlock(pb.getBlockPos(), placeBlock.defaultBlockState(), 11);
                     if (ForgeEventFactory.onBlockPlace(playerEntity, blockSnapshot, Direction.UP)) {
                         blockSnapshot.restore(true, false);
                         return BuildResult.ERROR;
@@ -103,7 +105,7 @@ public class FactoryHelper {
                 return BuildResult.SUCCESS;
             } else {
                 // cannot replace block
-                playerEntity.sendStatusMessage(
+                playerEntity.sendSystemMessage(
                         new TranslationTextComponent("chat.woot.intern.noreplace",
                                 StringHelper.translate(pb.getFactoryComponent().getTranslationKey()),
                                 pb.getBlockPos().getX(), pb.getBlockPos().getY(), pb.getBlockPos().getZ()), false);
@@ -113,9 +115,9 @@ public class FactoryHelper {
         return allPlaced ? BuildResult.ALL_BLOCKS_PLACED : BuildResult.ERROR;
     }
 
-    public static void tryValidate(World world, BlockPos pos, PlayerEntity playerEntity, Direction facing, Tier tier) {
+    public static void tryValidate(Level world, BlockPos pos, Player playerEntity, Direction facing, Tier tier) {
 
-        playerEntity.sendStatusMessage(
+        playerEntity.sendSystemMessage(
                 new TranslationTextComponent(
                 "chat.woot.intern.validate.start",
                         StringHelper.translate(tier.getTranslationKey())),
@@ -124,21 +126,19 @@ public class FactoryHelper {
         List<String> feedback = new ArrayList<>();
         AbsolutePattern absolutePattern = AbsolutePattern.create(world, tier, pos, facing);
         if (!FactoryScanner.compareToWorld(absolutePattern, world, feedback)) {
-            playerEntity.sendStatusMessage(new StringTextComponent("----"), false);
-            playerEntity.sendStatusMessage(
-                    new TranslationTextComponent(
-                    "chat.woot.intern.validate.invalid", StringHelper.translate(tier.getTranslationKey())),
-            true);
+            playerEntity.sendSystemMessage(Component.literal("----"));
+            playerEntity.sendSystemMessage(
+                    Component.translatable(
+                    "chat.woot.intern.validate.invalid", StringHelper.translate(tier.getTranslationKey())));
             for (String s : feedback)
-                playerEntity.sendStatusMessage(new StringTextComponent(s), false);
-            playerEntity.sendStatusMessage(new StringTextComponent("----"), false);
+                playerEntity.sendSystemMessage(Component.literal(s));
+            playerEntity.sendSystemMessage(Component.literal("----"));
         } else {
-            playerEntity.sendStatusMessage(
-                    new TranslationTextComponent(
-                    "chat.woot.intern.validate.valid", StringHelper.translate(tier.getTranslationKey())),
-                    true);
-            if (playerEntity instanceof ServerPlayerEntity)
-                Advancements.TIER_VALIDATE_TRIGGER.trigger((ServerPlayerEntity)playerEntity, tier);
+            playerEntity.sendSystemMessage(
+                    Component.translatable(
+                    "chat.woot.intern.validate.valid", StringHelper.translate(tier.getTranslationKey())));
+            if (playerEntity instanceof ServerPlayer)
+                Advancements.TIER_VALIDATE_TRIGGER.trigger((ServerPlayer)playerEntity, tier);
         }
     }
 }

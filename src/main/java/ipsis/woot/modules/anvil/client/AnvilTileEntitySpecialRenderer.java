@@ -1,16 +1,13 @@
 package ipsis.woot.modules.anvil.client;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+
 import ipsis.woot.modules.anvil.blocks.AnvilTileEntity;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.model.ItemCameraTransforms;
-import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
-import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.vector.Vector3f;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.world.item.ItemStack;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+
 
 @OnlyIn(Dist.CLIENT)
 public class AnvilTileEntitySpecialRenderer extends TileEntityRenderer<AnvilTileEntity> {
@@ -38,7 +35,7 @@ public class AnvilTileEntitySpecialRenderer extends TileEntityRenderer<AnvilTile
             renderStack(ingredients[3],  matrixStack, iRenderTypeBuffer, 0.5F, 1.05F, 0.5F + 0.4F, combinedLight, combinedOverlay);
     }
 
-    private void renderStack(ItemStack itemStack, MatrixStack matrixStack, IRenderTypeBuffer iRenderTypeBuffer, double x, double y, double z, int combinedLight, int combinedOverlay) {
+    private void renderStack(ItemStack itemStack, GuiGraphics matrixStack, IRenderTypeBuffer iRenderTypeBuffer, double x, double y, double z, int combinedLight, int combinedOverlay) {
         float scale = 0.20F;
         matrixStack.push();
         matrixStack.translate(x, y, z);

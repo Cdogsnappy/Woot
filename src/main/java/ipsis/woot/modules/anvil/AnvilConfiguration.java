@@ -2,13 +2,13 @@ package ipsis.woot.modules.anvil;
 
 import ipsis.woot.config.ConfigDefaults;
 import ipsis.woot.config.ConfigPath;
-import net.minecraftforge.common.ForgeConfigSpec;
+import net.neoforged.neoforge.common.ModConfigSpec;
 
 public class AnvilConfiguration {
 
-    public static ForgeConfigSpec.BooleanValue ANVIL_PARTICILES;
+    public static ModConfigSpec.BooleanValue ANVIL_PARTICILES;
 
-    public static void init(ForgeConfigSpec.Builder COMMON_BUILDER, ForgeConfigSpec.Builder CLIENT_BUILDER) {
+    public static void init(ModConfigSpec.Builder COMMON_BUILDER, ModConfigSpec.Builder CLIENT_BUILDER) {
 
         COMMON_BUILDER.comment("Settings for the anvil").push(ConfigPath.Anvil.CATEGORY);
         CLIENT_BUILDER.comment("Settings for the anvil").push(ConfigPath.Anvil.CATEGORY);

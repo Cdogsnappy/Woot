@@ -9,8 +9,13 @@ import ipsis.woot.modules.factory.multiblock.MultiBlockBlockEntity;
 import ipsis.woot.modules.factory.multiblock.MultiBlockTracker;
 import ipsis.woot.util.WootDebug;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
@@ -21,8 +26,8 @@ import java.util.List;
 
 public class UpgradeBlockEntity extends MultiBlockBlockEntity implements WootDebug {
 
-    public UpgradeBlockEntity() {
-        super(FactorySetup.FACTORY_UPGRADE_BLOCK_TILE.get());
+    public UpgradeBlockEntity(BlockPos pos, BlockState state) {
+        super(FactorySetup.FACTORY_UPGRADE_BLOCK_TILE.get(), pos, state);
     }
 
     public boolean tryAddUpgrade(Level world, Player playerEntity, BlockState state, Perk type) {
@@ -30,49 +35,49 @@ public class UpgradeBlockEntity extends MultiBlockBlockEntity implements WootDeb
         if (state.getValue(UpgradeBlock.UPGRADE) == Perk.EMPTY) {
             // Add to empty must be level 1
             if (Perk.LEVEL_1_PERKS.contains(type)) {
-                world.setBlock(pos,
-                        state.with(UpgradeBlock.UPGRADE, type), 2);
+                world.setBlock(getBlockPos(),
+                        state.setValue(UpgradeBlock.UPGRADE, type), 2);
                 glue.onGoodbye();
-                MultiBlockTracker.get().addEntry(world, pos);
+                MultiBlockTracker.get().addEntry(world, getBlockPos());
                 Woot.setup.getLogger().debug("tryAddUpgrade: added {}", type);
-                if (playerEntity instanceof ServerPlayerEntity)
-                    Advancements.APPLY_PERK_TRIGGER.trigger((ServerPlayerEntity) playerEntity, type);
+                if (playerEntity instanceof ServerPlayer)
+                    Advancements.APPLY_PERK_TRIGGER.trigger((ServerPlayer) playerEntity, type);
                 return true;
             } else {
-                playerEntity.sendStatusMessage(new TranslationTextComponent("chat.woot.perk.fail.0"), false);
+                playerEntity.sendSystemMessage(Component.translatable("chat.woot.perk.fail.0"));
                 return false;
             }
         } else {
             // Add to non-empty, must be same type and level + 1
-            Perk upgrade = getBlockState().get(UpgradeBlock.UPGRADE);
+            Perk upgrade = getBlockState().getValue(UpgradeBlock.UPGRADE);
             Perk.Group currType = Perk.getGroup(upgrade);
             Perk.Group addType = Perk.getGroup(type);
             int currLevel = Perk.getLevel(upgrade);
             int addLevel = Perk.getLevel(type);
             if (currType != addType) {
-                playerEntity.sendStatusMessage(new TranslationTextComponent("chat.woot.perk.fail.1"), false);
+                playerEntity.sendSystemMessage(Component.translatable("chat.woot.perk.fail.1"));
                 return false;
             }
 
             if (currLevel == 3) {
-                playerEntity.sendStatusMessage(new TranslationTextComponent("chat.woot.perk.fail.2"), false);
+                playerEntity.sendSystemMessage(Component.translatable("chat.woot.perk.fail.2"));
                 return false;
             }
 
             if (currLevel == addLevel) {
-                playerEntity.sendStatusMessage(new TranslationTextComponent("chat.woot.perk.fail.4"), false);
+                playerEntity.sendSystemMessage(Component.translatable("chat.woot.perk.fail.4"));
                 return false;
             }
 
             if (currLevel + 1 != addLevel) {
-                playerEntity.sendStatusMessage(new TranslationTextComponent("chat.woot.perk.fail.4", currLevel + 1), false);
+                playerEntity.sendSystemMessage(Component.translatable("chat.woot.perk.fail.4", currLevel + 1));
                 return false;
             }
 
-            world.setBlockState(pos,
-                    state.with(UpgradeBlock.UPGRADE, type), 2);
+            world.setBlock(getBlockPos(),
+                    state.setValue(UpgradeBlock.UPGRADE, type), 2);
             glue.onGoodbye();
-            MultiBlockTracker.get().addEntry(world, pos);
+            MultiBlockTracker.get().addEntry(world, getBlockPos());
             Woot.setup.getLogger().debug("tryAddUpgrade: added {}", type);
             return true;
         }
@@ -90,7 +95,7 @@ public class UpgradeBlockEntity extends MultiBlockBlockEntity implements WootDeb
                 ItemStack itemStack = PerkItem.getItemStack(type, i);
                 if (!itemStack.isEmpty()) {
                     itemStack.setCount(1);
-                    InventoryHelper.spawnItemStack(world, pos.getX(), pos.getY(), pos.getZ(), itemStack);
+                    Containers.dropItemStack(world, pos.getX(), pos.getY(), pos.getZ(), itemStack);
                 }
             }
         }

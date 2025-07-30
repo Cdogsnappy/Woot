@@ -4,17 +4,13 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import ipsis.woot.Woot;
 import ipsis.woot.util.FakeMob;
-import net.minecraft.data.IFinishedRecipe;
-import net.minecraft.inventory.ItemStackHelper;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.util.JSONUtils;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.ObjectHolder;
+import net.minecraft.core.NonNullList;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.neoforged.neoforge.fluids.FluidStack;
+
 
 import java.util.function.Consumer;
 
@@ -130,7 +126,7 @@ public class FactoryRecipeBuilder {
         }
 
         @Override
-        public IRecipeSerializer<?> getSerializer() {
+        public RecipeSerializer<?> getSerializer() {
             return SERIALIZER;
         }
 
@@ -146,7 +142,7 @@ public class FactoryRecipeBuilder {
     }
 
     @ObjectHolder("woot:factory")
-    public static final IRecipeSerializer<IRecipe<?>> SERIALIZER = null;
+    public static final RecipeSerializer<Recipe<?>> SERIALIZER = null;
 
 
 }

@@ -4,18 +4,14 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import ipsis.woot.Woot;
 import ipsis.woot.modules.factory.perks.Perk;
-import net.minecraft.advancements.criterion.AbstractCriterionTrigger;
-import net.minecraft.advancements.criterion.CriterionInstance;
-import net.minecraft.advancements.criterion.EntityPredicate;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.loot.ConditionArrayParser;
-import net.minecraft.loot.ConditionArraySerializer;
-import net.minecraft.util.JSONUtils;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.GsonHelper;
+
 
 public class ApplyPerkTrigger extends AbstractCriterionTrigger<ApplyPerkTrigger.Instance>  {
 
-    private static final ResourceLocation ID = new ResourceLocation(Woot.MODID, "applyperk");
+    private static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(Woot.MODID, "applyperk");
 
     @Override
     public ResourceLocation getId() { return ID; }
@@ -25,12 +21,12 @@ public class ApplyPerkTrigger extends AbstractCriterionTrigger<ApplyPerkTrigger.
         JsonElement element = json.get("perk");
         Perk perk = Perk.EMPTY;
         if (element != null && !element.isJsonNull())
-            perk = Perk.byIndex(JSONUtils.getInt(json, "perk"));
+            perk = Perk.byIndex(GsonHelper.convertToInt(json, "perk"));
 
         return new Instance(entityPredicate, perk);
     }
 
-    public void trigger(ServerPlayerEntity playerEntity, Perk perk) {
+    public void trigger(ServerPlayer playerEntity, Perk perk) {
         this.triggerListeners(playerEntity, instance -> instance.test(playerEntity, perk));
     }
 
@@ -46,7 +42,7 @@ public class ApplyPerkTrigger extends AbstractCriterionTrigger<ApplyPerkTrigger.
             return new ApplyPerkTrigger.Instance(EntityPredicate.AndPredicate.ANY_AND, perk);
         }
 
-        public boolean test(ServerPlayerEntity playerEntity, Perk perk) {
+        public boolean test(ServerPlayer playerEntity, Perk perk) {
             return this.perk == perk;
         }
 

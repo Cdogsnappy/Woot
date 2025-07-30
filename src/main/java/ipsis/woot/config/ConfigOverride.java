@@ -5,8 +5,7 @@ import ipsis.woot.modules.factory.Tier;
 import ipsis.woot.modules.factory.perks.Perk;
 import ipsis.woot.simulator.spawning.SpawnController;
 import ipsis.woot.util.FakeMob;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
+import net.minecraft.world.level.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -194,16 +193,16 @@ public class ConfigOverride {
     }
 
     public OverrideKey getKeyByPerk(Perk.Group group, int level) {
-        level = MathHelper.clamp(level, 1, 3) - 1;
+        level = Math.clamp(level, 1, 3) - 1;
         return perkMap.get(group)[level];
     }
 
-    public Tier getMobTier(FakeMob fakeMob, World world) {
+    public Tier getMobTier(FakeMob fakeMob, Level world) {
         Tier tier = Tier.TIER_5;
         if (fakeMob.isValid() && world != null) {
             if (Config.OVERRIDE.hasOverride(fakeMob, ConfigOverride.OverrideKey.TIER)) {
                 int v = Config.OVERRIDE.getInteger(fakeMob, ConfigOverride.OverrideKey.TIER);
-                v = MathHelper.clamp(v, 1, Tier.getMaxTier());
+                v = Math.clamp(v, 1, Tier.getMaxTier());
                 tier = Tier.byIndex(v);
             } else {
 

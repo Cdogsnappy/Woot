@@ -14,6 +14,7 @@ import ipsis.woot.setup.ServerDataRequest;
 import ipsis.woot.util.FakeMob;
 import ipsis.woot.util.WootContainerScreen;
 import ipsis.woot.util.helper.StringHelper;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;

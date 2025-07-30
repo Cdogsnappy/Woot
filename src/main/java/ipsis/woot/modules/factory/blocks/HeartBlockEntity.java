@@ -16,6 +16,11 @@ import ipsis.woot.util.FakeMob;
 import ipsis.woot.util.WootDebug;
 import ipsis.woot.util.helper.StorageHelper;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
@@ -27,6 +32,7 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.items.IItemHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -109,7 +115,7 @@ public class HeartBlockEntity extends BlockEntity implements TickingBlockEntity,
                    loadedFromNBT = false;
                } else {
                    consumedUnits = 0;
-                   markDirty();
+                   setChanged();
                }
 
                layout.clearChanged();
@@ -122,7 +128,7 @@ public class HeartBlockEntity extends BlockEntity implements TickingBlockEntity,
            if (consumedUnits >= recipe.getNumTicks()) {
                // get and process the ingredients
                consumedUnits = 0;
-               markDirty();
+               setChanged();
 
                List<ItemStack> items = createItemIngredients(recipe, formedSetup);
                List<FluidStack> fluids = createFluidIngredients(recipe, formedSetup);
@@ -194,7 +200,7 @@ public class HeartBlockEntity extends BlockEntity implements TickingBlockEntity,
         if (items.isEmpty())
             return;
 
-        for (LazyOptional<IItemHandler> hdlr : formedSetup.getImportHandlers()) {
+        for (Optional<IItemHandler> hdlr : formedSetup.getImportHandlers()) {
             if (items.isEmpty())
                 break;
 
@@ -207,7 +213,7 @@ public class HeartBlockEntity extends BlockEntity implements TickingBlockEntity,
 
                     for (int slot = 0; slot < h.getSlots(); slot++) {
                         ItemStack slotStack = h.getStackInSlot(slot);
-                        if (!slotStack.isEmpty() && ItemStack.areItemsEqual(itemStack, slotStack)) {
+                        if (!slotStack.isEmpty() && ItemStack.isSameItem(itemStack, slotStack)) {
                             Woot.setup.getLogger().debug("consumeItemIngredients: slot {} consume {}", slot, itemStack.getCount());
                             ItemStack extractedStack = h.extractItem(slot, itemStack.getCount(), false);
                             if (!extractedStack.isEmpty())
@@ -223,7 +229,7 @@ public class HeartBlockEntity extends BlockEntity implements TickingBlockEntity,
         if (fluids.isEmpty())
             return;
 
-        for (LazyOptional<IFluidHandler> hdlr : formedSetup.getImportFluidHandlers()) {
+        for (Optional<IFluidHandler> hdlr : formedSetup.getImportFluidHandlers()) {
             if (fluids.isEmpty())
                 break;
 
@@ -316,13 +322,9 @@ public class HeartBlockEntity extends BlockEntity implements TickingBlockEntity,
     void tickRecipe() {
         // Purely the passage of time
         consumedUnits++;
-        markDirty();
+       setChanged();
     }
 
-    @Override
-    public List<String> getDebugText(List<String> debug, UseOnContext itemUseContext) {
-        return List.of();
-    }
 
     /**
      * Tick Tracker
@@ -366,7 +368,7 @@ public class HeartBlockEntity extends BlockEntity implements TickingBlockEntity,
      * WootDebug
      */
     @Override
-    public List<String> getDebugText(List<String> debug, ItemUseContext itemUseContext) {
+    public List<String> getDebugText(List<String> debug, UseOnContext itemUseContext) {
         debug.add("====> HeartTileEntity");
         debug.add("      layout: " + layout);
         debug.add("      setup: " + formedSetup);
@@ -379,17 +381,17 @@ public class HeartBlockEntity extends BlockEntity implements TickingBlockEntity,
      * INamedContainerProvider
      */
     @Override
-    public ITextComponent getDisplayName() {
+    public Component getDisplayName() {
         if (isFormed())
-            return new TranslationTextComponent(formedSetup.getTier().getTranslationKey());
+            return Component.translatable(formedSetup.getTier().getTranslationKey());
 
-        return new StringTextComponent(getType().getRegistryName().getPath());
+        return Component.literal(getType().builtInRegistryHolder().getRegisteredName());
     }
 
     @Nullable
     @Override
-    public Container createMenu(int windowId, PlayerInventory playerInventory, PlayerEntity playerEntity) {
-        return new HeartMenu(windowId, world, pos, playerInventory, playerEntity);
+    public AbstractContainerMenu createMenu(int windowId, Inventory playerInventory, Player playerEntity) {
+        return new HeartMenu(windowId, level, getBlockPos(), playerInventory, playerEntity);
     }
 
     public int getFluidCapacity() {

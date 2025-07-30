@@ -2,6 +2,7 @@ package ipsis.woot.datagen;
 
 import ipsis.woot.datagen.modules.*;
 import net.minecraft.data.*;
+import net.minecraft.data.recipes.RecipeProvider;
 
 import java.util.function.Consumer;
 
@@ -13,7 +14,7 @@ public class Recipes extends RecipeProvider {
     }
 
     @Override
-    protected void registerRecipes(Consumer<IFinishedRecipe> consumer) {
+    protected void registerRecipes(Consumer<FinishedRecipe> consumer) {
 
         Anvil.registerRecipes(consumer);
         Factory.registerRecipes(consumer);

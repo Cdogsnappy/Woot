@@ -5,20 +5,21 @@ import ipsis.woot.mod.ModNBT;
 import ipsis.woot.modules.factory.Tier;
 import ipsis.woot.util.FakeMob;
 import ipsis.woot.util.helper.StringHelper;
-import net.minecraft.block.Block;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.EntityType;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.CustomData;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -31,19 +32,18 @@ public class ControllerBlockItem extends BlockItem {
 
     @OnlyIn(Dist.CLIENT)
     @Override
-    public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-        super.addInformation(stack, worldIn, tooltip, flagIn);
-        CompoundNBT compoundNBT = stack.getChildTag("BlockEntityTag");
-        if (compoundNBT != null && compoundNBT.contains(ModNBT.Controller.MOB_TAG)) {
-            FakeMob fakeMob = new FakeMob(compoundNBT.getCompound(ModNBT.Controller.MOB_TAG));
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flagIn) {
+        super.appendHoverText(stack, context, tooltip, flagIn);
+        CustomData data = stack.get(DataComponents.BLOCK_ENTITY_DATA);
+        if (data != null && data.contains(ModNBT.Controller.MOB_TAG)) {
+            FakeMob fakeMob = new FakeMob(data.copyTag().getCompound(ModNBT.Controller.MOB_TAG));
             if (fakeMob.isValid()) {
-                EntityType<?> entityType = ForgeRegistries.ENTITIES.getValue(fakeMob.getResourceLocation());
-                if (entityType != null)
-                    tooltip.add(new TranslationTextComponent(entityType.getTranslationKey()));
+                EntityType<?> entityType = BuiltInRegistries.ENTITY_TYPE.get(fakeMob.getResourceLocation());
+                tooltip.add(Component.literal(entityType.getDescriptionId()));
                 if (fakeMob.hasTag())
-                    tooltip.add(new StringTextComponent("[" + fakeMob.getTag() + "]"));
+                    tooltip.add(Component.literal("[" + fakeMob.getTag() + "]"));
 
-                tooltip.add(new TranslationTextComponent("info.woot.controller.0"));
+                tooltip.add(Component.literal("info.woot.controller.0"));
             }
         }
     }

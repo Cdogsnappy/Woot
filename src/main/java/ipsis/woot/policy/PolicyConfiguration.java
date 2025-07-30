@@ -2,48 +2,49 @@ package ipsis.woot.policy;
 
 import ipsis.woot.config.ConfigPath;
 import ipsis.woot.config.PolicyDefaults;
+import net.neoforged.neoforge.common.ModConfigSpec;
 
 import java.util.List;
 
 public class PolicyConfiguration {
 
-    public static ForgeConfigSpec.ConfigValue<List<String>> CAPTURE_BLACKLIST_FULL_MOD;
-    public static ForgeConfigSpec.ConfigValue<List<String>> CAPTURE_BLACKLIST_ENTITY;
-    public static ForgeConfigSpec.ConfigValue<List<String>> LEARN_BLACKLIST_FULL_MOD;
-    public static ForgeConfigSpec.ConfigValue<List<String>> LEARN_BLACKLIST_ITEM;
-    public static ForgeConfigSpec.ConfigValue<List<String>> GENERATE_BLACKLIST_FULL_MOD;
-    public static ForgeConfigSpec.ConfigValue<List<String>> GENERATE_BLACKLIST_ITEM;
-    public static ForgeConfigSpec.ConfigValue<List<String>> SHARD_BLACKLIST_FULL_MOD;
-    public static ForgeConfigSpec.ConfigValue<List<String>> SHARD_BLACKLIST_ENTITY;
-    public static ForgeConfigSpec.ConfigValue<List<String>> CUSTOM_DROPS_ONLY;
+    public static ModConfigSpec.ConfigValue<List<String>> CAPTURE_BLACKLIST_FULL_MOD;
+    public static ModConfigSpec.ConfigValue<List<String>> CAPTURE_BLACKLIST_ENTITY;
+    public static ModConfigSpec.ConfigValue<List<String>> LEARN_BLACKLIST_FULL_MOD;
+    public static ModConfigSpec.ConfigValue<List<String>> LEARN_BLACKLIST_ITEM;
+    public static ModConfigSpec.ConfigValue<List<String>> GENERATE_BLACKLIST_FULL_MOD;
+    public static ModConfigSpec.ConfigValue<List<String>> GENERATE_BLACKLIST_ITEM;
+    public static ModConfigSpec.ConfigValue<List<String>> SHARD_BLACKLIST_FULL_MOD;
+    public static ModConfigSpec.ConfigValue<List<String>> SHARD_BLACKLIST_ENTITY;
+    public static ModConfigSpec.ConfigValue<List<String>> CUSTOM_DROPS_ONLY;
 
     // Override values
-    public static ForgeConfigSpec.ConfigValue<List<String>> MOB_MASS_COUNT;
-    public static ForgeConfigSpec.ConfigValue<List<String>> MOB_SPAWN_TICKS;
-    public static ForgeConfigSpec.ConfigValue<List<String>> MOB_HEALTH;
-    public static ForgeConfigSpec.ConfigValue<List<String>> MOB_UNITS_PER_HEALTH;
-    public static ForgeConfigSpec.ConfigValue<List<String>> MOB_XP;
-    public static ForgeConfigSpec.ConfigValue<List<String>> MOB_TIER;
-    public static ForgeConfigSpec.ConfigValue<List<String>> MOB_SHARD_KILLS;
-    public static ForgeConfigSpec.ConfigValue<List<String>> MOB_FIXED_COST;
-    public static ForgeConfigSpec.ConfigValue<List<String>> MOB_PERK_EFFICIENCY_1;
-    public static ForgeConfigSpec.ConfigValue<List<String>> MOB_PERK_EFFICIENCY_2;
-    public static ForgeConfigSpec.ConfigValue<List<String>> MOB_PERK_EFFICIENCY_3;
-    public static ForgeConfigSpec.ConfigValue<List<String>> MOB_PERK_MASS_1;
-    public static ForgeConfigSpec.ConfigValue<List<String>> MOB_PERK_MASS_2;
-    public static ForgeConfigSpec.ConfigValue<List<String>> MOB_PERK_MASS_3;
-    public static ForgeConfigSpec.ConfigValue<List<String>> MOB_PERK_RATE_1;
-    public static ForgeConfigSpec.ConfigValue<List<String>> MOB_PERK_RATE_2;
-    public static ForgeConfigSpec.ConfigValue<List<String>> MOB_PERK_RATE_3;
-    public static ForgeConfigSpec.ConfigValue<List<String>> MOB_PERK_XP_1;
-    public static ForgeConfigSpec.ConfigValue<List<String>> MOB_PERK_XP_2;
-    public static ForgeConfigSpec.ConfigValue<List<String>> MOB_PERK_XP_3;
-    public static ForgeConfigSpec.ConfigValue<List<String>> MOB_PERK_HEADLESS_1;
-    public static ForgeConfigSpec.ConfigValue<List<String>> MOB_PERK_HEADLESS_2;
-    public static ForgeConfigSpec.ConfigValue<List<String>> MOB_PERK_HEADLESS_3;
-    public static ForgeConfigSpec.ConfigValue<List<String>> MOB_PERK_HEADLESS_SKULLS;
+    public static ModConfigSpec.ConfigValue<List<String>> MOB_MASS_COUNT;
+    public static ModConfigSpec.ConfigValue<List<String>> MOB_SPAWN_TICKS;
+    public static ModConfigSpec.ConfigValue<List<String>> MOB_HEALTH;
+    public static ModConfigSpec.ConfigValue<List<String>> MOB_UNITS_PER_HEALTH;
+    public static ModConfigSpec.ConfigValue<List<String>> MOB_XP;
+    public static ModConfigSpec.ConfigValue<List<String>> MOB_TIER;
+    public static ModConfigSpec.ConfigValue<List<String>> MOB_SHARD_KILLS;
+    public static ModConfigSpec.ConfigValue<List<String>> MOB_FIXED_COST;
+    public static ModConfigSpec.ConfigValue<List<String>> MOB_PERK_EFFICIENCY_1;
+    public static ModConfigSpec.ConfigValue<List<String>> MOB_PERK_EFFICIENCY_2;
+    public static ModConfigSpec.ConfigValue<List<String>> MOB_PERK_EFFICIENCY_3;
+    public static ModConfigSpec.ConfigValue<List<String>> MOB_PERK_MASS_1;
+    public static ModConfigSpec.ConfigValue<List<String>> MOB_PERK_MASS_2;
+    public static ModConfigSpec.ConfigValue<List<String>> MOB_PERK_MASS_3;
+    public static ModConfigSpec.ConfigValue<List<String>> MOB_PERK_RATE_1;
+    public static ModConfigSpec.ConfigValue<List<String>> MOB_PERK_RATE_2;
+    public static ModConfigSpec.ConfigValue<List<String>> MOB_PERK_RATE_3;
+    public static ModConfigSpec.ConfigValue<List<String>> MOB_PERK_XP_1;
+    public static ModConfigSpec.ConfigValue<List<String>> MOB_PERK_XP_2;
+    public static ModConfigSpec.ConfigValue<List<String>> MOB_PERK_XP_3;
+    public static ModConfigSpec.ConfigValue<List<String>> MOB_PERK_HEADLESS_1;
+    public static ModConfigSpec.ConfigValue<List<String>> MOB_PERK_HEADLESS_2;
+    public static ModConfigSpec.ConfigValue<List<String>> MOB_PERK_HEADLESS_3;
+    public static ModConfigSpec.ConfigValue<List<String>> MOB_PERK_HEADLESS_SKULLS;
 
-    public static void init(ForgeConfigSpec.Builder COMMON_BUILDER, ForgeConfigSpec.Builder CLIENT_BUILDER) {
+    public static void init(ModConfigSpec.Builder COMMON_BUILDER, ModConfigSpec.Builder CLIENT_BUILDER) {
 
         COMMON_BUILDER.comment("Settings for the factory").push(ConfigPath.Policy.CATEGORY);
         CLIENT_BUILDER.comment("Settings for the factory").push(ConfigPath.Policy.CATEGORY);

@@ -1,18 +1,19 @@
 package ipsis.woot.modules.infuser;
 
 import ipsis.woot.config.ConfigPath;
-import net.minecraftforge.common.ForgeConfigSpec;
+
 
 import ipsis.woot.config.ConfigDefaults.Infuser;
+import net.neoforged.neoforge.common.ModConfigSpec;
 
 public class InfuserConfiguration {
 
-    public static ForgeConfigSpec.IntValue INFUSER_TANK_CAPACITY;
-    public static ForgeConfigSpec.IntValue INFUSER_MAX_ENERGY;
-    public static ForgeConfigSpec.IntValue INFUSER_MAX_ENERGY_RX;
-    public static ForgeConfigSpec.IntValue INFUSER_ENERGY_PER_TICK;
+    public static ModConfigSpec.IntValue INFUSER_TANK_CAPACITY;
+    public static ModConfigSpec.IntValue INFUSER_MAX_ENERGY;
+    public static ModConfigSpec.IntValue INFUSER_MAX_ENERGY_RX;
+    public static ModConfigSpec.IntValue INFUSER_ENERGY_PER_TICK;
 
-    public static void init(ForgeConfigSpec.Builder COMMON_BUILDER, ForgeConfigSpec.Builder CLIENT_BUILDER) {
+    public static void init(ModConfigSpec.Builder COMMON_BUILDER, ModConfigSpec.Builder CLIENT_BUILDER) {
 
         COMMON_BUILDER.comment("Settings for the infuser").push(ConfigPath.Infuser.CATEGORY);
         CLIENT_BUILDER.comment("Settings for the infuser").push(ConfigPath.Infuser.CATEGORY);

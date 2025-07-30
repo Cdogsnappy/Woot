@@ -5,33 +5,29 @@ import ipsis.woot.modules.anvil.AnvilConfiguration;
 import ipsis.woot.modules.anvil.AnvilSetup;
 import ipsis.woot.modules.debug.items.DebugItem;
 import ipsis.woot.util.WootDebug;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.state.StateContainer;
-import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -40,7 +36,7 @@ import java.util.Random;
 public class AnvilBlock extends Block implements WootDebug {
 
     // From vanilla
-    private static final VoxelShape PART_BASE = Block.makeCuboidShape(2.0D, 0.0D, 2.0D, 14.0D, 4.0D, 14.0D);
+    private static final VoxelShape PART_BASE = Shapes.makeCuboidShape(2.0D, 0.0D, 2.0D, 14.0D, 4.0D, 14.0D);
     private static final VoxelShape PART_LOWER_X = Block.makeCuboidShape(3.0D, 4.0D, 4.0D, 13.0D, 5.0D, 12.0D);
     private static final VoxelShape PART_MID_X = Block.makeCuboidShape(4.0D, 5.0D, 6.0D, 12.0D, 10.0D, 10.0D);
     private static final VoxelShape PART_UPPER_X = Block.makeCuboidShape(0.0D, 10.0D, 3.0D, 16.0D, 16.0D, 13.0D);
@@ -51,8 +47,8 @@ public class AnvilBlock extends Block implements WootDebug {
     private static final VoxelShape Z_AXIS_AABB = VoxelShapes.or(PART_BASE, PART_LOWER_Z, PART_MID_Z, PART_UPPER_Z);
 
     public AnvilBlock() {
-        super(Properties.create(Material.IRON).sound(SoundType.METAL).hardnessAndResistance(3.5F));
-        setDefaultState(getStateContainer().getBaseState().with(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH));
+        super(Properties.of().sound(SoundType.METAL).strength(3.5F));
+        registerDefaultState(getStateDefinition().any());
     }
 
     @Override
@@ -60,18 +56,18 @@ public class AnvilBlock extends Block implements WootDebug {
 
     @Nullable
     @Override
-    public TileEntity createTileEntity(BlockState state, IBlockReader world) {
+    public BlockEntity createTileEntity(BlockState state, IBlockReader world) {
         return new AnvilTileEntity();
     }
 
     @Nullable
     @Override
     public BlockState getStateForPlacement(BlockItemUseContext context) {
-        return this.getDefaultState().with(BlockStateProperties.HORIZONTAL_FACING, context.getPlacementHorizontalFacing().rotateY());
+        return this.defaultBlockState().setValue(BlockStateProperties.HORIZONTAL_FACING, context.getPlacementHorizontalFacing().rotateY());
     }
 
     @Override
-    protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+    protected void S(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(BlockStateProperties.HORIZONTAL_FACING);
     }
 
@@ -82,71 +78,70 @@ public class AnvilBlock extends Block implements WootDebug {
     }
 
     @Override
-    public ActionResultType onBlockActivated(BlockState blockState, World world, BlockPos pos, PlayerEntity playerEntity, Hand hand, BlockRayTraceResult blockRayTraceResult) {
+    public ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
 
-        if (world.isRemote)
-            super.onBlockActivated(blockState, world, pos, playerEntity, hand, blockRayTraceResult);
+        if (level.isClientSide)
+            super.useItemOn(stack, state, level, pos, player, hand, hitResult);
 
-        TileEntity te = world.getTileEntity(pos);
+        BlockEntity te = level.getBlockEntity(pos);
         if (te instanceof AnvilTileEntity) {
             AnvilTileEntity anvil = (AnvilTileEntity)te;
-            ItemStack heldItem = playerEntity.getHeldItem(hand);
 
-            if (playerEntity.isSneaking() && heldItem.isEmpty()) {
+            if (player.isCrouching() && stack.isEmpty()) {
                 // Sneak with empty hand to empty
-                anvil.dropItem(playerEntity);
-            } else if (heldItem.getItem() == AnvilSetup.HAMMER_ITEM.get()) {
+                anvil.dropItem(player);
+            } else if (stack.getItem() == AnvilSetup.HAMMER_ITEM.get()) {
                 // Crafting
-                anvil.tryCraft(playerEntity);
+                anvil.tryCraft(player);
             } else {
                 if (!anvil.hasBaseItem()) {
                     // Check if valid base item
-                    if (AnvilRecipe.isValidInput(heldItem)) {
-                        ItemStack baseItem = heldItem.copy();
+                    if (AnvilRecipe.isValidInput(stack)) {
+                        ItemStack baseItem = stack.copy();
                         baseItem.setCount(1);
                         anvil.setBaseItem(baseItem);
-                        heldItem.shrink(1);
-                        if (heldItem.isEmpty())
-                            playerEntity.inventory.setInventorySlotContents( playerEntity.inventory.currentItem, ItemStack.EMPTY);
+                        stack.shrink(1);
+                        if (stack.isEmpty())
+                            player.getInventory().setItem( player.getInventory().selected, ItemStack.EMPTY);
                         else
-                            playerEntity.inventory.setInventorySlotContents( playerEntity.inventory.currentItem, heldItem);
-                        playerEntity.openContainer.detectAndSendChanges();
+                            player.getInventory().setItem( player.getInventory().selected, stack);
+                        player.containerMenu.broadcastChanges();
                     } else {
-                        playerEntity.sendStatusMessage(new TranslationTextComponent("chat.woot.anvil.nobase"), true);
+                        player.sendSystemMessage(Component.translatable("chat.woot.anvil.nobase"));
                     }
                 } else {
                     // Base item already present
-                    ItemStack ingredient = heldItem.copy();
+                    ItemStack ingredient = stack.copy();
                     ingredient.setCount(1);
                     if (anvil.addIngredient(ingredient)) {
-                        heldItem.shrink(1);
-                        if (heldItem.isEmpty())
-                            playerEntity.inventory.setInventorySlotContents( playerEntity.inventory.currentItem, ItemStack.EMPTY);
+                        stack.shrink(1);
+                        if (stack.isEmpty())
+                            player.getInventory().setItem( player.getInventory().selected, ItemStack.EMPTY);
                         else
-                            playerEntity.inventory.setInventorySlotContents( playerEntity.inventory.currentItem, heldItem);
-                        playerEntity.openContainer.detectAndSendChanges();
+                            player.getInventory().setItem( player.getInventory().selected, stack);
+                        player.containerMenu.broadcastChanges();
                     }
                 }
             }
 
         }
 
-        return ActionResultType.SUCCESS;
+        return ItemInteractionResult.SUCCESS;
     }
 
-    public boolean isAnvilHot(World world, BlockPos pos) {
-        return world.getBlockState(pos.down()).getBlock() == Blocks.MAGMA_BLOCK;
+    public boolean isAnvilHot(Level world, BlockPos pos) {
+        return world.getBlockState(pos.below()).getBlock() == Blocks.MAGMA_BLOCK;
     }
 
     @OnlyIn(Dist.CLIENT)
-    public void animateTick(BlockState stateIn, World worldIn, BlockPos pos, Random rand) {
+    public void animateTick(BlockState stateIn, Level worldIn, BlockPos pos, Random rand) {
         super.animateTick(stateIn, worldIn, pos, rand);
         if (AnvilConfiguration.ANVIL_PARTICILES.get() && rand.nextInt(10) == 0 && isAnvilHot(worldIn, pos))
             worldIn.addParticle(ParticleTypes.LAVA, (double) ((float) pos.getX() + rand.nextFloat()), (double) ((float) pos.getY() + 1.1F), (double) ((float) pos.getZ() + rand.nextFloat()), 0.0D, 0.0D, 0.0D);
     }
 
     @Override
-    public void onReplaced(BlockState blockState, World world, BlockPos pos, BlockState newBlockState, boolean isMoving) {
+    public void onReplaced(BlockState blockState, Level world, BlockPos pos, BlockState newBlockState, boolean isMoving) {
         if (blockState.getBlock() != newBlockState.getBlock()) {
             TileEntity te = world.getTileEntity(pos);
             if (te instanceof AnvilTileEntity)
@@ -159,9 +154,10 @@ public class AnvilBlock extends Block implements WootDebug {
      * WootDebug
      */
     @Override
-    public List<String> getDebugText(List<String> debug, ItemUseContext itemUseContext) {
+    public List<String> getDebugText(List<String> debug, UseOnContext itemUseContext) {
         debug.add("====> AnvilBlock");
         DebugItem.getTileEntityDebug(debug, itemUseContext);
         return debug;
     }
+
 }

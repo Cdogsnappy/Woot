@@ -6,84 +6,70 @@ import ipsis.woot.modules.factory.FactoryComponentProvider;
 import ipsis.woot.modules.factory.FactoryConfiguration;
 import ipsis.woot.modules.factory.FactorySetup;
 import ipsis.woot.util.WootDebug;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.state.StateContainer;
-import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidUtil;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.phys.BlockHitResult;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidUtil;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class CellBlock extends Block implements WootDebug, FactoryComponentProvider {
+public class CellBlock extends Block implements WootDebug, FactoryComponentProvider, EntityBlock {
 
     final Class<? extends CellBlockEntityBase> tileEntityClazz;
     public CellBlock(Class<? extends CellBlockEntityBase> clazz) {
-        super(Properties.create(Material.IRON).sound(SoundType.METAL).hardnessAndResistance(3.5F));
-        setDefaultState(getStateContainer().getBaseState().with(BlockStateProperties.ATTACHED, false));
+        super(Properties.of().sound(SoundType.METAL).strength(3.5F));
+        registerDefaultState(getStateDefinition().any().setValue(BlockStateProperties.ATTACHED, false));
         this.tileEntityClazz = clazz;
     }
 
     @Override
-    protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(BlockStateProperties.ATTACHED);
     }
 
-    @Override
-    public boolean hasTileEntity(BlockState state) {
-        return true;
-    }
-
-    @Nullable
-    @Override
-    public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-        try {
-            return tileEntityClazz.newInstance();
-        } catch (InstantiationException | IllegalAccessException e) {
-            throw new RuntimeException();
-        }
-    }
 
     @Override
-    public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult p_225533_6_) {
-        if (worldIn.isRemote)
-            return ActionResultType.SUCCESS;
+    public @NotNull ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult p_225533_6_) {
+        if (worldIn.isClientSide)
+            return ItemInteractionResult.SUCCESS;
 
-        if (!(worldIn.getTileEntity(pos) instanceof CellBlockEntityBase))
+        if (!(worldIn.getBlockEntity(pos) instanceof CellBlockEntityBase))
             throw new IllegalStateException("Tile entity is missing");
 
 
-        ItemStack heldItem = player.getHeldItem(handIn);
+        ItemStack heldItem = player.getItemInHand(handIn);
         if (FluidUtil.getFluidHandler(heldItem).isPresent())
-            return FluidUtil.interactWithFluidHandler(player, handIn, worldIn, pos, null) ? ActionResultType.SUCCESS : ActionResultType.FAIL;
+            return FluidUtil.interactWithFluidHandler(player, handIn, worldIn, pos, null) ? ItemInteractionResult.SUCCESS : ItemInteractionResult.FAIL;
 
-        return super.onBlockActivated(state, worldIn, pos, player, handIn, p_225533_6_);
+        return super.useItemOn(stack, state, worldIn, pos, player, handIn, p_225533_6_);
     }
 
     @OnlyIn(Dist.CLIENT)
     @Override
-    public void addInformation(ItemStack stack, @Nullable IBlockReader worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-        super.addInformation(stack, worldIn, tooltip, flagIn);
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flagIn) {
+        super.appendHoverText(stack, context, tooltip, flagIn);
         int transfer = 0;
         int capacity = 0;
         if (stack.getItem() == FactorySetup.CELL_1_BLOCK.get().asItem()) {
@@ -101,13 +87,13 @@ public class CellBlock extends Block implements WootDebug, FactoryComponentProvi
         }
 
         int contents = 0;
-        CompoundNBT compoundNBT = stack.getChildTag("BlockEntityTag");
-        if (compoundNBT != null && compoundNBT.contains("Tank")) {
-            FluidStack fluidStack = FluidStack.loadFluidStackFromNBT(compoundNBT.getCompound("Tank"));
+        CompoundTag compoundNBT = stack.get(DataComponents.BLOCK_ENTITY_DATA).copyTag();
+        if (compoundNBT.contains("Tank")) {
+            FluidStack fluidStack = FluidStack.parse(context.registries(), compoundNBT.getCompound("Tank")).get();
             contents = fluidStack.getAmount();
         }
-        tooltip.add(new TranslationTextComponent("info.woot.cell.0", contents, capacity));
-        tooltip.add(new TranslationTextComponent("info.woot.cell.1", transfer));
+        tooltip.add(Component.translatable("info.woot.cell.0", contents, capacity));
+        tooltip.add(Component.translatable("info.woot.cell.1", transfer));
     }
 
     /**
@@ -122,9 +108,18 @@ public class CellBlock extends Block implements WootDebug, FactoryComponentProvi
      * WootDebug
      */
     @Override
-    public List<String> getDebugText(List<String> debug, ItemUseContext itemUseContext) {
+    public List<String> getDebugText(List<String> debug, UseOnContext itemUseContext) {
         debug.add("====> CellBlock");
         DebugItem.getTileEntityDebug(debug, itemUseContext);
         return debug;
+    }
+
+    @Override
+    public @org.jetbrains.annotations.Nullable BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {
+        try {
+            return tileEntityClazz.newInstance();
+        } catch (InstantiationException | IllegalAccessException e) {
+            throw new RuntimeException();
+        }
     }
 }

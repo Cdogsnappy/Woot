@@ -52,11 +52,11 @@ public class Glue implements MultiBlockGlue {
         if (this.master == null || !this.master.equals(master)) {
             //LOGGER.debug("setMaster: {} has a new master {}", te.getPos(), master);
             this.master = master;
-            te.getWorld().setBlockState(te.getPos(),
-                    te.getBlockState().with(BlockStateProperties.ATTACHED, true), 3);
-            WorldHelper.updateClient(te.getWorld(), te.getPos());
+            te.getLevel().setBlock(te.getBlockPos(),
+                    te.getBlockState().setValue(BlockStateProperties.ATTACHED, true), 3);
+            WorldHelper.updateClient(te.getLevel(), te.getBlockPos());
             // Update neighbours to trigger possible connection changes eg. power cables
-            WorldHelper.updateNeighbours(te.getWorld(), te.getPos());
+            WorldHelper.updateNeighbours(te.getLevel(), te.getBlockPos());
         }
     }
 

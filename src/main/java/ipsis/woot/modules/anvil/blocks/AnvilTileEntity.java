@@ -10,21 +10,30 @@ import ipsis.woot.util.FakeMob;
 import ipsis.woot.util.WootDebug;
 import ipsis.woot.util.helper.WorldHelper;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.Containers;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 
 
 import javax.annotation.Nullable;
+import java.util.Arrays;
 import java.util.List;
 
 import static ipsis.woot.crafting.anvil.AnvilRecipe.ANVIL_TYPE;
 
 public class AnvilTileEntity extends BlockEntity implements WootDebug {
 
-    public AnvilTileEntity() {
-        super(AnvilSetup.ANVIL_BLOCK_TILE.get());
+    public AnvilTileEntity(BlockPos pos, BlockState blockState) {
+        super(AnvilSetup.ANVIL_BLOCK_TILE.get(), pos, blockState);
     }
 
     private ItemStack baseItem = ItemStack.EMPTY;
@@ -37,9 +46,9 @@ public class AnvilTileEntity extends BlockEntity implements WootDebug {
             return;
 
         this.baseItem = itemStack.copy();
-        markDirty();
-        if (world != null)
-            WorldHelper.updateClient(world, pos);
+        setChanged();
+        if (level != null)
+            WorldHelper.updateClient(level, getBlockPos());
     }
 
     public ItemStack[] getIngredients() { return ingredients; }
@@ -52,9 +61,9 @@ public class AnvilTileEntity extends BlockEntity implements WootDebug {
         for (int i = 0; i < ingredients.length; i++) {
             if (ingredients[i].isEmpty()) {
                 ingredients[i] = itemStack.copy();
-                markDirty();
-                if (world != null)
-                    WorldHelper.updateClient(world, pos);
+                setChanged();
+                if (level != null)
+                    WorldHelper.updateClient(level, getBlockPos());
                 return true;
             }
         }
@@ -64,18 +73,18 @@ public class AnvilTileEntity extends BlockEntity implements WootDebug {
 
     public void dropContents(Level world, BlockPos pos) {
         if (!baseItem.isEmpty()) {
-            InventoryHelper.spawnItemStack(world, pos.getX(), pos.getY(), pos.getZ(), baseItem);
+            Containers.dropItemStack(world, pos.getX(), pos.getY(), pos.getZ(), baseItem);
             baseItem = ItemStack.EMPTY;
         }
 
         for (int i = 0; i < ingredients.length; i++) {
             if (!ingredients[i].isEmpty()) {
-                InventoryHelper.spawnItemStack(world, pos.getX(), pos.getY(), pos.getZ(), ingredients[i]);
+                Containers.dropItemStack(world, pos.getX(), pos.getY(), pos.getZ(), ingredients[i]);
                 ingredients[i] = ItemStack.EMPTY;
             }
         }
 
-        markDirty();
+        setChanged();
         if (world != null)
             WorldHelper.updateClient(world, pos);
     }
@@ -98,34 +107,34 @@ public class AnvilTileEntity extends BlockEntity implements WootDebug {
         }
 
         if (!itemStack.isEmpty()) {
-            markDirty();
-            if (world != null)
-                WorldHelper.updateClient(world, pos);
+            setChanged();
+            if (this.level != null)
+                WorldHelper.updateClient(level, getBlockPos());
 
-            if (!playerEntity.inventory.addItemStackToInventory(itemStack)) {
-                InventoryHelper.spawnItemStack(world, pos.getX(), pos.getY(), pos.getZ(), itemStack);
+            if (!playerEntity.getInventory().add(itemStack)) {
+                Containers.dropItemStack(level, getBlockPos().getX(), getBlockPos().getY(), getBlockPos().getZ(), itemStack);
             } else {
-                playerEntity.openContainer.detectAndSendChanges();
+                playerEntity.containerMenu.broadcastChanges();
             }
         }
     }
 
-    public void tryCraft(PlayerEntity playerEntity) {
+    public void tryCraft(Player playerEntity) {
 
         /**
          * Check anvil is hot
          */
-        if (!AnvilSetup.ANVIL_BLOCK.get().isAnvilHot(world, pos)) {
-            playerEntity.sendStatusMessage(new TranslationTextComponent("chat.woot.anvil.cold"), true);
+        if (!AnvilSetup.ANVIL_BLOCK.get().isAnvilHot(level, getBlockPos())) {
+            playerEntity.sendSystemMessage(Component.translatable("chat.woot.anvil.cold"));
             return;
         }
 
-        AnvilRecipe recipe = world.getRecipeManager().getRecipe(ANVIL_TYPE,
-                new Inventory(baseItem, ingredients[0], ingredients[1], ingredients[2], ingredients[3]), world).orElse(null);
+        AnvilRecipe recipe = level.getRecipeManager().getRecipeFor(ANVIL_TYPE,
+                new Inventory(baseItem, ingredients[0], ingredients[1], ingredients[2], ingredients[3]), level).orElse(null);
         if (recipe == null)
             return;
 
-        ItemStack output = recipe.getOutput();
+        ItemStack output = recipe.output();
         /**
          * Handle the shard programming
          */
@@ -135,24 +144,23 @@ public class AnvilTileEntity extends BlockEntity implements WootDebug {
         }
 
         baseItem = ItemStack.EMPTY;
-        for (int i = 0; i < ingredients.length; i++)
-            ingredients[i] = ItemStack.EMPTY;
+        Arrays.fill(ingredients, ItemStack.EMPTY);
 
-        markDirty();
-        WorldHelper.updateClient(world, pos);
-        ItemEntity itemEntity = new ItemEntity(world,
-                pos.getX(), pos.getY() + 1, pos.getZ(),
+        setChanged();
+        WorldHelper.updateClient(level, getBlockPos());
+        ItemEntity itemEntity = new ItemEntity(level,
+                getBlockPos().getX(), getBlockPos().getY() + 1, getBlockPos().getZ(),
                 output);
-        itemEntity.setDefaultPickupDelay();
-        world.addEntity(itemEntity);
+        itemEntity.setDefaultPickUpDelay();
+        level.addFreshEntity(itemEntity);
     }
 
     /**
      * NBT
      */
     @Override
-    public void read(BlockState blockState, CompoundNBT compoundNBT) {
-        super.read(blockState, compoundNBT);
+    public void saveAdditional(CompoundTag compoundNBT, HolderLookup.Provider registries) {
+        super.saveAdditional(compoundNBT, registries);
         readFromNBT(compoundNBT);
     }
 
@@ -162,11 +170,11 @@ public class AnvilTileEntity extends BlockEntity implements WootDebug {
         readFromNBT(compoundNBT);
     }
 
-    private void readFromNBT(CompoundNBT compoundNBT) {
+    private void readFromNBT(CompoundTag compoundNBT) {
         if (compoundNBT.contains(ModNBT.Anvil.BASE_ITEM_TAG)) {
             ListNBT listNBT = compoundNBT.getList(ModNBT.INVENTORY_TAG, 10);
             for (int i = 0; i < listNBT.size(); i++) {
-                CompoundNBT itemTags = listNBT.getCompound(i);
+                CompoundTag itemTags = listNBT.getCompound(i);
                 int j = itemTags.getInt(ModNBT.INVENTORY_SLOT_TAG);
                 if (j >= 0 && j < ingredients.length) {
                     ingredients[j] = ItemStack.read(itemTags);
@@ -176,7 +184,7 @@ public class AnvilTileEntity extends BlockEntity implements WootDebug {
     }
 
     @Override
-    public CompoundNBT write(CompoundNBT compoundNBT) {
+    public CompoundTag write(CompoundTag compoundNBT) {
         super.write(compoundNBT);
 
         if (!baseItem.isEmpty()) {
@@ -199,16 +207,16 @@ public class AnvilTileEntity extends BlockEntity implements WootDebug {
     }
 
     @Override
-    public CompoundNBT getUpdateTag() {
-        return write(new CompoundNBT());
+    public CompoundTag getUpdateTag() {
+        return write(new CompoundTag());
     }
 
     @Nullable
     @Override
     public SUpdateTileEntityPacket getUpdatePacket() {
-        CompoundNBT compoundNBT = new CompoundNBT();
+        CompoundTag compoundNBT = new CompoundTag();
         this.write(compoundNBT);
-        return new SUpdateTileEntityPacket(getPos(), 1, compoundNBT);
+        return new SUpdateTileEntityPacket(getBlockPos(), 1, compoundNBT);
     }
 
     @Override
@@ -220,7 +228,7 @@ public class AnvilTileEntity extends BlockEntity implements WootDebug {
      * WootDebug
      */
     @Override
-    public List<String> getDebugText(List<String> debug, ItemUseContext itemUseContext) {
+    public List<String> getDebugText(List<String> debug, UseOnContext itemUseContext) {
         debug.add("====> AnvilTileEntity");
         debug.add("      base: " + baseItem);
         for (int i = 0; i < ingredients.length; i++)

@@ -10,12 +10,12 @@ import ipsis.woot.policy.PolicyRegistry;
 import ipsis.woot.modules.factory.blocks.ControllerBlockEntity;
 import ipsis.woot.util.FakeMob;
 import ipsis.woot.util.helper.StringHelper;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -31,12 +31,12 @@ public class FactoryScanner {
     /**
      * Scan for the specified tier.
      */
-    public static @Nullable AbsolutePattern scanTier(World world, Tier tier, BlockPos origin, Direction facing) {
+    public static @Nullable AbsolutePattern scanTier(Level world, Tier tier, BlockPos origin, Direction facing) {
         AbsolutePattern absolutePattern = AbsolutePattern.create(world, tier, origin, facing);
         return compareToWorldQuick(absolutePattern, world);
     }
 
-    public static @Nullable AbsolutePattern scanForTier(World world, BlockPos origin, Direction facing) {
+    public static @Nullable AbsolutePattern scanForTier(Level world, BlockPos origin, Direction facing) {
 
         // Remember to skip invalid
         for (int i = Tier.VALUES.length - 1; i >= 0; i--) {
@@ -53,14 +53,14 @@ public class FactoryScanner {
         return null;
     }
 
-    public static @Nullable AbsolutePattern compareToWorldQuick(AbsolutePattern absolutePattern, World world) {
+    public static @Nullable AbsolutePattern compareToWorldQuick(AbsolutePattern absolutePattern, Level world) {
 
         List<String> feedback = new ArrayList<>();
         boolean valid = compareToWorld(absolutePattern, world, feedback);
         return valid ? absolutePattern : null;
     }
 
-    public static boolean compareToWorld(AbsolutePattern absolutePattern, World world, List<String> feedback) {
+    public static boolean compareToWorld(AbsolutePattern absolutePattern, Level world, List<String> feedback) {
 
         boolean valid = true;
         boolean foundPrimaryController = false;
@@ -77,10 +77,10 @@ public class FactoryScanner {
             return false;
 
         BlockPos primaryControllerPos;
-        primaryControllerPos = new BlockPos(heartPos.offset(absolutePattern.facing, 1).add(0,-2,0));
+        primaryControllerPos = BlockPos.of(BlockPos.offset(heartPos.asLong(), absolutePattern.facing)).offset(0,-2,0);
 
         if (absolutePattern.getTier() == Tier.TIER_5) {
-            BlockState exoticBlockState = world.getBlockState(heartPos.up());
+            BlockState exoticBlockState = world.getBlockState(heartPos.above());
             if (exoticBlockState.getBlock() instanceof ExoticBlock) {
                 Block b = exoticBlockState.getBlock();
                 Exotic exotic = ((ExoticBlock) b).getExotic();
@@ -93,7 +93,7 @@ public class FactoryScanner {
         for (PatternBlock p : absolutePattern.getBlocks()) {
 
             // Don't load an unloaded chunk
-            if (!world.isBlockLoaded(p.getBlockPos())) {
+            if (!world.isLoaded(p.getBlockPos())) {
                 valid = false;
                 continue;
             }
@@ -101,7 +101,7 @@ public class FactoryScanner {
             BlockState currState = world.getBlockState(p.getBlockPos());
             Block currBlock = currState.getBlock();
 
-            String found = StringHelper.translate(currBlock.getTranslationKey());
+            String found = StringHelper.translate(currBlock.getDescriptionId());
             String expected = StringHelper.translate(p.getFactoryComponent().getTranslationKey());
 
             if (p.getFactoryComponent() == FactoryComponent.CELL)
@@ -129,15 +129,15 @@ public class FactoryScanner {
 
             if (p.getFactoryComponent() == FactoryComponent.FACTORY_UPGRADE) {
                 BlockState blockState = world.getBlockState(p.getBlockPos());
-                if (blockState.get(UpgradeBlock.UPGRADE) != Perk.EMPTY)
-                    absolutePattern.addPerk(blockState.get(UpgradeBlock.UPGRADE));
+                if (blockState.getValue(UpgradeBlock.UPGRADE) != Perk.EMPTY)
+                    absolutePattern.addPerk(blockState.getValue(UpgradeBlock.UPGRADE));
             }
 
             /**
              * Fails if the controller is not valid for the tier
              */
             if (p.getFactoryComponent() == FactoryComponent.CONTROLLER) {
-                TileEntity te = world.getTileEntity(p.getBlockPos());
+                BlockEntity te = world.getBlockEntity(p.getBlockPos());
                 if (te instanceof ControllerBlockEntity) {
                     FakeMob fakeMob = ((ControllerBlockEntity) te).getFakeMob();
                     if (fakeMob.isValid()) {
@@ -197,7 +197,7 @@ public class FactoryScanner {
      * the upgrade mods or controllers changing.
      * This will be used to trigger a new factory recipe calculation.
      */
-    public static boolean isPatternEqual(@Nonnull World world, AbsolutePattern pattern1, AbsolutePattern pattern2) {
+    public static boolean isPatternEqual(@Nonnull Level world, AbsolutePattern pattern1, AbsolutePattern pattern2) {
 
         if (pattern1 == null || pattern2 == null)
             return false;

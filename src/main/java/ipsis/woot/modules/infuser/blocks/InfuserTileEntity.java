@@ -13,38 +13,8 @@ import ipsis.woot.util.WootEnergyStorage;
 import ipsis.woot.util.WootMachineTileEntity;
 import ipsis.woot.util.helper.WorldHelper;
 import ipsis.woot.util.oss.OutputOnlyItemStackHandler;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.InventoryHelper;
-import net.minecraft.inventory.ItemStackHelper;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.INamedContainerProvider;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.Constants;
-import net.minecraftforge.common.util.INBTSerializable;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.energy.CapabilityEnergy;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.fluids.capability.templates.FluidTank;
-import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.ItemHandlerHelper;
-import net.minecraftforge.items.ItemStackHandler;
-import net.minecraftforge.items.wrapper.CombinedInvWrapper;
+import net.neoforged.neoforge.items.ItemStackHandler;
+
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -54,7 +24,7 @@ import java.util.Objects;
 
 import static ipsis.woot.crafting.InfuserRecipe.INFUSER_TYPE;
 
-public class InfuserTileEntity extends WootMachineTileEntity implements WootDebug, INamedContainerProvider {
+public class InfuserTileEntity extends WootMachineTileEntity implements WootDebug, NamedContainerProvider {
 
     public InfuserTileEntity() {
         super(InfuserSetup.INFUSER_BLOCK_TILE.get());
@@ -62,7 +32,7 @@ public class InfuserTileEntity extends WootMachineTileEntity implements WootDebu
             @Override
             protected void onContentsChanged(int slot) {
                 InfuserTileEntity.this.onContentsChanged(slot);
-                markDirty();
+                setChanged();
             }
 
             @Override

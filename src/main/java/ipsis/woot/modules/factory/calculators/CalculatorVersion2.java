@@ -10,11 +10,10 @@ import ipsis.woot.modules.factory.perks.Perk;
 import ipsis.woot.util.FakeMob;
 import ipsis.woot.util.FluidStackHelper;
 import ipsis.woot.util.ItemStackHelper;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.MathHelper;
-import net.minecraftforge.fluids.FluidStack;
+import net.minecraft.core.NonNullList;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.fluids.FluidStack;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -45,7 +44,7 @@ public class CalculatorVersion2 {
 
             int fluidSaving = (int)((mobCost / 100.0F) * getEfficiency(fakeMob, setup));
             mobCost -= fluidSaving;
-            mobCost = MathHelper.clamp(mobCost, 0, Integer.MAX_VALUE);
+            mobCost = Math.clamp(mobCost, 0, Integer.MAX_VALUE);
             LOGGER.debug("Calculator: {} saving of {}mB -> {}mB", fakeMob, fluidSaving, mobCost);
             fluidCost += mobCost;
         }
@@ -86,7 +85,7 @@ public class CalculatorVersion2 {
             for (ItemStack itemStack : recipeItems) {
                 if (!itemStack.isEmpty()) {
                     Woot.setup.getLogger().debug("getRecipeItems: {} {} {} {}",
-                            fakeMob, itemStack.getTranslationKey(), itemStack.getCount(), mobCount);
+                            fakeMob, itemStack.getDescriptionId(), itemStack.getCount(), mobCount);
                     ItemStack itemStack1 = itemStack.copy();
                     itemStack1.setCount(itemStack1.getCount() * mobCount);
                     items.add(itemStack1);
@@ -117,7 +116,7 @@ public class CalculatorVersion2 {
             for (FluidStack fluidStack : recipeFluids) {
                 if (!fluidStack.isEmpty()) {
                     Woot.setup.getLogger().debug("getRecipeFluids: {} {} {} {}",
-                            fakeMob, fluidStack.getTranslationKey(), fluidStack.getAmount(), mobCount);
+                            fakeMob, fluidStack.getDescriptionId(), fluidStack.getAmount(), mobCount);
                     FluidStack fluidStack1 = fluidStack.copy();
                     fluidStack1.setAmount(fluidStack1.getAmount() * mobCount);
                     fluids.add(fluidStack1);

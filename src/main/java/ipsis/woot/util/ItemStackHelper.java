@@ -1,8 +1,8 @@
 package ipsis.woot.util;
 
 import ipsis.woot.Woot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.item.ItemStack;
+
 
 public class ItemStackHelper {
 
@@ -11,7 +11,7 @@ public class ItemStackHelper {
      */
     public static ItemStack reduceByPercentage(ItemStack itemStack, double p) {
 
-        p = MathHelper.clamp(p, 0.0F, 100.0F);
+        p = Math.clamp(p, 0.0F, 100.0F);
 
         Woot.setup.getLogger().debug("reduceByPercentage: {} @ {}%%",
                 itemStack.getCount(), p);

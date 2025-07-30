@@ -1,13 +1,14 @@
 package ipsis.woot.util;
 
 import ipsis.woot.util.helper.WorldHelper;
-import net.minecraft.inventory.InventoryHelper;
-import net.minecraft.item.ItemStack;
-import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.Containers;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -22,7 +23,7 @@ import java.util.List;
  * This is HEAVILY based off the CoFH's TileMachineBase processing algorithm
  *
  */
-public abstract class WootMachineTileEntity extends TileEntity implements ITickableTileEntity {
+public abstract class WootMachineTileEntity extends BlockEntity {
 
     protected enum Mode {
         NONE, INPUT, OUTPUT
@@ -31,16 +32,15 @@ public abstract class WootMachineTileEntity extends TileEntity implements ITicka
 
     protected static final Logger LOGGER = LogManager.getLogger();
 
-    public WootMachineTileEntity(TileEntityType<?> tileEntityType) {
-        super(tileEntityType);
+    public WootMachineTileEntity(BlockEntityType<?> blockEntityType, BlockPos pos, BlockState state) {
+        super(blockEntityType, pos, state);
         for (Direction direction : Direction.values())
             settings.put(direction, Mode.NONE);
     }
 
 
-    @Override
-    public void tick() {
-        if (world.isRemote)
+    public void tick(Level level) {
+        if (level.isClientSide)
             return;
 
         machineTick();
@@ -72,7 +72,7 @@ public abstract class WootMachineTileEntity extends TileEntity implements ITicka
                 processOff();;
             }
         } else if (!isDisabled()) {
-            if (world.getGameTime() % 10 == 0 && canStart()) {
+            if (level.getGameTime() % 10 == 0 && canStart()) {
                 // have a valid set of input items and enough energy
                 processStart(); // set processMax and processRem
                 processTick(); // use energy and update processRem
@@ -161,10 +161,10 @@ public abstract class WootMachineTileEntity extends TileEntity implements ITicka
         for (ItemStack itemStack : items) {
             if (itemStack.isEmpty())
                 continue;
-            InventoryHelper.spawnItemStack(world, pos.getX(), pos.getY(), pos.getZ(), itemStack);
+            Containers.dropItemStack(level, getBlockPos().getX(), getBlockPos().getY(), getBlockPos().getZ(), itemStack);
         }
-        markDirty();
-        WorldHelper.updateClient(world, pos);
+        setChanged();
+        WorldHelper.updateClient(level, getBlockPos());
     }
 
 }

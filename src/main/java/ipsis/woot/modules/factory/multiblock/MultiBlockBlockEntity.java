@@ -26,22 +26,18 @@ public class MultiBlockBlockEntity extends BlockEntity implements MultiBlockGlue
         glue = new Glue(this, this);
     }
 
-    public MultiBlockBlockEntity() {
-        this(FactorySetup.MULTIBLOCK_BLOCK_TILE.get());
-    }
-
     @Override
-    public void validate() {
-        super.validate();
+    public void clearRemoved() {
+        super.clearRemoved();
         if (!level.isClientSide) {
             //LOGGER.debug("validate");
-            MultiBlockTracker.get().addEntry(world, pos);
+            MultiBlockTracker.get().addEntry(level, getBlockPos());
         }
     }
 
     @Override
-    public void remove() {
-        super.remove();
+    public void setRemoved() {
+        super.setRemoved();
         if (!level.isClientSide) {
             //LOGGER.debug("remove");
             glue.onGoodbye();
