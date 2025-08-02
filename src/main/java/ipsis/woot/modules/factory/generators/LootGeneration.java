@@ -5,6 +5,7 @@ import ipsis.woot.modules.factory.FormedSetup;
 import ipsis.woot.modules.factory.blocks.HeartBlockEntity;
 import ipsis.woot.modules.factory.items.XpShardBaseItem;
 import ipsis.woot.modules.factory.perks.Perk;
+import ipsis.woot.modules.generic.GenericSetup;
 import ipsis.woot.modules.generic.items.GenericItem;
 import ipsis.woot.policy.PolicyConfiguration;
 import ipsis.woot.simulator.MobSimulator;
@@ -14,7 +15,12 @@ import ipsis.woot.util.FakeMobKey;
 import ipsis.woot.util.helper.RandomHelper;
 import ipsis.woot.util.helper.StorageHelper;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.util.RandomSource;
+import net.minecraft.util.random.WeightedEntry;
+import net.minecraft.util.random.WeightedRandom;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.items.IItemHandler;
 import org.apache.logging.log4j.LogManager;
@@ -26,7 +32,7 @@ import java.util.stream.Collectors;
 public class LootGeneration {
 
     static final Logger LOGGER = LogManager.getLogger();
-    static final Random RANDOM = new Random();
+    static final RandomSource RANDOM = RandomSource.create();
     static final SkullGenerator SKULL_GENERATOR = new SkullGenerator();
 
     public static LootGeneration get() { return INSTANCE; }
@@ -80,9 +86,8 @@ public class LootGeneration {
                         itemStack.remove(DataComponents.ENCHANTMENTS);
 
                     float f = setup.getWorld().getCurrentDifficultyAt(heartTileEntity.getPos()).getEffectiveDifficulty();
-                    boolean allowTreasure = false;
-                    EnchantmentHelper.addRandomEnchantment(RandomHelper.RANDOM, itemStack,
-                            (int)(5.0F + f * (float)RandomHelper.RANDOM.nextInt(18)), allowTreasure);
+                    EnchantmentHelper.enchantItem(RandomHelper.RANDOM, itemStack,
+                            (int)(5.0F + f * (float)RandomHelper.RANDOM.nextInt(18)),heartTileEntity.getLevel().registryAccess(),  Optional.empty());
                 }
             }
 
@@ -119,10 +124,10 @@ public class LootGeneration {
         // Shard gen
         if (setup.getAllPerks().containsKey(Perk.Group.TIER_SHARD)) {
 
-            List<ShardPerkData> shards = new ArrayList<>();
-            shards.add(new ShardPerkData(GenericItem.GenericItemType.BASIC_UP_SHARD, setup.getBasicShardWeight()));
-            shards.add(new ShardPerkData(GenericItem.GenericItemType.ADVANCED_UP_SHARD, setup.getAdvancedShardWeight()));
-            shards.add(new ShardPerkData(GenericItem.GenericItemType.ELITE_UP_SHARD, setup.getEliteShardWeight()));
+            List<WeightedEntry.Wrapper<ItemStack>> shards = new ArrayList<>();
+            shards.add(WeightedEntry.wrap(new ItemStack(GenericSetup.T1_SHARD_ITEM.get()), setup.getBasicShardWeight()));
+            shards.add(WeightedEntry.wrap(new ItemStack(GenericSetup.T2_SHARD_ITEM.get()), setup.getAdvancedShardWeight()));
+            shards.add(WeightedEntry.wrap(new ItemStack(GenericSetup.T3_SHARD_ITEM.get()), setup.getEliteShardWeight()));
 
             int rolls = setup.getPerkTierShardValue();
             List<ItemStack> dropShards = new ArrayList<>();
@@ -134,8 +139,8 @@ public class LootGeneration {
 
             for (int i = 0; i < rolls; i++) {
                 if (RandomHelper.rollPercentage(setup.getShardDropChance(), "shardGen")) {
-                    ShardPerkData chosenShard = WeightedRandom.getRandomItem(RANDOM, shards);
-                    dropShards.add(chosenShard.getItemStack());
+                    ItemStack chosenShard = WeightedRandom.getRandomItem(RANDOM, shards).get().data();
+                    dropShards.add(chosenShard);
                 }
             }
 

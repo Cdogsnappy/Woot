@@ -1,32 +1,20 @@
 package ipsis.woot.modules.layout.blocks;
 
 import ipsis.woot.util.helper.WorldHelper;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.state.StateContainer;
-import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 import javax.annotation.Nullable;
 
 public class LayoutBlock extends Block {
 
     public LayoutBlock() {
-        super(Block.Properties.create(Material.GLASS).sound(SoundType.GLASS).hardnessAndResistance(0.3F));
-        setDefaultState(getStateContainer().getBaseState().with(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH));
+        super(Block.Properties.of().sound(SoundType.GLASS).strength(0.3F));
+        registerDefaultState(getStateDefinition().any().setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH));
     }
 
     @Nullable
@@ -36,7 +24,7 @@ public class LayoutBlock extends Block {
     }
 
     @Override
-    protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(BlockStateProperties.HORIZONTAL_FACING);
     }
 
@@ -48,7 +36,7 @@ public class LayoutBlock extends Block {
     @Nullable
     @Override
     public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-        return new LayoutTileEntity();
+        return new LayoutBlockEntity();
     }
 
     @Override
@@ -61,8 +49,8 @@ public class LayoutBlock extends Block {
             return ActionResultType.FAIL;
 
         TileEntity te = worldIn.getTileEntity(pos);
-        if (te instanceof LayoutTileEntity) {
-            LayoutTileEntity layout = (LayoutTileEntity)te;
+        if (te instanceof LayoutBlockEntity) {
+            LayoutBlockEntity layout = (LayoutBlockEntity)te;
             if (player.isSneaking()) {
                 layout.setNextLevel();
             } else {

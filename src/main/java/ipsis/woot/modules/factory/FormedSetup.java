@@ -317,7 +317,7 @@ public class FormedSetup {
                 }
             } else if (pb.getFactoryComponent() == FactoryComponent.CELL) {
                 formedSetup.cellPos = new BlockPos(pb.getBlockPos());
-                TileEntity te = world.getTileEntity(pb.getBlockPos());
+                BlockEntity te = world.getBlockEntity(pb.getBlockPos());
                 if (te instanceof CellBlockEntityBase) {
                     formedSetup.cellCapacity = ((CellBlockEntityBase) te).getCapacity();
                     if (te instanceof Cell1BlockEntity)

@@ -6,7 +6,7 @@ import net.neoforged.neoforge.common.util.INBTSerializable;
 import net.neoforged.neoforge.energy.EnergyStorage;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 
-public class WootEnergyStorage extends EnergyStrage implements IEnergyStorage {
+public class WootEnergyStorage extends EnergyStorage implements IEnergyStorage {
 
 
     public WootEnergyStorage(int capacity) {

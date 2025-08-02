@@ -2,60 +2,53 @@ package ipsis.woot.modules.fluidconvertor.blocks;
 
 import ipsis.woot.modules.debug.items.DebugItem;
 import ipsis.woot.modules.fluidconvertor.FluidConvertorConfiguration;
-import ipsis.woot.modules.infuser.InfuserConfiguration;
 import ipsis.woot.util.WootDebug;
 import ipsis.woot.util.helper.StringHelper;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.container.INamedContainerProvider;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.state.StateContainer;
-import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidUtil;
-import net.minecraftforge.fml.network.NetworkHooks;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidUtil;
+
 
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class FluidConvertorBlock extends Block implements WootDebug {
+public class FluidConvertorBlock extends Block implements EntityBlock, WootDebug {
 
     public FluidConvertorBlock() {
-        super(Block.Properties.create(Material.IRON).sound(SoundType.METAL).hardnessAndResistance(3.5F));
-        setDefaultState(getStateContainer().getBaseState().with(
+        super(Block.Properties.of().sound(SoundType.METAL).strength(3.5F));
+        registerDefaultState(getStateDefinition().any().setValue(
                 BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH
         ));
     }
 
     @Nullable
     @Override
-    public BlockState getStateForPlacement(BlockItemUseContext context) {
-        return this.getDefaultState().with(
-                BlockStateProperties.HORIZONTAL_FACING, context.getPlacementHorizontalFacing().getOpposite());
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        return this.defaultBlockState().setValue(
+                BlockStateProperties.HORIZONTAL_FACING, context.getHorizontalDirection().getOpposite());
     }
 
     @Override
-    protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(BlockStateProperties.HORIZONTAL_FACING);
     }
 
@@ -66,8 +59,8 @@ public class FluidConvertorBlock extends Block implements WootDebug {
 
     @Nullable
     @Override
-    public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-        return new FluidConvertorTileEntity();
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return new FluidConvertorBlockEntity(pos, state);
     }
 
     @Override
@@ -75,10 +68,10 @@ public class FluidConvertorBlock extends Block implements WootDebug {
         if (worldIn.isRemote)
             return ActionResultType.SUCCESS;
 
-        if (!(worldIn.getTileEntity(pos) instanceof FluidConvertorTileEntity))
+        if (!(worldIn.getTileEntity(pos) instanceof FluidConvertorBlockEntity))
             throw new IllegalStateException("Tile entity is missing");
 
-        FluidConvertorTileEntity tileEntity = (FluidConvertorTileEntity) worldIn.getTileEntity(pos);
+        FluidConvertorBlockEntity tileEntity = (FluidConvertorBlockEntity) worldIn.getTileEntity(pos);
         ItemStack heldItem = player.getHeldItem(handIn);
 
         if (FluidUtil.getFluidHandler(heldItem).isPresent()) {
@@ -94,12 +87,12 @@ public class FluidConvertorBlock extends Block implements WootDebug {
     }
 
     @Override
-    public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
+    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
         if (state.getBlock() != newState.getBlock()) {
-            TileEntity te = worldIn.getTileEntity(pos);
-            if (te instanceof FluidConvertorTileEntity)
-                ((FluidConvertorTileEntity) te).dropContents(worldIn, pos);
-            super.onReplaced(state, worldIn, pos, newState, isMoving);
+            BlockEntity te = level.getBlockEntity(pos);
+            if (te instanceof FluidConvertorBlockEntity)
+                ((FluidConvertorBlockEntity) te).dropContents(level, pos);
+            super.onRemove(state, level, pos, newState, isMoving);
         }
     }
 
@@ -107,7 +100,7 @@ public class FluidConvertorBlock extends Block implements WootDebug {
     //region WootDebug
 
     @Override
-    public List<String> getDebugText(List<String> debug, ItemUseContext itemUseContext) {
+    public List<String> getDebugText(List<String> debug, UseOnContext itemUseContext) {
         debug.add("====> " + this.getClass().toString());
         DebugItem.getTileEntityDebug(debug, itemUseContext);
         return debug;
@@ -116,44 +109,45 @@ public class FluidConvertorBlock extends Block implements WootDebug {
 
     @OnlyIn(Dist.CLIENT)
     @Override
-    public void addInformation(ItemStack stack, @Nullable IBlockReader worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-        super.addInformation(stack, worldIn, tooltip, flagIn);
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flagIn) {
+        super.appendHoverText(stack, context, tooltip, flagIn);
 
-        CompoundNBT nbt = stack.getChildTag("BlockEntityTag");
+        CompoundTag nbt = stack.get(DataComponents.BLOCK_ENTITY_DATA).copyTag();
         if (nbt == null)
             return;
 
         if (nbt.contains("energy")) {
-            CompoundNBT nbtEnergy = nbt.getCompound("energy");
-            tooltip.add(new TranslationTextComponent("info.woot.energy",
+            CompoundTag nbtEnergy = nbt.getCompound("energy");
+            tooltip.add(Component.translatable("info.woot.energy",
                     nbtEnergy.getInt("energy"), FluidConvertorConfiguration.FLUID_CONV_MAX_ENERGY.get()));
         }
 
         if (nbt.contains("inputTank")) {
-            FluidStack fluidStack = FluidStack.loadFluidStackFromNBT(nbt.getCompound("inputTank"));
+            FluidStack fluidStack = FluidStack.parse(context.registries(), nbt.getCompound("inputTank")).get();
             if (!fluidStack.isEmpty()) {
-                tooltip.add(new TranslationTextComponent("info.woot.input_tank",
-                        StringHelper.translate(fluidStack.getTranslationKey()),
+                tooltip.add(Component.translatable("info.woot.input_tank",
+                        StringHelper.translate(fluidStack.getDescriptionId()),
                         fluidStack.getAmount(),
                         FluidConvertorConfiguration.FLUID_CONV_INPUT_TANK_CAPACITY.get()));
             } else {
-                tooltip.add(new TranslationTextComponent("info.woot.input_tank.empty",
+                tooltip.add(Component.translatable("info.woot.input_tank.empty",
                         FluidConvertorConfiguration.FLUID_CONV_INPUT_TANK_CAPACITY.get()));
             }
 
         }
 
         if (nbt.contains("outputTank")) {
-            FluidStack fluidStack = FluidStack.loadFluidStackFromNBT(nbt.getCompound("outputTank"));
+            FluidStack fluidStack = FluidStack.parse(context.registries(), nbt.getCompound("outputTank")).get();
             if (!fluidStack.isEmpty()) {
-                tooltip.add(new TranslationTextComponent("info.woot.output_tank",
-                        StringHelper.translate(fluidStack.getTranslationKey()),
+                tooltip.add(Component.translatable("info.woot.output_tank",
+                        StringHelper.translate(fluidStack.getDescriptionId()),
                         fluidStack.getAmount(),
                         FluidConvertorConfiguration.FLUID_CONV_OUTPUT_TANK_CAPACITY.get()));
             } else {
-                tooltip.add(new TranslationTextComponent("info.woot.output_tank.empty",
+                tooltip.add(Component.translatable("info.woot.output_tank.empty",
                     FluidConvertorConfiguration.FLUID_CONV_OUTPUT_TANK_CAPACITY.get()));
             }
         }
     }
+
 }

@@ -12,7 +12,11 @@ import ipsis.woot.util.helper.WorldHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.Container;
 import net.minecraft.world.Containers;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Inventory;
@@ -28,7 +32,6 @@ import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.List;
 
-import static ipsis.woot.crafting.anvil.AnvilRecipe.ANVIL_TYPE;
 
 public class AnvilTileEntity extends BlockEntity implements WootDebug {
 
@@ -130,7 +133,7 @@ public class AnvilTileEntity extends BlockEntity implements WootDebug {
         }
 
         AnvilRecipe recipe = level.getRecipeManager().getRecipeFor(ANVIL_TYPE,
-                new Inventory(baseItem, ingredients[0], ingredients[1], ingredients[2], ingredients[3]), level).orElse(null);
+                new BlockContainer(baseItem, ingredients[0], ingredients[1], ingredients[2], ingredients[3]), level).orElse(null);
         if (recipe == null)
             return;
 
@@ -159,69 +162,65 @@ public class AnvilTileEntity extends BlockEntity implements WootDebug {
      * NBT
      */
     @Override
-    public void saveAdditional(CompoundTag compoundNBT, HolderLookup.Provider registries) {
-        super.saveAdditional(compoundNBT, registries);
+    public void loadAdditional(CompoundTag compoundNBT, HolderLookup.Provider registries) {
+        super.loadAdditional(compoundNBT, registries);
         readFromNBT(compoundNBT);
     }
 
-    @Override
-    public void deserializeNBT(CompoundNBT compoundNBT) {
-        super.deserializeNBT(compoundNBT);
-        readFromNBT(compoundNBT);
-    }
 
     private void readFromNBT(CompoundTag compoundNBT) {
         if (compoundNBT.contains(ModNBT.Anvil.BASE_ITEM_TAG)) {
-            ListNBT listNBT = compoundNBT.getList(ModNBT.INVENTORY_TAG, 10);
+            ListTag listNBT = compoundNBT.getList(ModNBT.INVENTORY_TAG, 10);
             for (int i = 0; i < listNBT.size(); i++) {
                 CompoundTag itemTags = listNBT.getCompound(i);
                 int j = itemTags.getInt(ModNBT.INVENTORY_SLOT_TAG);
                 if (j >= 0 && j < ingredients.length) {
-                    ingredients[j] = ItemStack.read(itemTags);
+                    ingredients[j] = ItemStack.parse(level.registryAccess(), itemTags).get();
                 }
             }
         }
     }
 
     @Override
-    public CompoundTag write(CompoundTag compoundNBT) {
-        super.write(compoundNBT);
+    public void saveAdditional(CompoundTag compoundNBT, HolderLookup.Provider lookupProvider) {
+        super.saveAdditional(compoundNBT, lookupProvider);
 
         if (!baseItem.isEmpty()) {
-            CompoundNBT compoundNBT1 = new CompoundNBT();
-            baseItem.write(compoundNBT1);
+            CompoundTag compoundNBT1 = new CompoundTag();
+            baseItem.save(lookupProvider, compoundNBT1);
             compoundNBT.put(ModNBT.Anvil.BASE_ITEM_TAG, compoundNBT1);
 
-            ListNBT listNBT = new ListNBT();
+            ListTag listNBT = new ListTag();
             for (int i = 0; i < ingredients.length; i++) {
                 if (!ingredients[i].isEmpty()) {
-                    CompoundNBT itemTags = new CompoundNBT();
+                    CompoundTag itemTags = new CompoundTag();
                     itemTags.putInt(ModNBT.INVENTORY_SLOT_TAG, i);
-                    ingredients[i].write(itemTags);
+                    ingredients[i].save(lookupProvider, itemTags);
                     listNBT.add(itemTags);
                 }
             }
             compoundNBT.put(ModNBT.INVENTORY_TAG, listNBT);
         }
-        return compoundNBT;
     }
 
     @Override
-    public CompoundTag getUpdateTag() {
-        return write(new CompoundTag());
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        CompoundTag tag = new CompoundTag();
+        saveAdditional(tag, level.registryAccess());
+        return tag;
     }
 
     @Nullable
     @Override
-    public SUpdateTileEntityPacket getUpdatePacket() {
+    public ClientboundBlockEntityDataPacket getUpdatePacket() {
         CompoundTag compoundNBT = new CompoundTag();
-        this.write(compoundNBT);
-        return new SUpdateTileEntityPacket(getBlockPos(), 1, compoundNBT);
+        this.saveAdditional(compoundNBT, level.registryAccess());
+        return ClientboundBlockEntityDataPacket.create(this);
     }
 
     @Override
-    public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
-        this.deserializeNBT(pkt.getNbtCompound());
+    public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt, HolderLookup.Provider lookupProvider) {
+        loadAdditional(pkt.getTag(), lookupProvider);
     }
 
     /**

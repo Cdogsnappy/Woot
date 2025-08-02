@@ -64,95 +64,95 @@ public class FactorySetup {
 
     public static final String CONTROLLER_TAG = "controller";
     public static final DeferredHolder<Block, ControllerBlock> CONTROLLER_BLOCK = BLOCKS.register(
-            CONTROLLER_TAG, () -> new ControllerBlock());
-    public static final DeferredHolder<Item> CONTROLLER_BLOCK_ITEM = ITEMS.register(
+            CONTROLLER_TAG, ControllerBlock::new);
+    public static final DeferredHolder<Item, Item> CONTROLLER_BLOCK_ITEM = ITEMS.register(
             CONTROLLER_TAG, () ->
                     new ControllerBlockItem(CONTROLLER_BLOCK.get(), Woot.createStandardProperties()));
-    public static final DeferredHolder<BlockEntityType<?>> CONTROLLER_BLOCK_TILE = BLOCKENTITIES.register(
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<ControllerBlockEntity>> CONTROLLER_BLOCK_TILE = BLOCKENTITIES.register(
             CONTROLLER_TAG, () ->
                     BlockEntityType.Builder.of(ControllerBlockEntity::new, CONTROLLER_BLOCK.get()).build(null));
 
-    public static final DeferredHolder<FactoryBlock> FACTORY_A_BLOCK = BLOCKS.register(
+    public static final DeferredHolder<Block, FactoryBlock> FACTORY_A_BLOCK = BLOCKS.register(
             FactoryBlock.FACTORY_A_REGNAME, () -> new FactoryBlock(FactoryComponent.FACTORY_A));
-    public static final DeferredHolder<Item> FACTORY_A_BLOCK_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item, Item> FACTORY_A_BLOCK_ITEM = ITEMS.register(
             FactoryBlock.FACTORY_A_REGNAME, () ->
                     new BlockItem(FACTORY_A_BLOCK.get(), Woot.createStandardProperties()));
 
-    public static final DeferredHolder<FactoryBlock> FACTORY_B_BLOCK = BLOCKS.register(
+    public static final DeferredHolder<Block, FactoryBlock> FACTORY_B_BLOCK = BLOCKS.register(
             FactoryBlock.FACTORY_B_REGNAME, () -> new FactoryBlock(FactoryComponent.FACTORY_B));
-    public static final DeferredHolder<Item> FACTORY_B_BLOCK_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item, Item> FACTORY_B_BLOCK_ITEM = ITEMS.register(
             FactoryBlock.FACTORY_B_REGNAME, () ->
                     new BlockItem(FACTORY_B_BLOCK.get(), Woot.createStandardProperties()));
 
-    public static final DeferredHolder<FactoryBlock> FACTORY_C_BLOCK = BLOCKS.register(
+    public static final DeferredHolder<Block, FactoryBlock> FACTORY_C_BLOCK = BLOCKS.register(
             FactoryBlock.FACTORY_C_REGNAME, () -> new FactoryBlock(FactoryComponent.FACTORY_C));
-    public static final DeferredHolder<Item> FACTORY_C_BLOCK_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item, Item> FACTORY_C_BLOCK_ITEM = ITEMS.register(
             FactoryBlock.FACTORY_C_REGNAME, () ->
                     new BlockItem(FACTORY_C_BLOCK.get(), Woot.createStandardProperties()));
 
-    public static final DeferredHolder<FactoryBlock> FACTORY_D_BLOCK = BLOCKS.register(
+    public static final DeferredHolder<Block, FactoryBlock> FACTORY_D_BLOCK = BLOCKS.register(
             FactoryBlock.FACTORY_D_REGNAME, () -> new FactoryBlock(FactoryComponent.FACTORY_D));
-    public static final DeferredHolder<Item> FACTORY_D_BLOCK_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item, Item> FACTORY_D_BLOCK_ITEM = ITEMS.register(
             FactoryBlock.FACTORY_D_REGNAME, () ->
                     new BlockItem(FACTORY_D_BLOCK.get(), Woot.createStandardProperties()));
 
-    public static final DeferredHolder<FactoryBlock> FACTORY_E_BLOCK = BLOCKS.register(
+    public static final DeferredHolder<Block, FactoryBlock> FACTORY_E_BLOCK = BLOCKS.register(
             FactoryBlock.FACTORY_E_REGNAME, () -> new FactoryBlock(FactoryComponent.FACTORY_E));
-    public static final DeferredHolder<Item> FACTORY_E_BLOCK_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item, Item> FACTORY_E_BLOCK_ITEM = ITEMS.register(
             FactoryBlock.FACTORY_E_REGNAME, () ->
                     new BlockItem(FACTORY_E_BLOCK.get(), Woot.createStandardProperties()));
 
-    public static final DeferredHolder<FactoryBlock> CAP_A_BLOCK = BLOCKS.register(
+    public static final DeferredHolder<Block, FactoryBlock> CAP_A_BLOCK = BLOCKS.register(
             FactoryBlock.CAP_A_REGNAME, () -> new FactoryBlock(FactoryComponent.CAP_A));
-    public static final DeferredHolder<Item> CAP_A_BLOCK_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item, Item> CAP_A_BLOCK_ITEM = ITEMS.register(
             FactoryBlock.CAP_A_REGNAME, () ->
                     new BlockItem(CAP_A_BLOCK.get(), Woot.createStandardProperties()));
 
-    public static final DeferredHolder<FactoryBlock> CAP_B_BLOCK = BLOCKS.register(
+    public static final DeferredHolder<Block, FactoryBlock> CAP_B_BLOCK = BLOCKS.register(
             FactoryBlock.CAP_B_REGNAME, () -> new FactoryBlock(FactoryComponent.CAP_B));
-    public static final DeferredHolder<Item> CAP_B_BLOCK_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item, Item> CAP_B_BLOCK_ITEM = ITEMS.register(
             FactoryBlock.CAP_B_REGNAME, () ->
                     new BlockItem(CAP_B_BLOCK.get(), Woot.createStandardProperties()));
 
-    public static final DeferredHolder<FactoryBlock> CAP_C_BLOCK = BLOCKS.register(
+    public static final DeferredHolder<Block, FactoryBlock> CAP_C_BLOCK = BLOCKS.register(
             FactoryBlock.CAP_C_REGNAME, () -> new FactoryBlock(FactoryComponent.CAP_C));
-    public static final DeferredHolder<Item> CAP_C_BLOCK_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item, Item> CAP_C_BLOCK_ITEM = ITEMS.register(
             FactoryBlock.CAP_C_REGNAME, () ->
                     new BlockItem(CAP_C_BLOCK.get(), Woot.createStandardProperties()));
 
-    public static final DeferredHolder<FactoryBlock> CAP_D_BLOCK = BLOCKS.register(
+    public static final DeferredHolder<Block, FactoryBlock> CAP_D_BLOCK = BLOCKS.register(
             FactoryBlock.CAP_D_REGNAME, () -> new FactoryBlock(FactoryComponent.CAP_D));
-    public static final DeferredHolder<Item> CAP_D_BLOCK_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item, Item> CAP_D_BLOCK_ITEM = ITEMS.register(
             FactoryBlock.CAP_D_REGNAME, () ->
                     new BlockItem(CAP_D_BLOCK.get(), Woot.createStandardProperties()));
 
-    public static final DeferredHolder<FactoryBlock> FACTORY_CONNECT_BLOCK = BLOCKS.register(
+    public static final DeferredHolder<Block, FactoryBlock> FACTORY_CONNECT_BLOCK = BLOCKS.register(
             FactoryBlock.FACTORY_CONNECT_REGNAME, () -> new FactoryBlock(FactoryComponent.FACTORY_CONNECT));
-    public static final DeferredHolder<Item> FACTORY_CONNECT_BLOCK_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item, Item> FACTORY_CONNECT_BLOCK_ITEM = ITEMS.register(
             FactoryBlock.FACTORY_CONNECT_REGNAME, () ->
                     new BlockItem(FACTORY_CONNECT_BLOCK.get(), Woot.createStandardProperties()));
 
-    public static final DeferredHolder<FactoryBlock> FACTORY_CTR_BASE_PRI_BLOCK = BLOCKS.register(
+    public static final DeferredHolder<Block, FactoryBlock> FACTORY_CTR_BASE_PRI_BLOCK = BLOCKS.register(
             FactoryBlock.FACTORY_CTR_BASE_PRI_REGNAME, () -> new FactoryBlock(FactoryComponent.FACTORY_CTR_BASE_PRI));
-    public static final DeferredHolder<Item> FACTORY_CTR_BASE_PRI_BLOCK_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item, Item> FACTORY_CTR_BASE_PRI_BLOCK_ITEM = ITEMS.register(
             FactoryBlock.FACTORY_CTR_BASE_PRI_REGNAME, () ->
                     new BlockItem(FACTORY_CTR_BASE_PRI_BLOCK.get(), Woot.createStandardProperties()));
 
-    public static final DeferredHolder<FactoryBlock> FACTORY_CTR_BASE_SEC_BLOCK = BLOCKS.register(
+    public static final DeferredHolder<Block, FactoryBlock> FACTORY_CTR_BASE_SEC_BLOCK = BLOCKS.register(
             FactoryBlock.FACTORY_CTR_BASE_SEC_REGNAME, () -> new FactoryBlock(FactoryComponent.FACTORY_CTR_BASE_SEC));
-    public static final DeferredHolder<Item> FACTORY_CTR_BASE_SEC_BLOCK_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item, Item> FACTORY_CTR_BASE_SEC_BLOCK_ITEM = ITEMS.register(
             FactoryBlock.FACTORY_CTR_BASE_SEC_REGNAME, () ->
                     new BlockItem(FACTORY_CTR_BASE_SEC_BLOCK.get(), Woot.createStandardProperties()));
 
-    public static final DeferredHolder<FactoryBlock> IMPORT_BLOCK = BLOCKS.register(
+    public static final DeferredHolder<Block, FactoryBlock> IMPORT_BLOCK = BLOCKS.register(
             FactoryBlock.IMPORT_REGNAME, () -> new FactoryBlock(FactoryComponent.IMPORT));
-    public static final DeferredHolder<Item> IMPORT_BLOCK_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item, Item> IMPORT_BLOCK_ITEM = ITEMS.register(
             FactoryBlock.IMPORT_REGNAME, () ->
                     new BlockItem(IMPORT_BLOCK.get(), Woot.createStandardProperties()));
 
-    public static final DeferredHolder<FactoryBlock> EXPORT_BLOCK = BLOCKS.register(
+    public static final DeferredHolder<Block, FactoryBlock> EXPORT_BLOCK = BLOCKS.register(
             FactoryBlock.EXPORT_REGNAME, () -> new FactoryBlock(FactoryComponent.EXPORT));
-    public static final DeferredHolder<Item> EXPORT_BLOCK_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item, Item> EXPORT_BLOCK_ITEM = ITEMS.register(
             FactoryBlock.EXPORT_REGNAME, () ->
                     new BlockItem(EXPORT_BLOCK.get(), Woot.createStandardProperties()));
 
@@ -188,150 +188,150 @@ public class FactorySetup {
     public static final String CELL_1_TAG = "cell_1";
     public static final DeferredHolder<Block, CellBlock> CELL_1_BLOCK = BLOCKS.register(
             CELL_1_TAG, () -> new CellBlock(Cell1BlockEntity.class));
-    public static final DeferredHolder<Item> CELL_1_BLOCK_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item, Item> CELL_1_BLOCK_ITEM = ITEMS.register(
             CELL_1_TAG, () ->
                     new BlockItem(CELL_1_BLOCK.get(), Woot.createStandardProperties()));
-    public static final DeferredHolder<BlockEntityType<?>> CELL_1_BLOCK_TILE = BLOCKENTITIES.register(
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<Cell1BlockEntity>> CELL_1_BLOCK_TILE = BLOCKENTITIES.register(
             CELL_1_TAG, () ->
-                    BlockEntityType.Builder.create(Cell1BlockEntity::new, CELL_1_BLOCK.get()).build(null));
+                    BlockEntityType.Builder.of(Cell1BlockEntity::new, CELL_1_BLOCK.get()).build(null));
 
     public static final String CELL_2_TAG = "cell_2";
-    public static final DeferredHolder<CellBlock> CELL_2_BLOCK = BLOCKS.register(
+    public static final DeferredHolder<Block, CellBlock> CELL_2_BLOCK = BLOCKS.register(
             CELL_2_TAG, () -> new CellBlock(Cell2BlockEntity.class));
-    public static final DeferredHolder<Item> CELL_2_BLOCK_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item, Item> CELL_2_BLOCK_ITEM = ITEMS.register(
             CELL_2_TAG, () ->
                     new BlockItem(CELL_2_BLOCK.get(), Woot.createStandardProperties()));
-    public static final DeferredHolder<BlockEntityType<?>> CELL_2_BLOCK_TILE = BLOCKENTITIES.register(
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<Cell2BlockEntity>> CELL_2_BLOCK_TILE = BLOCKENTITIES.register(
             CELL_2_TAG, () ->
-                    BlockEntityType.Builder.create(Cell2BlockEntity::new, CELL_2_BLOCK.get()).build(null));
+                    BlockEntityType.Builder.of(Cell2BlockEntity::new, CELL_2_BLOCK.get()).build(null));
 
     public static final String CELL_3_TAG = "cell_3";
-    public static final DeferredHolder<CellBlock> CELL_3_BLOCK = BLOCKS.register(
+    public static final DeferredHolder<Block, CellBlock> CELL_3_BLOCK = BLOCKS.register(
             CELL_3_TAG, () -> new CellBlock(Cell3BlockEntity.class));
-    public static final DeferredHolder<Item> CELL_3_BLOCK_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item, Item> CELL_3_BLOCK_ITEM = ITEMS.register(
             CELL_3_TAG, () ->
                     new BlockItem(CELL_3_BLOCK.get(), Woot.createStandardProperties()));
-    public static final DeferredHolder<BlockEntityType<?>> CELL_3_BLOCK_TILE = BLOCKENTITIES.register(
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<Cell3BlockEntity>> CELL_3_BLOCK_TILE = BLOCKENTITIES.register(
             CELL_3_TAG, () ->
-                    BlockEntityType.Builder.create(Cell3BlockEntity::new, CELL_3_BLOCK.get()).build(null));
+                    BlockEntityType.Builder.of(Cell3BlockEntity::new, CELL_3_BLOCK.get()).build(null));
 
     public static final String CELL_4_TAG = "cell_4";
-    public static final DeferredHolder<CellBlock> CELL_4_BLOCK = BLOCKS.register(
+    public static final DeferredHolder<Block, CellBlock> CELL_4_BLOCK = BLOCKS.register(
             CELL_4_TAG, () -> new CellBlock(Cell4BlockEntity.class));
-    public static final DeferredHolder<Item> CELL_4_BLOCK_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item, Item> CELL_4_BLOCK_ITEM = ITEMS.register(
             CELL_4_TAG, () ->
                     new BlockItem(CELL_4_BLOCK.get(), Woot.createStandardProperties()));
-    public static final DeferredHolder<BlockEntityType<?>> CELL_4_BLOCK_TILE = BLOCKENTITIES.register(
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<Cell4BlockEntity>> CELL_4_BLOCK_TILE = BLOCKENTITIES.register(
             CELL_4_TAG, () ->
-                    BlockEntityType.Builder.create(Cell4BlockEntity::new, CELL_4_BLOCK.get()).build(null));
+                    BlockEntityType.Builder.of(Cell4BlockEntity::new, CELL_4_BLOCK.get()).build(null));
 
-    public static final DeferredHolder<ExoticBlock> EXOTIC_A_BLOCK = BLOCKS.register(
+    public static final DeferredHolder<Block, ExoticBlock> EXOTIC_A_BLOCK = BLOCKS.register(
             Exotic.EXOTIC_A.getName(), () -> new ExoticBlock(Exotic.EXOTIC_A));
-    public static final DeferredHolder<Item> EXOTIC_A_BLOCK_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item, Item> EXOTIC_A_BLOCK_ITEM = ITEMS.register(
             Exotic.EXOTIC_A.getName(), () -> new BlockItem(EXOTIC_A_BLOCK.get(), Woot.createStandardProperties()));
 
-    public static final DeferredHolder<ExoticBlock> EXOTIC_B_BLOCK = BLOCKS.register(
+    public static final DeferredHolder<Block, ExoticBlock> EXOTIC_B_BLOCK = BLOCKS.register(
             Exotic.EXOTIC_B.getName(), () -> new ExoticBlock(Exotic.EXOTIC_B));
-    public static final DeferredHolder<Item> EXOTIC_B_BLOCK_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item, Item> EXOTIC_B_BLOCK_ITEM = ITEMS.register(
             Exotic.EXOTIC_B.getName(), () -> new BlockItem(EXOTIC_B_BLOCK.get(), Woot.createStandardProperties()));
 
-    public static final DeferredHolder<ExoticBlock> EXOTIC_C_BLOCK = BLOCKS.register(
+    public static final DeferredHolder<Block, ExoticBlock> EXOTIC_C_BLOCK = BLOCKS.register(
             Exotic.EXOTIC_C.getName(), () -> new ExoticBlock(Exotic.EXOTIC_C));
-    public static final DeferredHolder<Item> EXOTIC_C_BLOCK_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item, Item> EXOTIC_C_BLOCK_ITEM = ITEMS.register(
             Exotic.EXOTIC_C.getName(), () -> new BlockItem(EXOTIC_C_BLOCK.get(), Woot.createStandardProperties()));
 
-    public static final DeferredHolder<ExoticBlock> EXOTIC_D_BLOCK = BLOCKS.register(
+    public static final DeferredHolder<Block, ExoticBlock> EXOTIC_D_BLOCK = BLOCKS.register(
             Exotic.EXOTIC_D.getName(), () -> new ExoticBlock(Exotic.EXOTIC_D));
-    public static final DeferredHolder<Item> EXOTIC_D_BLOCK_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item, Item> EXOTIC_D_BLOCK_ITEM = ITEMS.register(
             Exotic.EXOTIC_D.getName(), () -> new BlockItem(EXOTIC_D_BLOCK.get(), Woot.createStandardProperties()));
 
-    public static final DeferredHolder<ExoticBlock> EXOTIC_E_BLOCK = BLOCKS.register(
+    public static final DeferredHolder<Block, ExoticBlock> EXOTIC_E_BLOCK = BLOCKS.register(
             Exotic.EXOTIC_E.getName(), () -> new ExoticBlock(Exotic.EXOTIC_E));
-    public static final DeferredHolder<Item> EXOTIC_E_BLOCK_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item, Item> EXOTIC_E_BLOCK_ITEM = ITEMS.register(
             Exotic.EXOTIC_E.getName(), () -> new BlockItem(EXOTIC_E_BLOCK.get(), Woot.createStandardProperties()));
 
-    public static final DeferredHolder<PerkItem> EFFICIENCY_1_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item, PerkItem> EFFICIENCY_1_ITEM = ITEMS.register(
             PerkItem.EFFICIENCY_1_REGNAME, () -> new PerkItem(Perk.EFFICIENCY_1));
-    public static final DeferredHolder<PerkItem> EFFICIENCY_2_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item, PerkItem> EFFICIENCY_2_ITEM = ITEMS.register(
             PerkItem.EFFICIENCY_2_REGNAME, () -> new PerkItem(Perk.EFFICIENCY_2));
-    public static final DeferredHolder<PerkItem> EFFICIENCY_3_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item, PerkItem> EFFICIENCY_3_ITEM = ITEMS.register(
             PerkItem.EFFICIENCY_3_REGNAME, () -> new PerkItem(Perk.EFFICIENCY_3));
 
-    public static final DeferredHolder<PerkItem> LOOTING_1_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item, PerkItem> LOOTING_1_ITEM = ITEMS.register(
             PerkItem.LOOTING_1_REGNAME, () -> new PerkItem(Perk.LOOTING_1));
-    public static final DeferredHolder<PerkItem> LOOTING_2_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item, PerkItem> LOOTING_2_ITEM = ITEMS.register(
             PerkItem.LOOTING_2_REGNAME, () -> new PerkItem(Perk.LOOTING_2));
-    public static final DeferredHolder<PerkItem> LOOTING_3_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item, PerkItem> LOOTING_3_ITEM = ITEMS.register(
             PerkItem.LOOTING_3_REGNAME, () -> new PerkItem(Perk.LOOTING_3));
 
-    public static final DeferredHolder<PerkItem> MASS_1_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item, PerkItem> MASS_1_ITEM = ITEMS.register(
             PerkItem.MASS_1_REGNAME, () -> new PerkItem(Perk.MASS_1));
-    public static final DeferredHolder<PerkItem> MASS_2_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item, PerkItem> MASS_2_ITEM = ITEMS.register(
             PerkItem.MASS_2_REGNAME, () -> new PerkItem(Perk.MASS_2));
-    public static final DeferredHolder<PerkItem> MASS_3_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item, PerkItem> MASS_3_ITEM = ITEMS.register(
             PerkItem.MASS_3_REGNAME, () -> new PerkItem(Perk.MASS_3));
 
-    public static final DeferredHolder<PerkItem> RATE_1_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item, PerkItem> RATE_1_ITEM = ITEMS.register(
             PerkItem.RATE_1_REGNAME, () -> new PerkItem(Perk.RATE_1));
-    public static final DeferredHolder<PerkItem> RATE_2_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item, PerkItem> RATE_2_ITEM = ITEMS.register(
             PerkItem.RATE_2_REGNAME, () -> new PerkItem(Perk.RATE_2));
-    public static final DeferredHolder<PerkItem> RATE_3_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item, PerkItem> RATE_3_ITEM = ITEMS.register(
             PerkItem.RATE_3_REGNAME, () -> new PerkItem(Perk.RATE_3));
 
-    public static final DeferredHolder<PerkItem> TIER_SHARD_1_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item, PerkItem> TIER_SHARD_1_ITEM = ITEMS.register(
             PerkItem.TIER_SHARD_1_REGNAME, () -> new PerkItem(Perk.TIER_SHARD_1));
-    public static final DeferredHolder<PerkItem> TIER_SHARD_2_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item, PerkItem> TIER_SHARD_2_ITEM = ITEMS.register(
             PerkItem.TIER_SHARD_2_REGNAME, () -> new PerkItem(Perk.TIER_SHARD_2));
-    public static final DeferredHolder<PerkItem> TIER_SHARD_3_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item, PerkItem> TIER_SHARD_3_ITEM = ITEMS.register(
             PerkItem.TIER_SHARD_3_REGNAME, () -> new PerkItem(Perk.TIER_SHARD_3));
 
-    public static final DeferredHolder<PerkItem> XP_1_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item, PerkItem> XP_1_ITEM = ITEMS.register(
             PerkItem.XP_1_REGNAME, () -> new PerkItem(Perk.XP_1));
-    public static final DeferredHolder<PerkItem> XP_2_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item, PerkItem> XP_2_ITEM = ITEMS.register(
             PerkItem.XP_2_REGNAME, () -> new PerkItem(Perk.XP_2));
-    public static final DeferredHolder<PerkItem> XP_3_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item, PerkItem> XP_3_ITEM = ITEMS.register(
             PerkItem.XP_3_REGNAME, () -> new PerkItem(Perk.XP_3));
 
-    public static final DeferredHolder<PerkItem> HEADLESS_1_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item, PerkItem> HEADLESS_1_ITEM = ITEMS.register(
             PerkItem.HEADLESS_1_REGNAME, () -> new PerkItem(Perk.HEADLESS_1));
-    public static final DeferredHolder<PerkItem> HEADLESS_2_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item, PerkItem> HEADLESS_2_ITEM = ITEMS.register(
             PerkItem.HEADLESS_2_REGNAME, () -> new PerkItem(Perk.HEADLESS_2));
-    public static final DeferredHolder<PerkItem> HEADLESS_3_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item, PerkItem> HEADLESS_3_ITEM = ITEMS.register(
             PerkItem.HEADLESS_3_REGNAME, () -> new PerkItem(Perk.HEADLESS_3));
 
-    public static final DeferredHolder<PerkItem> SLAUGHTER_1_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item, PerkItem> SLAUGHTER_1_ITEM = ITEMS.register(
             PerkItem.SLAUGHTER_1_REGNAME, () -> new PerkItem(Perk.SLAUGHTER_1));
-    public static final DeferredHolder<PerkItem> SLAUGHTER_2_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item, PerkItem> SLAUGHTER_2_ITEM = ITEMS.register(
             PerkItem.SLAUGHTER_2_REGNAME, () -> new PerkItem(Perk.SLAUGHTER_2));
-    public static final DeferredHolder<PerkItem> SLAUGHTER_3_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item, PerkItem> SLAUGHTER_3_ITEM = ITEMS.register(
             PerkItem.SLAUGHTER_3_REGNAME, () -> new PerkItem(Perk.SLAUGHTER_3));
 
-    public static final DeferredHolder<PerkItem> CRUSHER_1_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item, PerkItem> CRUSHER_1_ITEM = ITEMS.register(
             PerkItem.CRUSHER_1_REGNAME, () -> new PerkItem(Perk.CRUSHER_1));
-    public static final DeferredHolder<PerkItem> CRUSHER_2_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item, PerkItem> CRUSHER_2_ITEM = ITEMS.register(
             PerkItem.CRUSHER_2_REGNAME, () -> new PerkItem(Perk.CRUSHER_2));
-    public static final DeferredHolder<PerkItem> CRUSHER_3_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item, PerkItem> CRUSHER_3_ITEM = ITEMS.register(
             PerkItem.CRUSHER_3_REGNAME, () -> new PerkItem(Perk.CRUSHER_3));
 
-    public static final DeferredHolder<PerkItem> LASER_1_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item, PerkItem> LASER_1_ITEM = ITEMS.register(
             PerkItem.LASER_1_REGNAME, () -> new PerkItem(Perk.LASER_1));
-    public static final DeferredHolder<PerkItem> LASER_2_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item, PerkItem> LASER_2_ITEM = ITEMS.register(
             PerkItem.LASER_2_REGNAME, () -> new PerkItem(Perk.LASER_2));
-    public static final DeferredHolder<PerkItem> LASER_3_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item, PerkItem> LASER_3_ITEM = ITEMS.register(
             PerkItem.LASER_3_REGNAME, () -> new PerkItem(Perk.LASER_3));
 
-    public static final DeferredHolder<PerkItem> FLAYED_1_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item, PerkItem> FLAYED_1_ITEM = ITEMS.register(
             PerkItem.FLAYED_1_REGNAME, () -> new PerkItem(Perk.FLAYED_1));
-    public static final DeferredHolder<PerkItem> FLAYED_2_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item, PerkItem> FLAYED_2_ITEM = ITEMS.register(
             PerkItem.FLAYED_2_REGNAME, () -> new PerkItem(Perk.FLAYED_2));
-    public static final DeferredHolder<PerkItem> FLAYED_3_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item, PerkItem> FLAYED_3_ITEM = ITEMS.register(
             PerkItem.FLAYED_3_REGNAME, () -> new PerkItem(Perk.FLAYED_3));
 
-    public static final DeferredHolder<MobShardItem> MOB_SHARD_ITEM = ITEMS.register(
-            "mobshard", () -> new MobShardItem());
+    public static final DeferredHolder<Item, MobShardItem> MOB_SHARD_ITEM = ITEMS.register(
+            "mobshard", MobShardItem::new);
 
-    public static final DeferredHolder<XpShardBaseItem> XP_SHARD_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item, XpShardBaseItem> XP_SHARD_ITEM = ITEMS.register(
             XpShardBaseItem.SHARD_REGNAME, () -> new XpShardBaseItem(XpShardBaseItem.Variant.SHARD));
-    public static final DeferredHolder<XpShardBaseItem> XP_SPLINTER_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item, XpShardBaseItem> XP_SPLINTER_ITEM = ITEMS.register(
             XpShardBaseItem.SPLINTER_REGNAME, () -> new XpShardBaseItem(XpShardBaseItem.Variant.SPLINTER));
 }

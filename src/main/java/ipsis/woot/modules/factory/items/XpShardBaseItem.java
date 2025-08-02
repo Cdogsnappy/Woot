@@ -3,21 +3,9 @@ package ipsis.woot.modules.factory.items;
 import ipsis.woot.Woot;
 import ipsis.woot.modules.factory.FactorySetup;
 import net.minecraft.advancements.CriteriaTriggers;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.item.ExperienceOrbEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.InventoryHelper;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.*;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.util.FakePlayer;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -41,7 +29,7 @@ public class XpShardBaseItem extends Item {
 
     final Variant variant;
     public XpShardBaseItem(Variant variant) {
-        super(new Item.Properties().maxStackSize(STACK_SIZE).group(Woot.setup.getCreativeTab()));
+        super(new Item.Properties().stacksTo(STACK_SIZE));
         this.variant = variant;
     }
 

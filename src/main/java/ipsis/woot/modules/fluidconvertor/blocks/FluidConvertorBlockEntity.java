@@ -1,15 +1,10 @@
 package ipsis.woot.modules.fluidconvertor.blocks;
 
-import ipsis.woot.crafting.DyeSqueezerRecipe;
 import ipsis.woot.crafting.FluidConvertorRecipe;
-import ipsis.woot.fluilds.FluidSetup;
-import ipsis.woot.fluilds.network.TankPacket;
 import ipsis.woot.mod.ModNBT;
 import ipsis.woot.modules.fluidconvertor.FluidConvertorConfiguration;
 import ipsis.woot.modules.fluidconvertor.FluidConvertorSetup;
-import ipsis.woot.modules.squeezer.blocks.DyeSqueezerTileEntity;
 import ipsis.woot.util.WootDebug;
-import ipsis.woot.util.WootEnergyStorage;
 import ipsis.woot.util.WootFluidTank;
 import ipsis.woot.util.WootMachineTileEntity;
 import net.minecraft.core.BlockPos;
@@ -21,6 +16,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -40,17 +36,17 @@ import java.util.Optional;
 
 import static ipsis.woot.crafting.FluidConvertorRecipe.FLUID_CONV_TYPE;
 
-public class FluidConvertorTileEntity extends WootMachineTileEntity implements WootDebug, MenuProvider {
+public class FluidConvertorBlockEntity extends WootMachineTileEntity implements WootDebug, MenuProvider {
 
-    public FluidConvertorTileEntity() {
-        super(FluidConvertorSetup.FLUID_CONVERTOR_BLOCK_TILE.get());
+    public FluidConvertorBlockEntity(BlockPos pos, BlockState state) {
+        super(FluidConvertorSetup.FLUID_CONVERTOR_BLOCK_TILE.get(), pos, state);
     }
 
     public final IItemHandler inventory = new ItemStackHandler(1)
     {
         @Override
         protected void onContentsChanged(int slot) {
-            FluidConvertorTileEntity.this.onContentsChanged(slot);
+            FluidConvertorBlockEntity.this.onContentsChanged(slot);
             markDirty();
         }
 
@@ -444,5 +440,10 @@ public class FluidConvertorTileEntity extends WootMachineTileEntity implements W
     @Override
     public @org.jetbrains.annotations.Nullable AbstractContainerMenu createMenu(int i, Inventory inventory, Player player) {
         return null;
+    }
+
+    @Override
+    public List<String> getDebugText(List<String> debug, UseOnContext itemUseContext) {
+        return List.of();
     }
 }

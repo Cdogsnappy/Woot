@@ -9,8 +9,11 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 
 import javax.annotation.Nullable;
@@ -36,13 +39,13 @@ public class FactoryBlock extends Block implements FactoryComponentProvider, Woo
     public static final String EXPORT_REGNAME = "export";
 
     public FactoryBlock(FactoryComponent component) {
-        super(Block.Properties.create(Material.IRON).sound(SoundType.STONE).hardnessAndResistance(3.5F));
-        setDefaultState(getStateContainer().getBaseState().with(BlockStateProperties.ATTACHED, false));
+        super(Block.Properties.of().sound(SoundType.STONE).strength(3.5F));
+        registerDefaultState(getStateDefinition().any().setValue(BlockStateProperties.ATTACHED, false));
         this.component = component;
     }
 
     @Override
-    protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+    protected void createStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(BlockStateProperties.ATTACHED);
     }
 

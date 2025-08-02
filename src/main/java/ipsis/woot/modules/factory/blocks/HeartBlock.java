@@ -17,12 +17,14 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.BlockHitResult;
+import org.jetbrains.annotations.NotNull;
 
 
 import javax.annotation.Nullable;
@@ -42,7 +44,7 @@ public class HeartBlock extends Block implements FactoryComponentProvider, WootD
     }
 
     @Override
-    protected void fillStateContainer(StateDefinition.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(BlockStateProperties.HORIZONTAL_FACING);
     }
 
@@ -52,20 +54,21 @@ public class HeartBlock extends Block implements FactoryComponentProvider, WootD
     }
 
 
-    public ItemInteractionResult useItemOn(ItemStack stack, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult blockHitResult) {
+    @Override
+    public @NotNull ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult){
 
-        if (worldIn.isClientSide || handIn == InteractionHand.OFF_HAND)
+        if (level.isClientSide || hand == InteractionHand.OFF_HAND)
             return ItemInteractionResult.SUCCESS;
 
         if (player.isCrouching())
             return ItemInteractionResult.FAIL;
 
-        if (player.getItemInHand(handIn).getItem() == LayoutSetup.INTERN_ITEM.get() || player.getItemInHand(handIn).getItem() == DebugSetup.DEBUG_ITEM.get()) {
+        if (player.getItemInHand(hand).getItem() == LayoutSetup.INTERN_ITEM.get() || player.getItemInHand(hand).getItem() == DebugSetup.DEBUG_ITEM.get()) {
                 // intern is used on the heart, so cannot open the gui
                 return ItemInteractionResult.FAIL; // Block was not activated
         }
 
-        BlockEntity te = worldIn.getBlockEntity(pos);
+        BlockEntity te = level.getBlockEntity(pos);
         if (te instanceof HeartBlockEntity && !((HeartBlockEntity) te).isFormed())
                 return ItemInteractionResult.FAIL;
 

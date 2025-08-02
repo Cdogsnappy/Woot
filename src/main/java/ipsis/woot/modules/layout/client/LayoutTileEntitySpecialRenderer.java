@@ -1,66 +1,46 @@
 package ipsis.woot.modules.layout.client;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
-import ipsis.woot.Woot;
 import ipsis.woot.modules.factory.FactoryComponent;
 import ipsis.woot.modules.factory.FactorySetup;
-import ipsis.woot.modules.factory.blocks.HeartBlock;
-import ipsis.woot.modules.layout.LayoutConfiguration;
 import ipsis.woot.modules.layout.LayoutSetup;
-import ipsis.woot.modules.layout.blocks.LayoutTileEntity;
+import ipsis.woot.modules.layout.blocks.LayoutBlockEntity;
 import ipsis.woot.modules.factory.layout.PatternBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.*;
-import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.client.renderer.texture.AtlasTexture;
-import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
-import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
-import net.minecraft.item.ItemStack;
-import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.tileentity.EndGatewayTileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.model.data.EmptyModelData;
-import org.lwjgl.opengl.GL11;
+
+
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
-public class LayoutTileEntitySpecialRenderer extends TileEntityRenderer<LayoutTileEntity> {
+public class LayoutTileEntitySpecialRenderer extends TileEntityRenderer<LayoutBlockEntity> {
 
     public LayoutTileEntitySpecialRenderer(TileEntityRendererDispatcher dispatcher) {
         super(dispatcher);
     }
 
     @Override
-    public boolean isGlobalRenderer(LayoutTileEntity te) {
+    public boolean isGlobalRenderer(LayoutBlockEntity te) {
         // Force the render even when the chunk is out of view
         return true;
     }
 
     @Override
-    public void render(LayoutTileEntity layoutTileEntity, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int combinedLightIn, int combinedOverlayIn) {
+    public void render(LayoutBlockEntity layoutBlockEntity, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int combinedLightIn, int combinedOverlayIn) {
 
-        World world = layoutTileEntity.getWorld();
+        World world = layoutBlockEntity.getWorld();
         if (world != null) {
-            if (layoutTileEntity.getAbsolutePattern() == null)
-                layoutTileEntity.refresh();
+            if (layoutBlockEntity.getAbsolutePattern() == null)
+                layoutBlockEntity.refresh();
 
-            textureRender(layoutTileEntity, partialTicks, matrixStackIn, bufferIn, combinedLightIn, combinedOverlayIn);
+            textureRender(layoutBlockEntity, partialTicks, matrixStackIn, bufferIn, combinedLightIn, combinedOverlayIn);
         }
     }
 
-    void textureRender(LayoutTileEntity tileEntityIn, float partialTicks, MatrixStack matrixStack, IRenderTypeBuffer bufferIn, int combinedLightIn, int combinedOverlayIn) {
+    void textureRender(LayoutBlockEntity tileEntityIn, float partialTicks, MatrixStack matrixStack, IRenderTypeBuffer bufferIn, int combinedLightIn, int combinedOverlayIn) {
 
         boolean showAll = tileEntityIn.getLevel() == -1;
         int validY = showAll ? 0 : tileEntityIn.getYForLevel();

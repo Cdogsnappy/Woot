@@ -7,7 +7,7 @@ import ipsis.woot.modules.factory.items.PerkItem;
 import ipsis.woot.modules.factory.layout.PatternRepository;
 import ipsis.woot.modules.factory.perks.Perk;
 import ipsis.woot.modules.infuser.blocks.InfuserTileEntity;
-import ipsis.woot.modules.layout.blocks.LayoutTileEntity;
+import ipsis.woot.modules.layout.blocks.LayoutBlockEntity;
 import ipsis.woot.modules.squeezer.blocks.DyeSqueezerTileEntity;
 import ipsis.woot.modules.squeezer.blocks.EnchantSqueezerTileEntity;
 import ipsis.woot.util.FakeMob;
@@ -145,10 +145,10 @@ public class WootTopPlugin {
 
         private void addLayoutProbeInfo(ProbeMode probeMode, IProbeInfo iProbeInfo, TileEntity te, PlayerEntity playerEntity, BlockState blockState) {
 
-            if (!(te instanceof LayoutTileEntity))
+            if (!(te instanceof LayoutBlockEntity))
                 return;
 
-            LayoutTileEntity layout = (LayoutTileEntity) te;
+            LayoutBlockEntity layout = (LayoutBlockEntity) te;
             Tier tier = layout.getTier();
 
             iProbeInfo.text(

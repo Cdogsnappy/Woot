@@ -26,11 +26,11 @@ import net.minecraftforge.items.SlotItemHandler;
 
 public class FluidConvertorContainer extends WootContainer implements TankPacketHandler {
 
-    public FluidConvertorTileEntity tileEntity;
+    public FluidConvertorBlockEntity tileEntity;
 
     public FluidConvertorContainer(int windowId, World world, BlockPos pos, PlayerInventory playerInventory, PlayerEntity playerEntity) {
         super(FluidConvertorSetup.FLUID_CONVERTOR_BLOCK_CONTATAINER.get(), windowId);
-        tileEntity = (FluidConvertorTileEntity)world.getTileEntity(pos);
+        tileEntity = (FluidConvertorBlockEntity)world.getTileEntity(pos);
 
         addOwnSlots(tileEntity.getInventory());
         addPlayerSlots(playerInventory);

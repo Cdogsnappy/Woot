@@ -5,8 +5,9 @@ import ipsis.woot.modules.factory.FactoryConfiguration;
 import ipsis.woot.modules.factory.FormedSetup;
 import ipsis.woot.modules.factory.perks.Perk;
 import ipsis.woot.util.FakeMob;
-import net.minecraft.world.World;
-import net.minecraftforge.fluids.FluidStack;
+import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.fluids.FluidStack;
+
 
 public class IndustrialForegoingGenerator {
 
@@ -17,7 +18,7 @@ public class IndustrialForegoingGenerator {
         public FluidStack ether = FluidStack.EMPTY;
     }
 
-    public static GeneratedFluids getFluids(FormedSetup formedSetup, World world) {
+    public static GeneratedFluids getFluids(FormedSetup formedSetup, Level world) {
         GeneratedFluids generatedFluids = new GeneratedFluids();
         for (FakeMob fakeMob : formedSetup.getAllMobs()) {
             int mobCount = formedSetup.getAllMobParams().get(fakeMob).getMobCount(formedSetup.getAllPerks().containsKey(Perk.Group.MASS), formedSetup.hasMassExotic());

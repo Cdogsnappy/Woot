@@ -1,13 +1,14 @@
 package ipsis.woot.util.helper;
 
 import ipsis.woot.Woot;
+import net.minecraft.util.RandomSource;
 
 
 import java.util.Random;
 
 public class RandomHelper {
 
-    public static final Random RANDOM = new Random();
+    public static final RandomSource RANDOM = RandomSource.create();
 
     private static final float PERCENT_MIN = 0.0F;
     private static final float PERCENT_MAX = 100.0F;

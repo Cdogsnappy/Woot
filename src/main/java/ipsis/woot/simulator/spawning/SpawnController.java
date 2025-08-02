@@ -14,10 +14,11 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.damagesource.DamageTypes;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.neoforged.fml.util.ObfuscationReflectionHelper;
 import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.common.util.FakePlayer;
 
@@ -68,8 +69,8 @@ public class SpawnController {
 
         CompoundTag nbt = new CompoundTag();
         nbt.putString("id", rl.toString());
-        Entity entity = EntityType.loadEntityAndExecute(nbt, world, (xc) -> {
-            xc.setLocationAndAngles(pos.getX(), pos.getY(), pos.getZ(), xc.rotationYaw, xc.rotationPitch);
+        Entity entity = EntityType.loadEntityRecursive(nbt, world, (xc) -> {
+            xc.moveTo(pos.getX(), pos.getY(), pos.getZ(), xc.yRotO, xc.xRotO);
             return xc;
         });
 
@@ -77,15 +78,15 @@ public class SpawnController {
     }
 
     private static final int UNKNOWN_MOB_HEALTH = 100;
-    public int getMobHealth(@Nonnull FakeMob fakeMob, @Nonnull Level world) {
-        if (world.isRemote)
+    public int getMobHealth(@Nonnull FakeMob fakeMob, @Nonnull Level level) {
+        if (level.isClientSide)
             return UNKNOWN_MOB_HEALTH;
 
         if (!fakeMob.isValid())
             return UNKNOWN_MOB_HEALTH;
 
         if (!isCached(fakeMob)) {
-            if (!updateCache(fakeMob, world))
+            if (!updateCache(fakeMob,level))
                 return UNKNOWN_MOB_HEALTH;
         }
 
@@ -97,15 +98,15 @@ public class SpawnController {
     }
 
     private static final int UNKNOWN_MOB_EXP = 1;
-    public int getMobExperience(@Nonnull FakeMob fakeMob, @Nonnull Level world) {
-        if (world.isRemote)
+    public int getMobExperience(@Nonnull FakeMob fakeMob, @Nonnull Level level) {
+        if (level.isClientSide)
             return UNKNOWN_MOB_EXP;
 
         if (!fakeMob.isValid())
             return UNKNOWN_MOB_EXP;
 
         if (!isCached(fakeMob)) {
-            if (!updateCache(fakeMob, world))
+            if (!updateCache(fakeMob, level))
                 return UNKNOWN_MOB_EXP;
         }
 
@@ -133,7 +134,7 @@ public class SpawnController {
     private boolean updateCache(@Nonnull FakeMob fakeMob, @Nonnull Level world) {
         // Cache miss, create the entity
         Entity entity = createEntity(fakeMob, world, new BlockPos(0, 0, 0));
-        if (entity == null || !(entity instanceof LivingEntity))
+        if (!(entity instanceof LivingEntity))
             return false;
 
         int health = (int)((LivingEntity) entity).getMaxHealth();
@@ -142,7 +143,7 @@ public class SpawnController {
 
         int xp = 1;
         try {
-            Method getExp = ObfuscationReflectionHelper.findMethod(LivingEntity.class, "func_70693_a", PlayerEntity.class);
+            Method getExp = ObfuscationReflectionHelper.findMethod(LivingEntity.class, "func_70693_a", Player.class);
             getExp.setAccessible(true);
             xp = (int)getExp.invoke(entity, fakePlayer);
         } catch (Throwable e) {
@@ -150,14 +151,14 @@ public class SpawnController {
         }
 
         Woot.setup.getLogger().debug("updateCache: caching mob:{} xp:{} health:{}", fakeMob, xp, health);
-        addToCache(fakeMob, entity instanceof AnimalEntity, xp, health);
+        addToCache(fakeMob, entity instanceof Animal, xp, health);
         return true;
     }
 
 
     public boolean isLivingEntity(FakeMob fakeMob, Level world) {
         Entity entity = createEntity(fakeMob, world, new BlockPos(0, 0, 0));
-        return entity != null && entity instanceof MobEntity;
+        return entity != null && entity instanceof Mob;
     }
 
     private static Map<String, MobCacheEntry> mobCacheEntryHashMap = new HashMap<>();

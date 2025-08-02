@@ -7,13 +7,9 @@ import ipsis.woot.Woot;
 import ipsis.woot.simulator.MobSimulator;
 import ipsis.woot.util.FakeMob;
 import ipsis.woot.util.helper.RandomHelper;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.item.crafting.ShapedRecipe;
-import net.minecraft.util.JSONUtils;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.world.item.ItemStack;
+
 
 import java.util.HashMap;
 import java.util.List;
@@ -36,7 +32,7 @@ public class SkullGenerator {
                     Woot.setup.getLogger().error(s + " == INVALID (mob {})", parts[0]);
                 } else {
                     try {
-                        JsonObject jsonObject = JSONUtils.fromJson(parts[1]);
+                        JsonObject jsonObject = GsonHelper.fromJson(parts[1]);
                         if (jsonObject.isJsonObject()) {
                             ItemStack itemStack = ShapedRecipe.deserializeItem(jsonObject);
                             if (!itemStack.isEmpty()) {

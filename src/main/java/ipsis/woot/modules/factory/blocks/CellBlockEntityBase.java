@@ -4,62 +4,50 @@ import ipsis.woot.fluilds.FluidSetup;
 import ipsis.woot.mod.ModNBT;
 import ipsis.woot.modules.factory.multiblock.MultiBlockBlockEntity;
 import ipsis.woot.util.WootDebug;
-import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
 
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Optional;
 
 public abstract class CellBlockEntityBase extends MultiBlockBlockEntity implements WootDebug {
 
-    protected FluidTank tank = new FluidTank(FluidAttributes.BUCKET_VOLUME);
-    private final LazyOptional<IFluidHandler> holder = LazyOptional.of(() -> tank);
+    protected FluidTank tank = new FluidTank(FluidType.BUCKET_VOLUME);
+    private final Optional<IFluidHandler> holder = Optional.of(() -> tank);
 
-    public CellBlockEntityBase(TileEntityType<?> tileEntityType) {
-        super(tileEntityType);
+    public CellBlockEntityBase(BlockEntityType<?> blockEntityType, BlockPos pos, BlockState state) {
+        super(blockEntityType, pos, state);
         tank.setCapacity(getCapacity());
-        tank.setValidator(e -> e.getFluid() == FluidSetup.CONATUS_FLUID.get().getFluid());
+        tank.setValidator(e -> e.getFluid() == FluidSetup.CONATUS_FLUID.get().getSource());
     }
 
-    @Override
-    public void deserializeNBT(CompoundTag compound) {
-        super.deserializeNBT(compound);
-        readFromNBT(compound);
-    }
 
     @Override
-    public void read(BlockState blockState, CompoundTag compoundNBT) {
-        super.read(blockState, compoundNBT);
-        readFromNBT(compoundNBT);
+    public void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
+        readFromNBT(tag);
     }
 
     private void readFromNBT(CompoundTag compound) {
         if (compound.contains(ModNBT.TANK_TAG))
-            tank.readFromNBT(compound.getCompound(ModNBT.TANK_TAG));
+            tank.readFromNBT(this.level.registryAccess(), compound.getCompound(ModNBT.TANK_TAG));
     }
 
     @Override
-    public CompoundTag write(CompoundTag compound) {
-        super(compound);
+    public void saveAdditional(CompoundTag compound, HolderLookup.Provider registries) {
+        super.saveAdditional(compound, registries);
         CompoundTag tankNBT = new CompoundTag();
-        tank.writeToNBT(tankNBT);
+        tank.writeToNBT(registries, tankNBT);
         compound.put(ModNBT.TANK_TAG, tankNBT);
-        return compound;
-    }
-
-    @Override
-    @Nonnull
-    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> capability, @Nullable Direction facing)
-    {
-        if (capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY)
-            return holder.cast();
-        return super.getCapability(capability, facing);
     }
 
     /**
@@ -77,12 +65,12 @@ public abstract class CellBlockEntityBase extends MultiBlockBlockEntity implemen
      * WootDebug
      */
     @Override
-    public List<String> getDebugText(List<String> debug, ItemUseContext itemUseContext) {
+    public List<String> getDebugText(List<String> debug, UseOnContext itemUseContext) {
         debug.add("====> CellTileEntity");
         debug.add("      hasMaster: " + glue.hasMaster());
         debug.add("      capacity: " + tank.getCapacity());
         debug.add("      transfer: " + getMaxTransfer());
-        debug.add("      contains: " + tank.getFluid().getTranslationKey());
+        debug.add("      contains: " + tank.getFluid().getDescriptionId());
         debug.add("      contains: " + tank.getFluid().getAmount());
         return debug;
     }

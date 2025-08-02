@@ -1,25 +1,26 @@
 package ipsis.woot.util.helper;
 
 import ipsis.woot.Woot;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.ItemHandlerHelper;
+import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.items.ItemHandlerHelper;
+
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class StorageHelper {
 
-    public static void insertItems(List<ItemStack> items, List<LazyOptional<IItemHandler>> hdlrs) {
+    public static void insertItems(List<ItemStack> items, List<Optional<IItemHandler>> hdlrs) {
 
         if (items.isEmpty() || hdlrs.isEmpty())
             return;
 
-        for (LazyOptional<IItemHandler> hdlr : hdlrs) {
+        for (Optional<IItemHandler> hdlr : hdlrs) {
             hdlr.ifPresent(h -> {
                 for (int i = 0; i < items.size(); i++) {
                     ItemStack itemStack = items.get(i);
@@ -33,13 +34,13 @@ public class StorageHelper {
         }
     }
 
-    public static void insertFluids(List<FluidStack> fluids, List<LazyOptional<IFluidHandler>> hdlrs) {
+    public static void insertFluids(List<FluidStack> fluids, List<Optional<IFluidHandler>> hdlrs) {
 
         if (fluids.isEmpty() || hdlrs.isEmpty())
             return;
 
         // Try to fill non-empty tanks
-        for (LazyOptional<IFluidHandler> hdlr : hdlrs) {
+        for (Optional<IFluidHandler> hdlr : hdlrs) {
             hdlr.ifPresent(h -> {
                 int tanks = h.getTanks();
                 if (tanks > 0) {
@@ -47,9 +48,9 @@ public class StorageHelper {
                         FluidStack fluidStack = h.getFluidInTank(tank);
                         if (fluidStack != null && !fluidStack.isEmpty()) {
                             for (FluidStack f : fluids) {
-                                if (!f.isEmpty() && fluidStack.isFluidEqual(f)) {
+                                if (!f.isEmpty() && fluidStack.is(f.getFluid())) {
                                     int filled = h.fill(f, IFluidHandler.FluidAction.EXECUTE);
-                                    Woot.setup.getLogger().debug("insertFluids: {} ----> topup {} {}", tank, f.getTranslationKey(), filled);
+                                    Woot.setup.getLogger().debug("insertFluids: {} ----> topup {} {}", tank, f.getDescriptionId(), filled);
                                     if (filled > 0)
                                         f.setAmount(f.getAmount() - filled);
                                 }
@@ -68,7 +69,7 @@ public class StorageHelper {
 
         if (haveFluids) {
             // Try to fill empty tanks
-            for (LazyOptional<IFluidHandler> hdlr : hdlrs) {
+            for (Optional<IFluidHandler> hdlr : hdlrs) {
                 hdlr.ifPresent(h -> {
                     int tanks = h.getTanks();
                     if (tanks > 0) {
@@ -78,7 +79,7 @@ public class StorageHelper {
                                 for (FluidStack f : fluids) {
                                     if (!f.isEmpty()) {
                                         int filled = h.fill(f, IFluidHandler.FluidAction.EXECUTE);
-                                        Woot.setup.getLogger().debug("insertFluids: {} ----> new fill {} {}", tank, f.getTranslationKey(), filled);
+                                        Woot.setup.getLogger().debug("insertFluids: {} ----> new fill {} {}", tank, f.getDescriptionId(), filled);
                                         if (filled > 0)
                                             f.setAmount(f.getAmount() - filled);
                                     }
@@ -103,7 +104,7 @@ public class StorageHelper {
                 if (itemStack.isEmpty())
                     break;
 
-                if (ItemHandlerHelper.canItemStacksStack(flatStack, itemStack)) {
+                if (ItemStack.isSameItemSameComponents(flatStack, itemStack)) {
                     flatStack.grow(itemStack.getCount());
                     itemStack.setCount(0);
                 }
@@ -116,16 +117,16 @@ public class StorageHelper {
         return flattened;
     }
 
-    public static int getCount(ItemStack itemStack, List<LazyOptional<IItemHandler>> hdlrs) {
+    public static int getCount(ItemStack itemStack, List<Optional<IItemHandler>> hdlrs) {
 
         AtomicInteger count = new AtomicInteger();
-        for (LazyOptional<IItemHandler> hdlr : hdlrs) {
+        for (Optional<IItemHandler> hdlr : hdlrs) {
             hdlr.ifPresent(h -> {
                 for (int slot = 0; slot < h.getSlots(); slot++) {
                     ItemStack slotStack = h.getStackInSlot(slot);
                     if (slotStack.isEmpty())
                         continue;
-                    if (ItemStack.areItemsEqual(itemStack, slotStack))
+                    if (ItemStack.isSameItem(itemStack, slotStack))
                         count.getAndAdd(slotStack.getCount());
                 }
             });
@@ -134,10 +135,10 @@ public class StorageHelper {
         return count.get();
     }
 
-    public static int getAmount(FluidStack fluidStack, List<LazyOptional<IFluidHandler>> hdlrs) {
+    public static int getAmount(FluidStack fluidStack, List<Optional<IFluidHandler>> hdlrs) {
 
         AtomicInteger count = new AtomicInteger();
-        for (LazyOptional<IFluidHandler> hdlr : hdlrs) {
+        for (Optional<IFluidHandler> hdlr : hdlrs) {
             hdlr.ifPresent(h -> {
 
                 for (int slot = 0; slot < h.getTanks(); slot++) {
@@ -145,7 +146,7 @@ public class StorageHelper {
                     if (slotStack.isEmpty())
                         continue;
 
-                    if (FluidStack.areFluidStackTagsEqual(fluidStack, slotStack))
+                    if (FluidStack.isSameFluid(fluidStack, slotStack))
                         count.getAndAdd(slotStack.getAmount());
                 }
             });

@@ -2,17 +2,18 @@ package ipsis.woot.modules.fluidconvertor;
 
 import ipsis.woot.config.ConfigDefaults;
 import ipsis.woot.config.ConfigPath;
-import net.minecraftforge.common.ForgeConfigSpec;
+import net.neoforged.neoforge.common.ModConfigSpec;
+
 
 public class FluidConvertorConfiguration {
 
-    public static ForgeConfigSpec.IntValue FLUID_CONV_INPUT_TANK_CAPACITY;
-    public static ForgeConfigSpec.IntValue FLUID_CONV_OUTPUT_TANK_CAPACITY;
-    public static ForgeConfigSpec.IntValue FLUID_CONV_MAX_ENERGY;
-    public static ForgeConfigSpec.IntValue FLUID_CONV_MAX_ENERGY_RX;
-    public static ForgeConfigSpec.IntValue FLUID_CONV_ENERYG_PER_TICK;
+    public static ModConfigSpec.IntValue FLUID_CONV_INPUT_TANK_CAPACITY;
+    public static ModConfigSpec.IntValue FLUID_CONV_OUTPUT_TANK_CAPACITY;
+    public static ModConfigSpec.IntValue FLUID_CONV_MAX_ENERGY;
+    public static ModConfigSpec.IntValue FLUID_CONV_MAX_ENERGY_RX;
+    public static ModConfigSpec.IntValue FLUID_CONV_ENERYG_PER_TICK;
 
-    public static void init(ForgeConfigSpec.Builder COMMON_BUILDER, ForgeConfigSpec.Builder CLIENT_BUILDER) {
+    public static void init(ModConfigSpec.Builder COMMON_BUILDER, ModConfigSpec.Builder CLIENT_BUILDER) {
 
         COMMON_BUILDER.comment("Settings for the convertor").push(ConfigPath.FluidConvertor.CATEGORY);
         CLIENT_BUILDER.comment("Settings for the convertor").push(ConfigPath.FluidConvertor.CATEGORY);

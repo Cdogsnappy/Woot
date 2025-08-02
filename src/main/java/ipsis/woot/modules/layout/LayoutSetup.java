@@ -2,43 +2,43 @@ package ipsis.woot.modules.layout;
 
 import ipsis.woot.Woot;
 import ipsis.woot.modules.layout.blocks.LayoutBlock;
-import ipsis.woot.modules.layout.blocks.LayoutTileEntity;
+import ipsis.woot.modules.layout.blocks.LayoutBlockEntity;
 import ipsis.woot.modules.layout.items.InternItem;
-import net.minecraft.block.Block;
-import net.minecraft.inventory.container.ContainerType;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraftforge.fml.RegistryObject;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredRegister;
 
 public class LayoutSetup {
 
-    public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, Woot.MODID);
-    public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, Woot.MODID);
-    public static final DeferredRegister<TileEntityType<?>> TILES = DeferredRegister.create(ForgeRegistries.TILE_ENTITIES, Woot.MODID);
-    public static final DeferredRegister<ContainerType<?>> CONTAINERS = DeferredRegister.create(ForgeRegistries.CONTAINERS, Woot.MODID);
+    public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(BuiltInRegistries.ITEM, Woot.MODID);
+    public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(BuiltInRegistries.BLOCK, Woot.MODID);
+    public static final DeferredRegister<BlockEntityType<?>> TILES = DeferredRegister.create(BuiltInRegistries.BLOCK_ENTITY_TYPE, Woot.MODID);
+    public static final DeferredRegister<MenuType<?>> CONTAINERS = DeferredRegister.create(BuiltInRegistries.MENU, Woot.MODID);
 
-    public static void register() {
+    public static void register(IEventBus eventBus) {
         Woot.setup.getLogger().info("LayoutSetup: register");
-        BLOCKS.register(FMLJavaModLoadingContext.get().getModEventBus());
-        ITEMS.register(FMLJavaModLoadingContext.get().getModEventBus());
-        TILES.register(FMLJavaModLoadingContext.get().getModEventBus());
-        CONTAINERS.register(FMLJavaModLoadingContext.get().getModEventBus());
+        BLOCKS.register(eventBus);
+        ITEMS.register(eventBus);
+        TILES.register(eventBus);
+        CONTAINERS.register(eventBus);
     }
 
     public static final String LAYOUT_TAG = "layout";
-    public static final RegistryObject<LayoutBlock> LAYOUT_BLOCK = BLOCKS.register(
+    public static final DeferredHolder<Block, LayoutBlock> LAYOUT_BLOCK = BLOCKS.register(
             LAYOUT_TAG, () -> new LayoutBlock());
-    public static final RegistryObject<Item> LAYOUT_BLOCK_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item, BlockItem> LAYOUT_BLOCK_ITEM = ITEMS.register(
             LAYOUT_TAG, () ->
                     new BlockItem(LAYOUT_BLOCK.get(), Woot.createStandardProperties()));
-    public static final RegistryObject<TileEntityType<LayoutTileEntity>> LAYOUT_BLOCK_TILE = TILES.register(
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<LayoutBlockEntity>> LAYOUT_BLOCK_TILE = TILES.register(
             LAYOUT_TAG, () ->
-                    TileEntityType.Builder.create(LayoutTileEntity::new, LAYOUT_BLOCK.get()).build(null));
+                    BlockEntityType.Builder.of(LayoutBlockEntity::new, LAYOUT_BLOCK.get()).build(null));
 
-    public static final RegistryObject<InternItem> INTERN_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item, InternItem> INTERN_ITEM = ITEMS.register(
             "intern", () -> new InternItem());
 }
