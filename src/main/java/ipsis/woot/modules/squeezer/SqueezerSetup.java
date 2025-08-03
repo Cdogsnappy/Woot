@@ -2,44 +2,44 @@ package ipsis.woot.modules.squeezer;
 
 import ipsis.woot.Woot;
 import ipsis.woot.modules.squeezer.blocks.*;
-import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
-import net.minecraft.inventory.container.ContainerType;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraftforge.common.extensions.IForgeContainerType;
-import net.minecraftforge.fml.RegistryObject;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredRegister;
+
 
 public class SqueezerSetup {
 
-    public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, Woot.MODID);
-    public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, Woot.MODID);
-    public static final DeferredRegister<TileEntityType<?>> TILES = DeferredRegister.create(ForgeRegistries.TILE_ENTITIES, Woot.MODID);
-    public static final DeferredRegister<ContainerType<?>> CONTAINERS = DeferredRegister.create(ForgeRegistries.CONTAINERS, Woot.MODID);
+    public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(BuiltInRegistries.ITEM, Woot.MODID);
+    public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(BuiltInRegistries.BLOCK, Woot.MODID);
+    public static final DeferredRegister<BlockEntityType<?>> TILES = DeferredRegister.create(BuiltInRegistries.BLOCK_ENTITY_TYPE, Woot.MODID);
+    public static final DeferredRegister<MenuType<?>> CONTAINERS = DeferredRegister.create(BuiltInRegistries.MENU, Woot.MODID);
 
-    public static void register() {
+    public static void register(IEventBus eventBus) {
         Woot.setup.getLogger().info("SqueezerSetup: register");
-        BLOCKS.register(FMLJavaModLoadingContext.get().getModEventBus());
-        ITEMS.register(FMLJavaModLoadingContext.get().getModEventBus());
-        TILES.register(FMLJavaModLoadingContext.get().getModEventBus());
-        CONTAINERS.register(FMLJavaModLoadingContext.get().getModEventBus());
+        BLOCKS.register(eventBus);
+        ITEMS.register(eventBus);
+        TILES.register(eventBus);
+        CONTAINERS.register(eventBus);
     }
 
     public static final String SQUEEZER_TAG = "squeezer";
-    public static final RegistryObject<DyeSqueezerBlock> SQUEEZER_BLOCK = BLOCKS.register(
+    public static final DeferredHolder<Block, DyeSqueezerBlock> SQUEEZER_BLOCK = BLOCKS.register(
             SQUEEZER_TAG, () -> new DyeSqueezerBlock());
-    public static final RegistryObject<Item> SQUEEZER_BLOCK_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item> SQUEEZER_BLOCK_ITEM = ITEMS.register(
             SQUEEZER_TAG, () ->
                     new BlockItem(SQUEEZER_BLOCK.get(), Woot.createStandardProperties()));
-    public static final RegistryObject<TileEntityType<?>> SQUEEZER_BLOCK_TILE = TILES.register(
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<DyeSqueezerTileEntity>> SQUEEZER_BLOCK_TILE = TILES.register(
             SQUEEZER_TAG, () ->
-                    TileEntityType.Builder.create(DyeSqueezerTileEntity::new, SQUEEZER_BLOCK.get()).build(null));
+                    BlockEntityType.Builder.of(DyeSqueezerTileEntity::new, SQUEEZER_BLOCK.get()).build(null));
 
-    public static final RegistryObject<ContainerType<DyeSqueezerContainer>> SQUEEZER_BLOCK_CONTAINER = CONTAINERS.register(
+    public static final DeferredHolder<MenuType<?>, MenuType<DyeSqueezerContainer>> SQUEEZER_BLOCK_CONTAINER = CONTAINERS.register(
             SQUEEZER_TAG, () ->
                     IForgeContainerType.create((windowId, inv, data) -> {
                         return new DyeSqueezerContainer(
@@ -51,16 +51,16 @@ public class SqueezerSetup {
                     }));
 
     public static final String ENCHANT_SQUEEZER_TAG = "enchsqueezer";
-    public static final RegistryObject<EnchantSqueezerBlock> ENCHANT_SQUEEZER_BLOCK = BLOCKS.register(
+    public static final DeferredHolder<Block, EnchantSqueezerBlock> ENCHANT_SQUEEZER_BLOCK = BLOCKS.register(
             ENCHANT_SQUEEZER_TAG, () -> new EnchantSqueezerBlock());
-    public static final RegistryObject<Item> ENCHANT_SQUEEZER_BLOCK_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item, BlockItem> ENCHANT_SQUEEZER_BLOCK_ITEM = ITEMS.register(
             ENCHANT_SQUEEZER_TAG, () ->
                     new BlockItem(ENCHANT_SQUEEZER_BLOCK.get(), Woot.createStandardProperties()));
-    public static final RegistryObject<TileEntityType<?>> ENCHANT_SQUEEZER_BLOCK_TILE = TILES.register(
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<EnchantSqueezerTileEntity>> ENCHANT_SQUEEZER_BLOCK_TILE = TILES.register(
             ENCHANT_SQUEEZER_TAG, () ->
-                    TileEntityType.Builder.create(EnchantSqueezerTileEntity::new, ENCHANT_SQUEEZER_BLOCK.get()).build(null));
+                    BlockEntityType.Builder.of(EnchantSqueezerTileEntity::new, ENCHANT_SQUEEZER_BLOCK.get()).build(null));
 
-    public static final RegistryObject<ContainerType<EnchantSqueezerContainer>> ENCHANT_SQUEEZER_BLOCK_CONTAINER = CONTAINERS.register(
+    public static final DeferredHolder<MenuType<?>, MenuType<EnchantSqueezerContainer>> ENCHANT_SQUEEZER_BLOCK_CONTAINER = CONTAINERS.register(
             ENCHANT_SQUEEZER_TAG, () ->
                     IForgeContainerType.create((windowId, inv, data) -> {
                         return new EnchantSqueezerContainer(

@@ -1,9 +1,10 @@
 package ipsis.woot.modules.infuser;
 
-import ipsis.woot.crafting.InfuserRecipe;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.item.crafting.RecipeManager;
+import ipsis.woot.crafting.infuser.InfuserRecipe;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeManager;
 
 import javax.annotation.Nonnull;
 
@@ -15,14 +16,14 @@ public class InfuserRecipes {
         InfuserRecipe.clearValidInputs();
         InfuserRecipe.clearValidAugments();
         InfuserRecipe.clearValidFluids();
-        for (IRecipe recipe : manager.getRecipes()) {
-            if (recipe instanceof InfuserRecipe) {
-                InfuserRecipe dRecipe = (InfuserRecipe) recipe;
-                for (ItemStack itemStack : dRecipe.getIngredient().getMatchingStacks())
+        for (RecipeHolder<?> recipe : manager.getRecipes()) {
+            if (recipe.value() instanceof InfuserRecipe) {
+                InfuserRecipe dRecipe = (InfuserRecipe) recipe.value();
+                for (ItemStack itemStack : dRecipe.getIngredient().getItems())
                     InfuserRecipe.addValidInput(itemStack);
 
                 if (dRecipe.hasAugment()) {
-                    for (ItemStack itemStack : dRecipe.getAugment().getMatchingStacks())
+                    for (ItemStack itemStack : dRecipe.getAugment().getItems())
                         InfuserRecipe.addValidAugment(itemStack);
                 }
 

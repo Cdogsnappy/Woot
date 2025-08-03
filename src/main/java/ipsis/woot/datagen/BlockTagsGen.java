@@ -2,16 +2,19 @@ package ipsis.woot.datagen;
 
 import ipsis.woot.Woot;
 import ipsis.woot.modules.factory.FactorySetup;
-import net.minecraft.block.Block;
-import net.minecraft.data.BlockTagsProvider;
+
 import net.minecraft.data.DataGenerator;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.ITag;
-import net.minecraftforge.common.data.ExistingFileHelper;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.level.block.Block;
+import net.neoforged.neoforge.common.data.BlockTagsProvider;
+import net.neoforged.neoforge.common.data.ExistingFileHelper;
+
 
 public class BlockTagsGen extends BlockTagsProvider {
 
-    public static final ITag.INamedTag<Block> FACTORY_BLOCK = BlockTags.makeWrapperTag(Woot.MODID + ":factory_blocks");
+    public static final TagKey<Block> FACTORY_BLOCK = TagKey.create(Woot.MODID + ":factory_blocks");
 
     public BlockTagsGen(DataGenerator generator, ExistingFileHelper existingFileHelper) {
         super(generator, Woot.MODID, existingFileHelper);

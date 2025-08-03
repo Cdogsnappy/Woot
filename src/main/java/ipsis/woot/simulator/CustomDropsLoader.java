@@ -1,12 +1,9 @@
 package ipsis.woot.simulator;
 
 
-import ipsis.woot.crafting.FactoryRecipe;
-import ipsis.woot.simulator.MobSimulator;
-import ipsis.woot.util.FakeMob;
+import ipsis.woot.crafting.factory.FactoryRecipe;
 import ipsis.woot.util.FakeMobKey;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeManager;
 

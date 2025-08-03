@@ -2,7 +2,7 @@ package ipsis.woot.modules.anvil;
 
 import ipsis.woot.Woot;
 import ipsis.woot.modules.anvil.blocks.AnvilBlock;
-import ipsis.woot.modules.anvil.blocks.AnvilTileEntity;
+import ipsis.woot.modules.anvil.blocks.AnvilBlockEntity;
 import ipsis.woot.modules.anvil.items.DieItem;
 import ipsis.woot.modules.anvil.items.HammerItem;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -37,9 +37,9 @@ public class AnvilSetup {
     public static final DeferredHolder<Item, Item> ANVIL_BLOCK_ITEM = ITEMS.register(
             ANVIL_TAG, () ->
                     new BlockItem(ANVIL_BLOCK.get(), Woot.createStandardProperties()));
-    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<AnvilTileEntity>> ANVIL_BLOCK_TILE = TILES.register(
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<AnvilBlockEntity>> ANVIL_BLOCK_TILE = TILES.register(
             ANVIL_TAG, () ->
-                    BlockEntityType.Builder.of(AnvilTileEntity::new, ANVIL_BLOCK.get()).build(null));
+                    BlockEntityType.Builder.of(AnvilBlockEntity::new, ANVIL_BLOCK.get()).build(null));
 
     public static final DeferredHolder<Item, HammerItem> HAMMER_ITEM = ITEMS.register(
             "hammer", HammerItem::new);

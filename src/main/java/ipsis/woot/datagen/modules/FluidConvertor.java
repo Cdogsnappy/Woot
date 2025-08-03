@@ -1,31 +1,21 @@
 package ipsis.woot.datagen.modules;
 
 import ipsis.woot.Woot;
-import ipsis.woot.crafting.FluidConvertorRecipe;
-import ipsis.woot.crafting.FluidConvertorRecipeBuilder;
+import ipsis.woot.crafting.fluidconvertor.FluidConvertorRecipeBuilder;
 import ipsis.woot.fluilds.FluidSetup;
 import ipsis.woot.modules.factory.FactorySetup;
 import ipsis.woot.modules.fluidconvertor.FluidConvertorSetup;
 import ipsis.woot.modules.generic.GenericSetup;
-import ipsis.woot.modules.squeezer.SqueezerSetup;
-import net.minecraft.advancements.criterion.InventoryChangeTrigger;
-import net.minecraft.block.Blocks;
-import net.minecraft.data.IFinishedRecipe;
-import net.minecraft.data.ShapedRecipeBuilder;
-import net.minecraft.data.ShapelessRecipeBuilder;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.item.Items;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.tags.BlockTags;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.common.Tags;
-import net.minecraftforge.fluids.FluidStack;
-
-import java.util.function.Consumer;
+import net.minecraft.data.recipes.RecipeOutput;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.material.Fluids;
+import net.neoforged.neoforge.fluids.FluidStack;
 
 public class FluidConvertor {
 
-    public static void registerRecipes(Consumer<IFinishedRecipe> consumer) {
+    public static void registerRecipes(RecipeOutput recipeOutput) {
 
         ShapedRecipeBuilder.shapedRecipe(FluidConvertorSetup.FLUID_CONVERTOR_BLOCK.get())
                 .patternLine(" s ")
@@ -49,12 +39,12 @@ public class FluidConvertor {
          * Contaus Fluid
          */
         Ingredient[] conatus_ingredients = {
-                Ingredient.fromItems(FactorySetup.XP_SHARD_ITEM.get()),
-                Ingredient.fromItems(FactorySetup.XP_SPLINTER_ITEM.get()),
-                Ingredient.fromItems(Items.REDSTONE),
-                Ingredient.fromItems(GenericSetup.T1_SHARD_ITEM.get()),
-                Ingredient.fromItems(GenericSetup.T2_SHARD_ITEM.get()),
-                Ingredient.fromItems(GenericSetup.T3_SHARD_ITEM.get())
+                Ingredient.of(FactorySetup.XP_SHARD_ITEM.get()),
+                Ingredient.of(FactorySetup.XP_SPLINTER_ITEM.get()),
+                Ingredient.of(Items.REDSTONE),
+                Ingredient.of(GenericSetup.T1_SHARD_ITEM.get()),
+                Ingredient.of(GenericSetup.T2_SHARD_ITEM.get()),
+                Ingredient.of(GenericSetup.T3_SHARD_ITEM.get())
         };
         ResourceLocation rl;
         int[] conatus_outputAmount = { 1000, 100, 1000, 1250, 2500, 5000 };
@@ -75,14 +65,14 @@ public class FluidConvertor {
         FluidConvertorRecipeBuilder.fluidConvertorRecipe(
                 new FluidStack(FluidSetup.CONATUS_FLUID.get(), 1250),
                 1000,
-                Ingredient.fromItems(Items.MAGMA_BLOCK), 1,
+                Ingredient.of(Items.MAGMA_BLOCK), 1,
                 new FluidStack(FluidSetup.ENCHANT_FLUID.get(), 1000))
                 .build(consumer, "conatus_ench1");
 
         FluidConvertorRecipeBuilder.fluidConvertorRecipe(
                 new FluidStack(FluidSetup.CONATUS_FLUID.get(), 1450),
                 1000,
-                Ingredient.fromItems(Items.END_STONE), 1,
+                Ingredient.of(Items.END_STONE), 1,
                 new FluidStack(FluidSetup.ENCHANT_FLUID.get(), 1000))
                 .build(consumer, "conatus_ench2");
 
@@ -90,10 +80,10 @@ public class FluidConvertor {
          * Purge Fluid
          */
         Ingredient[] ingredients = {
-                Ingredient.fromItems(Items.ROTTEN_FLESH),
-                Ingredient.fromItems(Items.BONE),
-                Ingredient.fromItems(Items.BLAZE_ROD),
-                Ingredient.fromItems(Items.ENDER_PEARL),
+                Ingredient.of(Items.ROTTEN_FLESH),
+                Ingredient.of(Items.BONE),
+                Ingredient.of(Items.BLAZE_ROD),
+                Ingredient.of(Items.ENDER_PEARL),
         };
         int[] outputAmount = { 1000, 1000, 2000, 4000 };
 

@@ -1,7 +1,7 @@
 package ipsis.woot.modules.anvil.client;
 
 
-import ipsis.woot.modules.anvil.blocks.AnvilTileEntity;
+import ipsis.woot.modules.anvil.blocks.AnvilBlockEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.item.ItemStack;
@@ -10,21 +10,21 @@ import net.neoforged.api.distmarker.OnlyIn;
 
 
 @OnlyIn(Dist.CLIENT)
-public class AnvilTileEntitySpecialRenderer extends TileEntityRenderer<AnvilTileEntity> {
+public class AnvilTileEntitySpecialRenderer extends TileEntityRenderer<AnvilBlockEntity> {
 
     public AnvilTileEntitySpecialRenderer(TileEntityRendererDispatcher dispatcher) {
         super(dispatcher);
     }
 
     @Override
-    public void render(AnvilTileEntity anvilTileEntity, float v, MatrixStack matrixStack, IRenderTypeBuffer iRenderTypeBuffer, int combinedLight, int combinedOverlay) {
+    public void render(AnvilBlockEntity anvilBlockEntity, float v, MatrixStack matrixStack, IRenderTypeBuffer iRenderTypeBuffer, int combinedLight, int combinedOverlay) {
 
-        ItemStack itemStack = anvilTileEntity.getBaseItem();
+        ItemStack itemStack = anvilBlockEntity.getBaseItem();
         if (!itemStack.isEmpty()) {
             renderStack(itemStack, matrixStack, iRenderTypeBuffer, 0.5F, 1.05F, 0.5F, combinedLight, combinedOverlay);
         }
 
-        ItemStack[] ingredients = anvilTileEntity.getIngredients();
+        ItemStack[] ingredients = anvilBlockEntity.getIngredients();
         if (!ingredients[0].isEmpty())
             renderStack(ingredients[0],  matrixStack, iRenderTypeBuffer, 0.5F, 1.05F, 0.5F - 0.2F, combinedLight, combinedOverlay);
         if (!ingredients[1].isEmpty())

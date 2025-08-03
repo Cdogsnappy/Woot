@@ -1,6 +1,11 @@
 package ipsis.woot.util;
 
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.DynamicOps;
+import com.mojang.serialization.Encoder;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
@@ -9,6 +14,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.monster.MagmaCube;
@@ -33,6 +39,13 @@ public class FakeMob {
             ByteBufCodecs.STRING_UTF8, FakeMob::getTag,
             FakeMob::new
     );
+
+
+    public static final Codec<FakeMob> CODEC = Codec.lazyInitialized(() -> RecordCodecBuilder.create(inst ->
+        inst.group(ExtraCodecs.NON_EMPTY_STRING.fieldOf("entityKey").forGetter(FakeMob::getEntityKey),
+                ExtraCodecs.NON_EMPTY_STRING.fieldOf("tag").forGetter(FakeMob::getTag)).apply(inst, FakeMob::new)
+    ));
+
 
     public FakeMob() {
         this(INVALID_ENTITY_KEY, EMPTY_TAG);

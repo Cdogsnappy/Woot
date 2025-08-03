@@ -1,10 +1,10 @@
 package ipsis.woot.modules.squeezer;
 
-import net.minecraft.item.Item;
-import net.minecraft.tags.ITag;
-import net.minecraft.tags.Tag;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.common.Tags;
+
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
+import net.neoforged.neoforge.common.Tags;
 
 public enum DyeMakeup {
 
@@ -36,9 +36,9 @@ public enum DyeMakeup {
     private int blue;
     private int white;
     private String tag;
-    private ITag.INamedTag<Item> itemTag;
+    private TagKey<Item> itemTag;
 
-    DyeMakeup(String tag, int red, int yellow, int blue, int white, ITag.INamedTag<Item> itemTag) {
+    DyeMakeup(String tag, int red, int yellow, int blue, int white, TagKey<Item> itemTag) {
         this.tag = tag;
         this.red = red;
         this.yellow = yellow;
@@ -51,8 +51,8 @@ public enum DyeMakeup {
     public int getYellow() { return this.yellow; }
     public int getBlue() { return this.blue; }
     public int getWhite() { return this.white; }
-    public ResourceLocation getForgeTag() { return new ResourceLocation("forge", "dyes/" + this.tag); }
-    public ITag.INamedTag<Item> getItemTag() { return itemTag; }
+    public ResourceLocation getForgeTag() { return ResourceLocation.fromNamespaceAndPath("forge", "dyes/" + this.tag); }
+    public TagKey<Item> getItemTag() { return itemTag; }
 
     public static final DyeMakeup[] VALUES = DyeMakeup.values();
 }

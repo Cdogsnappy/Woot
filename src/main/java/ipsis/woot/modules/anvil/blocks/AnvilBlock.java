@@ -10,14 +10,15 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -33,7 +34,7 @@ import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Random;
 
-public class AnvilBlock extends Block implements WootDebug {
+public class AnvilBlock extends Block implements WootDebug, EntityBlock {
 
     // From vanilla
     private static final VoxelShape PART_BASE = Shapes.makeCuboidShape(2.0D, 0.0D, 2.0D, 14.0D, 4.0D, 14.0D);
@@ -51,18 +52,16 @@ public class AnvilBlock extends Block implements WootDebug {
         registerDefaultState(getStateDefinition().any());
     }
 
-    @Override
-    public boolean hasTileEntity(BlockState state) { return true; }
 
     @Nullable
     @Override
-    public BlockEntity createTileEntity(BlockState state, IBlockReader world) {
-        return new AnvilTileEntity();
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return new AnvilBlockEntity(pos, state);
     }
 
     @Nullable
     @Override
-    public BlockState getStateForPlacement(BlockItemUseContext context) {
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
         return this.defaultBlockState().setValue(BlockStateProperties.HORIZONTAL_FACING, context.getPlacementHorizontalFacing().rotateY());
     }
 
@@ -84,8 +83,8 @@ public class AnvilBlock extends Block implements WootDebug {
             super.useItemOn(stack, state, level, pos, player, hand, hitResult);
 
         BlockEntity te = level.getBlockEntity(pos);
-        if (te instanceof AnvilTileEntity) {
-            AnvilTileEntity anvil = (AnvilTileEntity)te;
+        if (te instanceof AnvilBlockEntity) {
+            AnvilBlockEntity anvil = (AnvilBlockEntity)te;
 
             if (player.isCrouching() && stack.isEmpty()) {
                 // Sneak with empty hand to empty
@@ -144,8 +143,8 @@ public class AnvilBlock extends Block implements WootDebug {
     public void onReplaced(BlockState blockState, Level world, BlockPos pos, BlockState newBlockState, boolean isMoving) {
         if (blockState.getBlock() != newBlockState.getBlock()) {
             TileEntity te = world.getTileEntity(pos);
-            if (te instanceof AnvilTileEntity)
-                ((AnvilTileEntity) te).dropContents(world, pos);
+            if (te instanceof AnvilBlockEntity)
+                ((AnvilBlockEntity) te).dropContents(world, pos);
             super.onReplaced(blockState, world, pos, newBlockState, isMoving);
         }
     }

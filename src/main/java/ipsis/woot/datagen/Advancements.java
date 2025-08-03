@@ -30,6 +30,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.IItemProvider;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.level.ItemLike;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -52,7 +53,7 @@ public class Advancements implements IDataProvider {
         this.generator = dataGenerator;
     }
 
-    private Advancement registerSimpleInvAdvancement(Consumer<Advancement> consumer, String name, Advancement parent, IItemProvider itemProvider, FrameType frameType) {
+    private Advancement registerSimpleInvAdvancement(Consumer<Advancement> consumer, String name, Advancement parent, ItemLike itemProvider, FrameType frameType) {
         return register(consumer,
                 new ResourceLocation(Woot.MODID, "main/" + name),
                 Advancement.Builder.builder()
@@ -66,11 +67,11 @@ public class Advancements implements IDataProvider {
                         .withCriterion(name, InventoryChangeTrigger.Instance.forItems(itemProvider)));
     }
 
-    private Advancement registerSimpleInvAdvancement(Consumer<Advancement> consumer, String name, Advancement parent, IItemProvider itemProvider) {
+    private Advancement registerSimpleInvAdvancement(Consumer<Advancement> consumer, String name, Advancement parent, ItemLike itemProvider) {
         return registerSimpleInvAdvancement(consumer, name, parent, itemProvider, FrameType.TASK);
     }
 
-    private Advancement registerTier(Consumer<Advancement> consumer, String name, Advancement parent, IItemProvider itemProvider, Tier tier) {
+    private Advancement registerTier(Consumer<Advancement> consumer, String name, Advancement parent, ItemLike itemProvider, Tier tier) {
         return register(consumer,
                 new ResourceLocation(Woot.MODID, "main/" + name),
                 Advancement.Builder.builder()
@@ -87,7 +88,7 @@ public class Advancements implements IDataProvider {
                                 TierValidateTrigger.Instance.forTier(tier)));
     }
 
-    private Advancement registerPerk(Consumer<Advancement> consumer, String name, Advancement parent, IItemProvider itemProvider, Perk perk) {
+    private Advancement registerPerk(Consumer<Advancement> consumer, String name, Advancement parent, ItemLike itemProvider, Perk perk) {
         return register(consumer,
                 new ResourceLocation(Woot.MODID, "main/" + name),
                 Advancement.Builder.builder()

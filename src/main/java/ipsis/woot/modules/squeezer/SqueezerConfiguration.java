@@ -2,34 +2,34 @@ package ipsis.woot.modules.squeezer;
 
 import ipsis.woot.config.ConfigDefaults.Squeezer;
 import ipsis.woot.config.ConfigPath;
-import net.minecraftforge.common.ForgeConfigSpec;
+import net.neoforged.neoforge.common.ModConfigSpec;
 
 public class SqueezerConfiguration {
 
-    public static ForgeConfigSpec.IntValue DYE_SQUEEZER_TANK_CAPACITY;
-    public static ForgeConfigSpec.IntValue DYE_SQUEEZER_INTERNAL_FLUID_MAX;
-    public static ForgeConfigSpec.IntValue DYE_SQUEEZER_MAX_ENERGY;
-    public static ForgeConfigSpec.IntValue DYE_SQUEEZER_MAX_ENERGY_RX;
-    public static ForgeConfigSpec.IntValue DYE_SQUEEZER_ENERGY_PER_TICK;
+    public static ModConfigSpec.IntValue DYE_SQUEEZER_TANK_CAPACITY;
+    public static ModConfigSpec.IntValue DYE_SQUEEZER_INTERNAL_FLUID_MAX;
+    public static ModConfigSpec.IntValue DYE_SQUEEZER_MAX_ENERGY;
+    public static ModConfigSpec.IntValue DYE_SQUEEZER_MAX_ENERGY_RX;
+    public static ModConfigSpec.IntValue DYE_SQUEEZER_ENERGY_PER_TICK;
 
-    public static ForgeConfigSpec.IntValue ENCH_SQUEEZER_TANK_CAPACITY;
-    public static ForgeConfigSpec.IntValue ENCH_SQUEEZER_MAX_ENERGY;
-    public static ForgeConfigSpec.IntValue ENCH_SQUEEZER_MAX_ENERGY_RX;
-    public static ForgeConfigSpec.IntValue ENCH_SQUEEZER_ENERGY_PER_TICK;
-    public static ForgeConfigSpec.IntValue ENCH_SQUEEZER_LVL_1_ENCHANT_MB;
-    public static ForgeConfigSpec.IntValue ENCH_SQUEEZER_LVL_2_ENCHANT_MB;
-    public static ForgeConfigSpec.IntValue ENCH_SQUEEZER_LVL_3_ENCHANT_MB;
-    public static ForgeConfigSpec.IntValue ENCH_SQUEEZER_LVL_4_ENCHANT_MB;
-    public static ForgeConfigSpec.IntValue ENCH_SQUEEZER_LVL_5_ENCHANT_MB;
-    public static ForgeConfigSpec.IntValue ENCH_SQUEEZER_EXTRA_ENCHANT_MB;
-    public static ForgeConfigSpec.IntValue ENCH_SQUEEZER_LVL_1_ENERGY_COST;
-    public static ForgeConfigSpec.IntValue ENCH_SQUEEZER_LVL_2_ENERGY_COST;
-    public static ForgeConfigSpec.IntValue ENCH_SQUEEZER_LVL_3_ENERGY_COST;
-    public static ForgeConfigSpec.IntValue ENCH_SQUEEZER_LVL_4_ENERGY_COST;
-    public static ForgeConfigSpec.IntValue ENCH_SQUEEZER_LVL_5_ENERGY_COST;
-    public static ForgeConfigSpec.IntValue ENCH_SQUEEZER_EXTRA_ENERGY_COST;
+    public static ModConfigSpec.IntValue ENCH_SQUEEZER_TANK_CAPACITY;
+    public static ModConfigSpec.IntValue ENCH_SQUEEZER_MAX_ENERGY;
+    public static ModConfigSpec.IntValue ENCH_SQUEEZER_MAX_ENERGY_RX;
+    public static ModConfigSpec.IntValue ENCH_SQUEEZER_ENERGY_PER_TICK;
+    public static ModConfigSpec.IntValue ENCH_SQUEEZER_LVL_1_ENCHANT_MB;
+    public static ModConfigSpec.IntValue ENCH_SQUEEZER_LVL_2_ENCHANT_MB;
+    public static ModConfigSpec.IntValue ENCH_SQUEEZER_LVL_3_ENCHANT_MB;
+    public static ModConfigSpec.IntValue ENCH_SQUEEZER_LVL_4_ENCHANT_MB;
+    public static ModConfigSpec.IntValue ENCH_SQUEEZER_LVL_5_ENCHANT_MB;
+    public static ModConfigSpec.IntValue ENCH_SQUEEZER_EXTRA_ENCHANT_MB;
+    public static ModConfigSpec.IntValue ENCH_SQUEEZER_LVL_1_ENERGY_COST;
+    public static ModConfigSpec.IntValue ENCH_SQUEEZER_LVL_2_ENERGY_COST;
+    public static ModConfigSpec.IntValue ENCH_SQUEEZER_LVL_3_ENERGY_COST;
+    public static ModConfigSpec.IntValue ENCH_SQUEEZER_LVL_4_ENERGY_COST;
+    public static ModConfigSpec.IntValue ENCH_SQUEEZER_LVL_5_ENERGY_COST;
+    public static ModConfigSpec.IntValue ENCH_SQUEEZER_EXTRA_ENERGY_COST;
 
-    public static void init(ForgeConfigSpec.Builder COMMON_BUILDER, ForgeConfigSpec.Builder CLIENT_BUILDER) {
+    public static void init(ModConfigSpec.Builder COMMON_BUILDER, ModConfigSpec.Builder CLIENT_BUILDER) {
 
         COMMON_BUILDER.comment("Settings for the squeezer").push(ConfigPath.Squeezer.CATEGORY);
         CLIENT_BUILDER.comment("Settings for the squeezer").push(ConfigPath.Squeezer.CATEGORY);

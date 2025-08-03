@@ -1,6 +1,6 @@
 package ipsis.woot.modules.fluidconvertor.blocks;
 
-import ipsis.woot.crafting.FluidConvertorRecipe;
+import ipsis.woot.crafting.fluidconvertor.FluidConvertorRecipe;
 import ipsis.woot.mod.ModNBT;
 import ipsis.woot.modules.fluidconvertor.FluidConvertorConfiguration;
 import ipsis.woot.modules.fluidconvertor.FluidConvertorSetup;
@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import static ipsis.woot.crafting.FluidConvertorRecipe.FLUID_CONV_TYPE;
+import static ipsis.woot.crafting.fluidconvertor.FluidConvertorRecipe.FLUID_CONV_TYPE;
 
 public class FluidConvertorBlockEntity extends WootMachineTileEntity implements WootDebug, MenuProvider {
 

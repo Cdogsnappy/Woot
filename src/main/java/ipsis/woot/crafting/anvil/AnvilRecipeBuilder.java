@@ -3,6 +3,7 @@ package ipsis.woot.crafting.anvil;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import ipsis.woot.Woot;
+import ipsis.woot.crafting.WootRecipes;
 import net.minecraft.advancements.Criterion;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
@@ -66,6 +67,7 @@ public class AnvilRecipeBuilder implements RecipeBuilder{
 
     @Override
     public void save(RecipeOutput recipeOutput, ResourceLocation resourceLocation) {
+        recipeOutput.accept(resourceLocation, new AnvilRecipe(baseIngredient, ingredients, result), null);
 
     }
 
@@ -83,19 +85,6 @@ public class AnvilRecipeBuilder implements RecipeBuilder{
             this.ingredients = ingredients;
         }
 
-        @Override
-        public void serialize(JsonObject json) {
-            json.add("base", this.baseIngredient.serialize());
-            JsonArray array = new JsonArray();
-            for (Ingredient i : this.ingredients)
-                array.add(i.serialize());
-            json.add("ingredients", array);
-            JsonObject jsonObject = new JsonObject();
-            jsonObject.addProperty("item", BuiltInRegistries.ITEM.getKey(this.result).toString());
-            if (this.count > 1)
-                jsonObject.addProperty("count", this.count);
-            json.add("result", jsonObject);
-        }
 
         @Override
         public CraftingBookCategory category() {
@@ -124,10 +113,9 @@ public class AnvilRecipeBuilder implements RecipeBuilder{
 
         @Override
         public RecipeSerializer<?> getSerializer() {
-            return SERIALIZER;
+            return WootRecipes.ANVIL_RECIPE_SERIALIZER.get();
         }
     }
 
-    @ObjectHolder("woot:anvil")
-    public static final RecipeSerializer<Recipe<?>> SERIALIZER = null;
+
 }

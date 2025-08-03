@@ -2,16 +2,17 @@ package ipsis.woot.simulator;
 
 import ipsis.woot.config.ConfigDefaults;
 import ipsis.woot.config.ConfigPath;
-import net.minecraftforge.common.ForgeConfigSpec;
+import net.neoforged.neoforge.common.ModConfigSpec;
+
 
 public class MobSimulatorConfiguration {
 
-    public static ForgeConfigSpec.IntValue SIMULATION_TICKS;
-    public static ForgeConfigSpec.IntValue SIMULATION_MOB_COUNT;
-    public static ForgeConfigSpec.IntValue SIMULATION_TICKS_PER_SIM_TICK;
-    public static ForgeConfigSpec.IntValue SIMULATION_CELLS_PER_SIM_TICK;
+    public static ModConfigSpec.IntValue SIMULATION_TICKS;
+    public static ModConfigSpec.IntValue SIMULATION_MOB_COUNT;
+    public static ModConfigSpec.IntValue SIMULATION_TICKS_PER_SIM_TICK;
+    public static ModConfigSpec.IntValue SIMULATION_CELLS_PER_SIM_TICK;
 
-    public static void init(ForgeConfigSpec.Builder COMMON_BUILDER, ForgeConfigSpec.Builder CLIENT_BUILDER) {
+    public static void init(ModConfigSpec.Builder COMMON_BUILDER, ModConfigSpec.Builder CLIENT_BUILDER) {
 
         COMMON_BUILDER.comment("Settings for the loot simulation").push(ConfigPath.Simulation.CATEGORY);
         CLIENT_BUILDER.comment("Settings for the loot simulation").push(ConfigPath.Simulation.CATEGORY);

@@ -1,7 +1,7 @@
 package ipsis.woot.modules.factory.calculators;
 
 import ipsis.woot.Woot;
-import ipsis.woot.crafting.FactoryRecipe;
+import ipsis.woot.crafting.factory.FactoryRecipe;
 import ipsis.woot.modules.factory.FactoryConfiguration;
 import ipsis.woot.modules.factory.FormedSetup;
 import ipsis.woot.modules.factory.blocks.ControllerBlockEntity;

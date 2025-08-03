@@ -164,11 +164,11 @@ public class SimulatedMobDrop {
     }
 
     public SimulatedMobDropSummary createSummary() {
-        return new SimulatedMobDropSummary(itemStack.copy(),
-                calculateDropChance(0),
+        return new SimulatedMobDropSummary(itemStack.copy(), Arrays.asList(calculateDropChance(0),
                 calculateDropChance(1),
                 calculateDropChance(2),
-                calculateDropChance(3));
+                calculateDropChance(3))
+                );
     }
 
     public @Nonnull ItemStack getRolledDrop(int looting) {

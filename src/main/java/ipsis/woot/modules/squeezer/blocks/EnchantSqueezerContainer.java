@@ -1,7 +1,5 @@
 package ipsis.woot.modules.squeezer.blocks;
 
-import ipsis.woot.Woot;
-import ipsis.woot.crafting.DyeSqueezerRecipe;
 import ipsis.woot.fluilds.network.TankPacket;
 import ipsis.woot.modules.squeezer.SqueezerSetup;
 import ipsis.woot.setup.NetworkChannel;

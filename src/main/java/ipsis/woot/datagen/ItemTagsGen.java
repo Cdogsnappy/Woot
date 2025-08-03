@@ -2,18 +2,15 @@ package ipsis.woot.datagen;
 
 import ipsis.woot.Woot;
 import ipsis.woot.modules.factory.FactorySetup;
-import net.minecraft.data.BlockTagsProvider;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.data.DataGenerator;
-import net.minecraft.data.ItemTagsProvider;
-import net.minecraft.item.DyeColor;
-import net.minecraft.item.Item;
-import net.minecraft.item.Items;
-import net.minecraft.tags.ITag;
-import net.minecraft.tags.ItemTags;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.common.Tags;
-import net.minecraftforge.common.data.ExistingFileHelper;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.data.tags.ItemTagsProvider;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
+import net.neoforged.neoforge.common.Tags;
+import net.neoforged.neoforge.registries.DeferredRegister;
+
 
 import java.util.Locale;
 import java.util.function.Consumer;
@@ -22,6 +19,8 @@ public class ItemTagsGen extends ItemTagsProvider {
 
     public static final ITag.INamedTag<Item> FACTORY_BLOCK = ItemTags.makeWrapperTag(Woot.MODID + ":factory_blocks");
     //public static final ITag.INamedTag<Item> BLACK_DYE = ItemTags.makeWrapperTag("forge:dyes/black");
+
+    public static final TagKey<Item> SKULLS = TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "skull"));
 
     public ItemTagsGen(DataGenerator generator, BlockTagsProvider provider, ExistingFileHelper existingFileHelper) {
         super(generator, provider, Woot.MODID, existingFileHelper);

@@ -16,10 +16,8 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.world.Container;
 import net.minecraft.world.Containers;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
@@ -33,9 +31,9 @@ import java.util.Arrays;
 import java.util.List;
 
 
-public class AnvilTileEntity extends BlockEntity implements WootDebug {
+public class AnvilBlockEntity extends BlockEntity implements WootDebug {
 
-    public AnvilTileEntity(BlockPos pos, BlockState blockState) {
+    public AnvilBlockEntity(BlockPos pos, BlockState blockState) {
         super(AnvilSetup.ANVIL_BLOCK_TILE.get(), pos, blockState);
     }
 

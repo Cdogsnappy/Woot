@@ -172,7 +172,7 @@ public class WootFluidTank implements IFluidHandler, IFluidTank {
     @Nonnull
     public FluidStack internalDrain(FluidStack resource, FluidAction action)
     {
-        if (resource.isEmpty() || !resource.isFluidEqual(fluid))
+        if (resource.isEmpty() || !resource.is(fluid.getFluidType()))
         {
             return FluidStack.EMPTY;
         }

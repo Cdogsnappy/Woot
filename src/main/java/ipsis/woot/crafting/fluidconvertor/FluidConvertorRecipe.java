@@ -1,8 +1,6 @@
-package ipsis.woot.crafting;
+package ipsis.woot.crafting.fluidconvertor;
 
-import com.google.gson.JsonObject;
 import ipsis.woot.Woot;
-import ipsis.woot.util.FluidStackHelper;
 import net.minecraft.data.IFinishedRecipe;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
@@ -15,13 +13,11 @@ import net.minecraft.world.World;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.registries.ObjectHolder;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Consumer;
 
-import static ipsis.woot.crafting.FluidConvertorRecipeBuilder.SERIALIZER;
+import static ipsis.woot.crafting.fluidconvertor.FluidConvertorRecipeBuilder.SERIALIZER;
 
 public class FluidConvertorRecipe implements IRecipe<IInventory> {
 

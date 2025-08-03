@@ -1,9 +1,6 @@
 package ipsis.woot.modules.infuser.blocks;
 
-import ipsis.woot.Woot;
-import ipsis.woot.crafting.InfuserRecipe;
-import ipsis.woot.fluilds.network.FluidStackPacket;
-import ipsis.woot.fluilds.network.TankPacket;
+import ipsis.woot.crafting.infuser.InfuserRecipe;
 import ipsis.woot.mod.ModNBT;
 import ipsis.woot.modules.infuser.InfuserConfiguration;
 import ipsis.woot.modules.infuser.InfuserSetup;
@@ -11,8 +8,9 @@ import ipsis.woot.util.EnchantingHelper;
 import ipsis.woot.util.WootDebug;
 import ipsis.woot.util.WootEnergyStorage;
 import ipsis.woot.util.WootMachineTileEntity;
-import ipsis.woot.util.helper.WorldHelper;
 import ipsis.woot.util.oss.OutputOnlyItemStackHandler;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
 
@@ -22,16 +20,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import static ipsis.woot.crafting.InfuserRecipe.INFUSER_TYPE;
+import static ipsis.woot.crafting.infuser.InfuserRecipe.INFUSER_TYPE;
 
-public class InfuserTileEntity extends WootMachineTileEntity implements WootDebug, NamedContainerProvider {
+public class InfuserBlockEntity extends WootMachineTileEntity implements WootDebug, NamedContainerProvider {
 
-    public InfuserTileEntity() {
-        super(InfuserSetup.INFUSER_BLOCK_TILE.get());
+    public InfuserBlockEntity(BlockPos pos, BlockState state) {
+        super(InfuserSetup.INFUSER_BLOCK_TILE.get(), pos, state);
         inputSlots = new ItemStackHandler(2) {
             @Override
             protected void onContentsChanged(int slot) {
-                InfuserTileEntity.this.onContentsChanged(slot);
+                InfuserBlockEntity.this.onContentsChanged(slot);
                 setChanged();
             }
 

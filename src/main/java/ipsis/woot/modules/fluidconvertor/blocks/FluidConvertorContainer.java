@@ -1,6 +1,6 @@
 package ipsis.woot.modules.fluidconvertor.blocks;
 
-import ipsis.woot.crafting.FluidConvertorRecipe;
+import ipsis.woot.crafting.fluidconvertor.FluidConvertorRecipe;
 import ipsis.woot.fluilds.network.TankPacket;
 import ipsis.woot.modules.fluidconvertor.FluidConvertorSetup;
 import ipsis.woot.setup.NetworkChannel;

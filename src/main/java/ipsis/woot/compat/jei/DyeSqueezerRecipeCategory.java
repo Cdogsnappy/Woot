@@ -2,9 +2,7 @@ package ipsis.woot.compat.jei;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import ipsis.woot.Woot;
-import ipsis.woot.crafting.DyeSqueezerRecipe;
-import ipsis.woot.crafting.EnchantSqueezerRecipe;
-import ipsis.woot.modules.squeezer.DyeMakeup;
+import ipsis.woot.crafting.dyesqueezer.DyeSqueezerRecipe;
 import ipsis.woot.modules.squeezer.SqueezerConfiguration;
 import ipsis.woot.modules.squeezer.SqueezerSetup;
 import ipsis.woot.util.helper.StringHelper;
@@ -20,13 +18,14 @@ import mezz.jei.api.recipe.category.IRecipeCategory;
 import mezz.jei.api.runtime.IJeiRuntime;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 
 import java.awt.*;
 
-public class DyeSqueezerRecipeCategory implements IRecipeCategory<DyeSqueezerRecipe>  {
+public class DyeSqueezerRecipeCategory implements RecipeCategory<DyeSqueezerRecipe> {
 
     public static final ResourceLocation UID = new ResourceLocation(Woot.MODID, "dyesqueezer");
     private static IDrawableStatic background;

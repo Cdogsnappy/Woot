@@ -6,7 +6,7 @@ import ipsis.woot.modules.factory.blocks.*;
 import ipsis.woot.modules.factory.items.PerkItem;
 import ipsis.woot.modules.factory.layout.PatternRepository;
 import ipsis.woot.modules.factory.perks.Perk;
-import ipsis.woot.modules.infuser.blocks.InfuserTileEntity;
+import ipsis.woot.modules.infuser.blocks.InfuserBlockEntity;
 import ipsis.woot.modules.layout.blocks.LayoutBlockEntity;
 import ipsis.woot.modules.squeezer.blocks.DyeSqueezerTileEntity;
 import ipsis.woot.modules.squeezer.blocks.EnchantSqueezerTileEntity;
@@ -137,10 +137,10 @@ public class WootTopPlugin {
 
         private void addInfuserProbeInfo(ProbeMode probeMode, IProbeInfo iProbeInfo, TileEntity te, PlayerEntity playerEntity, BlockState blockState) {
 
-            if (!(te instanceof InfuserTileEntity))
+            if (!(te instanceof InfuserBlockEntity))
                 return;
 
-            InfuserTileEntity infuser = (InfuserTileEntity) te;
+            InfuserBlockEntity infuser = (InfuserBlockEntity) te;
         }
 
         private void addLayoutProbeInfo(ProbeMode probeMode, IProbeInfo iProbeInfo, TileEntity te, PlayerEntity playerEntity, BlockState blockState) {

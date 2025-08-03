@@ -2,10 +2,9 @@ package ipsis.woot.compat.jei;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import ipsis.woot.Woot;
-import ipsis.woot.crafting.InfuserRecipe;
+import ipsis.woot.crafting.infuser.InfuserRecipe;
 import ipsis.woot.modules.infuser.InfuserConfiguration;
 import ipsis.woot.modules.infuser.InfuserSetup;
-import ipsis.woot.modules.squeezer.SqueezerConfiguration;
 import ipsis.woot.util.helper.StringHelper;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.IRecipeLayout;
@@ -28,7 +27,6 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 
 import java.awt.*;
-import java.awt.geom.Rectangle2D;
 import java.util.List;
 
 public class InfuserRecipeCategory implements IRecipeCategory<InfuserRecipe>, ITooltipCallback<ItemStack>  {

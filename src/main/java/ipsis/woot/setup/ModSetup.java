@@ -25,6 +25,7 @@ import ipsis.woot.modules.factory.layout.PatternRepository;
 import ipsis.woot.mod.ModFiles;
 import ipsis.woot.simulator.MobSimulator;
 import ipsis.woot.simulator.MobSimulatorSetup;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.IEventBus;
@@ -44,7 +45,7 @@ public class ModSetup {
     private CreativeModeTab creativeTab;
 
     public ModSetup() {
-        creativeTab = new CreativeModeTab(Woot.MODID) {
+        creativeTab = new CreativeModeTab(CreativeModeTab.builder().icon(() -> new ItemStack(FactorySetup.HEART_BLOCK.get().asItem())).title(Component.literal(Woot.MODID))) {
             @Override
             public @NotNull ItemStack getIconItem() {
                 return new ItemStack(FactorySetup.HEART_BLOCK.get());
@@ -53,17 +54,17 @@ public class ModSetup {
     }
 
     public void registrySetup(IEventBus eventBus) {
-        InfuserSetup.register();
-        SqueezerSetup.register();
-        OracleSetup.register();
-        FactorySetup.register();
-        LayoutSetup.register();
-        AnvilSetup.register();
-        FluidSetup.register();
-        ToolsSetup.register();
-        DebugSetup.register();
-        GenericSetup.register();
-        FluidConvertorSetup.register();
+        InfuserSetup.register(eventBus);
+        SqueezerSetup.register(eventBus);
+        OracleSetup.register(eventBus);
+        FactorySetup.register(eventBus);
+        LayoutSetup.register(eventBus);
+        AnvilSetup.register(eventBus);
+        FluidSetup.register(eventBus);
+        ToolsSetup.register(eventBus);
+        DebugSetup.register(eventBus);
+        GenericSetup.register(eventBus);
+        FluidConvertorSetup.register(eventBus);
     }
 
     public void commonSetup(FMLCommonSetupEvent e) {

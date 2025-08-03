@@ -2,11 +2,9 @@ package ipsis.woot.compat.jei;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import ipsis.woot.Woot;
-import ipsis.woot.crafting.FluidConvertorRecipe;
+import ipsis.woot.crafting.fluidconvertor.FluidConvertorRecipe;
 import ipsis.woot.modules.fluidconvertor.FluidConvertorConfiguration;
-import ipsis.woot.modules.infuser.InfuserConfiguration;
 import ipsis.woot.modules.infuser.InfuserSetup;
-import ipsis.woot.modules.squeezer.SqueezerConfiguration;
 import ipsis.woot.util.helper.StringHelper;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.IRecipeLayout;

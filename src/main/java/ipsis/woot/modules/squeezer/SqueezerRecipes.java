@@ -1,6 +1,6 @@
 package ipsis.woot.modules.squeezer;
 
-import ipsis.woot.crafting.DyeSqueezerRecipe;
+import ipsis.woot.crafting.dyesqueezer.DyeSqueezerRecipe;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.Ingredient;

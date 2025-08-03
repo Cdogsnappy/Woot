@@ -1,9 +1,7 @@
 package ipsis.woot.modules.infuser.blocks;
 
-import ipsis.woot.modules.anvil.blocks.AnvilTileEntity;
 import ipsis.woot.modules.debug.items.DebugItem;
 import ipsis.woot.modules.infuser.InfuserConfiguration;
-import ipsis.woot.modules.squeezer.SqueezerConfiguration;
 import ipsis.woot.util.WootDebug;
 import ipsis.woot.util.helper.StringHelper;
 import net.minecraft.core.BlockPos;
@@ -53,7 +51,7 @@ public class InfuserBlock extends Block implements WootDebug {
     @Nullable
     @Override
     public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-        return new InfuserTileEntity();
+        return new InfuserBlockEntity();
     }
 
     @Override
@@ -61,10 +59,10 @@ public class InfuserBlock extends Block implements WootDebug {
         if (worldIn.isRemote)
             return ActionResultType.SUCCESS;
 
-        if (!(worldIn.getTileEntity(pos) instanceof InfuserTileEntity))
+        if (!(worldIn.getTileEntity(pos) instanceof InfuserBlockEntity))
             throw new IllegalStateException("Tile entity is missing");
 
-        InfuserTileEntity infuser = (InfuserTileEntity)worldIn.getTileEntity(pos);
+        InfuserBlockEntity infuser = (InfuserBlockEntity)worldIn.getTileEntity(pos);
         ItemStack heldItem = player.getHeldItem(handIn);
 
         if (FluidUtil.getFluidHandler(heldItem).isPresent()) {
@@ -84,8 +82,8 @@ public class InfuserBlock extends Block implements WootDebug {
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
         if (state.getBlock() != newState.getBlock()) {
             BlockEntity te = level.getBlockEntity(pos);
-            if (te instanceof InfuserTileEntity)
-                ((InfuserTileEntity) te).dropContents(level, pos);
+            if (te instanceof InfuserBlockEntity)
+                ((InfuserBlockEntity) te).dropContents(level, pos);
             super.onRemove(state, level, pos, newState, isMoving);
         }
     }

@@ -146,14 +146,14 @@ public class MobSimulator {
     }
 
     public boolean isEqualForLearning(@Nonnull ItemStack a, @Nonnull ItemStack b) {
-        return ItemStack.areItemsEqualIgnoreDurability(a, b);
+        return ItemStack.isSameItem(a, b);
     }
 
     public void tick(Level world) {
         if (world == null)
             return;
 
-        currTicks = MathHelper.clamp(currTicks + 1, 0, Integer.MAX_VALUE);
+        currTicks = Math.clamp(currTicks + 1, 0, Integer.MAX_VALUE);
         if (currTicks < MobSimulatorConfiguration.SIMULATION_TICKS_PER_SIM_TICK.get())
             return;
 

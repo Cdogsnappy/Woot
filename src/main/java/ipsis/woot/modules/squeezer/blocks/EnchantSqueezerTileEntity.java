@@ -1,7 +1,5 @@
 package ipsis.woot.modules.squeezer.blocks;
 
-import ipsis.woot.Woot;
-import ipsis.woot.crafting.DyeSqueezerRecipe;
 import ipsis.woot.fluilds.FluidSetup;
 import ipsis.woot.mod.ModNBT;
 import ipsis.woot.modules.squeezer.SqueezerConfiguration;
@@ -11,41 +9,13 @@ import ipsis.woot.util.WootEnergyStorage;
 import ipsis.woot.util.WootFluidTank;
 import ipsis.woot.util.WootMachineTileEntity;
 import ipsis.woot.util.helper.EnchantmentHelper;
-import ipsis.woot.util.helper.WorldHelper;
-import net.minecraft.block.BlockState;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.InventoryHelper;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.INamedContainerProvider;
-import net.minecraft.item.EnchantedBookItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.Constants;
-import net.minecraftforge.common.util.INBTSerializable;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.energy.CapabilityEnergy;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.fluids.capability.templates.FluidTank;
-import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.ItemStackHandler;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.items.ItemStackHandler;
+
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -55,8 +25,8 @@ import java.util.Objects;
 
 public class EnchantSqueezerTileEntity extends WootMachineTileEntity implements WootDebug, INamedContainerProvider {
 
-    public EnchantSqueezerTileEntity() {
-        super(SqueezerSetup.ENCHANT_SQUEEZER_BLOCK_TILE.get());
+    public EnchantSqueezerTileEntity(BlockPos pos, BlockState blockState) {
+        super(SqueezerSetup.ENCHANT_SQUEEZER_BLOCK_TILE.get(), pos, blockState);
     }
 
     public final IItemHandler inventory = new ItemStackHandler(1)
@@ -64,7 +34,7 @@ public class EnchantSqueezerTileEntity extends WootMachineTileEntity implements 
         @Override
         protected void onContentsChanged(int slot) {
             EnchantSqueezerTileEntity.this.onContentsChanged(slot);
-            markDirty();
+            setChanged();
         }
 
         public boolean isItemValidForSlot(int slot, @Nonnull ItemStack stack) {
@@ -88,9 +58,9 @@ public class EnchantSqueezerTileEntity extends WootMachineTileEntity implements 
 
     @Override
     public void tick() {
-        super.tick();
+        super.tick(level);
 
-        if (world.isRemote)
+        if (level.isClientSide)
             return;
 
 

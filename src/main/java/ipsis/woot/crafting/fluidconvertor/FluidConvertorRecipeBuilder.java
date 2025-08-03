@@ -1,4 +1,4 @@
-package ipsis.woot.crafting;
+package ipsis.woot.crafting.fluidconvertor;
 
 import com.google.gson.JsonObject;
 import ipsis.woot.Woot;

@@ -2,15 +2,16 @@ package ipsis.woot.modules.infuser.items;
 
 import ipsis.woot.Woot;
 import ipsis.woot.setup.ModSetup;
-import net.minecraft.item.DyeColor;
-import net.minecraft.item.Item;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.Item;
+
 
 public class DyePlateItem extends Item {
 
     final DyeColor color;
 
     public DyePlateItem(DyeColor color) {
-        super(new Item.Properties().maxStackSize(64).group(Woot.setup.getCreativeTab()));
+        super(new Item.Properties().stacksTo(64));
         this.color = color;
     }
 

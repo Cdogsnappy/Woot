@@ -1,6 +1,6 @@
 package ipsis.woot.modules.infuser.blocks;
 
-import ipsis.woot.crafting.InfuserRecipe;
+import ipsis.woot.crafting.infuser.InfuserRecipe;
 import ipsis.woot.fluilds.network.TankPacket;
 import ipsis.woot.modules.infuser.InfuserSetup;
 import ipsis.woot.setup.NetworkChannel;
@@ -28,11 +28,11 @@ import javax.annotation.Nonnull;
 
 public class InfuserContainer extends WootContainer implements TankPacketHandler {
 
-    public InfuserTileEntity tileEntity;
+    public InfuserBlockEntity tileEntity;
 
     public InfuserContainer(int windowId, World world, BlockPos pos, PlayerInventory playerInventory, PlayerEntity playerEntity) {
         super(InfuserSetup.INFUSER_BLOCK_CONTAINER.get(), windowId);
-        tileEntity = (InfuserTileEntity) world.getTileEntity(pos);
+        tileEntity = (InfuserBlockEntity) world.getTileEntity(pos);
 
         addOwnSlots();
         addPlayerSlots(playerInventory);

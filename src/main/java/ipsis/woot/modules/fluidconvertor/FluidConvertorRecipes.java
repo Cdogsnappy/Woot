@@ -1,6 +1,6 @@
 package ipsis.woot.modules.fluidconvertor;
 
-import ipsis.woot.crafting.FluidConvertorRecipe;
+import ipsis.woot.crafting.fluidconvertor.FluidConvertorRecipe;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.RecipeManager;

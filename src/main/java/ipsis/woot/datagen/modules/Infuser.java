@@ -1,29 +1,27 @@
 package ipsis.woot.datagen.modules;
 
 import ipsis.woot.Woot;
-import ipsis.woot.crafting.InfuserRecipe;
-import ipsis.woot.crafting.InfuserRecipeBuilder;
+import ipsis.woot.crafting.infuser.InfuserRecipeBuilder;
 import ipsis.woot.fluilds.FluidSetup;
 import ipsis.woot.modules.generic.GenericSetup;
 import ipsis.woot.modules.infuser.InfuserSetup;
 import ipsis.woot.modules.infuser.items.DyeCasingItem;
 import ipsis.woot.modules.infuser.items.DyePlateItem;
-import net.minecraft.advancements.criterion.InventoryChangeTrigger;
-import net.minecraft.block.Blocks;
-import net.minecraft.data.IFinishedRecipe;
-import net.minecraft.data.ShapedRecipeBuilder;
-import net.minecraft.data.ShapelessRecipeBuilder;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.tags.ItemTags;
-import net.minecraft.tags.Tag;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.common.Tags;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fml.RegistryObject;
+import net.minecraft.advancements.critereon.InventoryChangeTrigger;
+import net.minecraft.data.recipes.RecipeCategory;
+import net.minecraft.data.recipes.RecipeOutput;
+import net.minecraft.data.recipes.ShapedRecipeBuilder;
+import net.minecraft.data.recipes.ShapelessRecipeBuilder;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.material.Fluids;
+import net.neoforged.neoforge.common.Tags;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.registries.DeferredHolder;
 
 import java.util.function.Consumer;
 
@@ -32,20 +30,20 @@ public class Infuser {
     /**
      * For easy updating of json recipe energy and fluid costs
      */
-    private static final ResourceLocation PRISM_RL = new ResourceLocation(Woot.MODID,"infuser/prism");
+    private static final ResourceLocation PRISM_RL = ResourceLocation.fromNamespaceAndPath(Woot.MODID,"infuser/prism");
     private static final int PRISM_ENERGY_COST = 1000;
     private static final int PRISM_FLUID_COST = 1000;
 
-    private static final ResourceLocation MAGMA_BLOCK_RL = new ResourceLocation(Woot.MODID,"infuser/magmablock1");
-    private static final ResourceLocation MAGMA_BLOCK_RL2 = new ResourceLocation(Woot.MODID,"infuser/magmablock2");
+    private static final ResourceLocation MAGMA_BLOCK_RL = ResourceLocation.fromNamespaceAndPath(Woot.MODID,"infuser/magmablock1");
+    private static final ResourceLocation MAGMA_BLOCK_RL2 = ResourceLocation.fromNamespaceAndPath(Woot.MODID,"infuser/magmablock2");
     private static final int MAGMA_BLOCK_ENERGY_COST = 1000;
     private static final int MAGMA_BLOCK_FLUID_COST = 1000;
 
-    private static final ResourceLocation ENCH_BOOK_1_RL = new ResourceLocation(Woot.MODID,"infuser/ench_book_1");
-    private static final ResourceLocation ENCH_BOOK_2_RL = new ResourceLocation(Woot.MODID,"infuser/ench_book_2");
-    private static final ResourceLocation ENCH_BOOK_3_RL = new ResourceLocation(Woot.MODID,"infuser/ench_book_3");
-    private static final ResourceLocation ENCH_BOOK_4_RL = new ResourceLocation(Woot.MODID,"infuser/ench_book_4");
-    private static final ResourceLocation ENCH_BOOK_5_RL = new ResourceLocation(Woot.MODID,"infuser/ench_book_5");
+    private static final ResourceLocation ENCH_BOOK_1_RL = ResourceLocation.fromNamespaceAndPath(Woot.MODID,"infuser/ench_book_1");
+    private static final ResourceLocation ENCH_BOOK_2_RL = ResourceLocation.fromNamespaceAndPath(Woot.MODID,"infuser/ench_book_2");
+    private static final ResourceLocation ENCH_BOOK_3_RL = ResourceLocation.fromNamespaceAndPath(Woot.MODID,"infuser/ench_book_3");
+    private static final ResourceLocation ENCH_BOOK_4_RL = ResourceLocation.fromNamespaceAndPath(Woot.MODID,"infuser/ench_book_4");
+    private static final ResourceLocation ENCH_BOOK_5_RL = ResourceLocation.fromNamespaceAndPath(Woot.MODID,"infuser/ench_book_5");
 
     private static final int ENCH_BOOK_1_ENERGY_COST = 1000;
     private static final int ENCH_BOOK_2_ENERGY_COST = 2000;
@@ -58,9 +56,9 @@ public class Infuser {
     private static final int ENCH_BOOK_4_FLUID_COST = 4000;
     private static final int ENCH_BOOK_5_FLUID_COST = 5000;
 
-    private static final ResourceLocation ENCH_PLATE_1_RL = new ResourceLocation(Woot.MODID,"infuser/ench_plate_1");
-    private static final ResourceLocation ENCH_PLATE_2_RL = new ResourceLocation(Woot.MODID,"infuser/ench_plate_2");
-    private static final ResourceLocation ENCH_PLATE_3_RL = new ResourceLocation(Woot.MODID,"infuser/ench_plate_3");
+    private static final ResourceLocation ENCH_PLATE_1_RL = ResourceLocation.fromNamespaceAndPath(Woot.MODID,"infuser/ench_plate_1");
+    private static final ResourceLocation ENCH_PLATE_2_RL = ResourceLocation.fromNamespaceAndPath(Woot.MODID,"infuser/ench_plate_2");
+    private static final ResourceLocation ENCH_PLATE_3_RL = ResourceLocation.fromNamespaceAndPath(Woot.MODID,"infuser/ench_plate_3");
 
     private static final int ENCH_PLATE_1_ENERGY_COST = 10000;
     private static final int ENCH_PLATE_2_ENERGY_COST = 20000;
@@ -72,108 +70,108 @@ public class Infuser {
     private static final int DYE_ENERGY_COST = 400;
     private static final int DYE_FLUID_COST = 72;
 
-    public static void registerRecipes(Consumer<IFinishedRecipe> consumer) {
+    public static void registerRecipes(RecipeOutput recipeOutput) {
 
-        ShapedRecipeBuilder.shapedRecipe(InfuserSetup.INFUSER_BLOCK.get())
-                .patternLine(" d ")
-                .patternLine("pcp")
-                .patternLine(" b ")
-                .key('d', Blocks.DROPPER)
-                .key('c', GenericSetup.MACHINE_CASING_ITEM.get())
-                .key('b', Items.BUCKET)
-                .key('p', Blocks.PISTON)
-                .setGroup(Woot.MODID)
-                .addCriterion("cobblestone", InventoryChangeTrigger.Instance.forItems(Blocks.COBBLESTONE))
-                .build(consumer);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, InfuserSetup.INFUSER_BLOCK.get())
+                .pattern(" d ")
+                .pattern("pcp")
+                .pattern(" b ")
+                .define('d', Blocks.DROPPER)
+                .define('c', GenericSetup.MACHINE_CASING_ITEM.get())
+                .define('b', Items.BUCKET)
+                .define('p', Blocks.PISTON)
+                .group(Woot.MODID)
+                .unlockedBy("cobblestone", InventoryChangeTrigger.TriggerInstance.hasItems(Blocks.COBBLESTONE))
+                .save(recipeOutput);
 
-        ShapelessRecipeBuilder.shapelessRecipe(InfuserSetup.INFUSER_BLOCK.get())
-                .addIngredient(InfuserSetup.INFUSER_BLOCK.get())
-                .setGroup(Woot.MODID)
-                .addCriterion("cobblestone", InventoryChangeTrigger.Instance.forItems(Blocks.COBBLESTONE))
-                .build(consumer, "infuser_1");
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, InfuserSetup.INFUSER_BLOCK.get())
+                .requires(InfuserSetup.INFUSER_BLOCK.get())
+                .group(Woot.MODID)
+                .unlockedBy("cobblestone", InventoryChangeTrigger.TriggerInstance.hasItems(Blocks.COBBLESTONE))
+                .save(recipeOutput, "infuser_1");
 
 
         InfuserRecipeBuilder.infuserRecipe(
-                GenericSetup.PRISM_ITEM.get(), 1,
-                Ingredient.fromTag(Tags.Items.GLASS),
+                new ItemStack(GenericSetup.PRISM_ITEM.get(), 1),
+                Ingredient.of(Tags.Items.GLASS_BLOCKS),
                 Ingredient.EMPTY, 0,
                 new FluidStack(FluidSetup.PUREDYE_FLUID.get(), PRISM_FLUID_COST),
-                PRISM_ENERGY_COST).build(consumer, "prism");
+                PRISM_ENERGY_COST).save(recipeOutput, "prism");
 
         InfuserRecipeBuilder.infuserRecipe(
-                Blocks.MAGMA_BLOCK.asItem(), 1,
-                Ingredient.fromTag(Tags.Items.STONE),
+                new ItemStack(Blocks.MAGMA_BLOCK.asItem(), 1),
+                Ingredient.of(Tags.Items.STONES),
                 Ingredient.EMPTY, 0,
                 new FluidStack(Fluids.LAVA, MAGMA_BLOCK_FLUID_COST),
-                MAGMA_BLOCK_ENERGY_COST).build(consumer, "magmablock1");
+                MAGMA_BLOCK_ENERGY_COST).save(recipeOutput, "magmablock1");
 
         InfuserRecipeBuilder.infuserRecipe(
-                Blocks.MAGMA_BLOCK.asItem(), 2,
-                Ingredient.fromTag(Tags.Items.OBSIDIAN),
+                new ItemStack(Blocks.MAGMA_BLOCK.asItem(), 2),
+                Ingredient.of(Tags.Items.OBSIDIANS),
                 Ingredient.EMPTY, 0,
                 new FluidStack(Fluids.LAVA, MAGMA_BLOCK_FLUID_COST),
-                MAGMA_BLOCK_ENERGY_COST).build(consumer, "magmablock2");
+                MAGMA_BLOCK_ENERGY_COST).save(recipeOutput, "magmablock2");
 
-        ItemStack book = new ItemStack(Items.ENCHANTED_BOOK);
+
         InfuserRecipeBuilder.infuserRecipe(
-                book.getItem(),  1,
-                Ingredient.fromItems(Items.BOOK),
-                Ingredient.fromItems(Items.REDSTONE), 1,
+                new ItemStack(Items.ENCHANTED_BOOK, 1),
+                Ingredient.of(Items.BOOK),
+                Ingredient.of(Items.REDSTONE), 1,
                 new FluidStack(FluidSetup.ENCHANT_FLUID.get(), ENCH_BOOK_1_FLUID_COST),
-                ENCH_BOOK_1_ENERGY_COST).build(consumer, "ench_book_1");
+                ENCH_BOOK_1_ENERGY_COST).save(recipeOutput, "ench_book_1");
         InfuserRecipeBuilder.infuserRecipe(
-                book.getItem(),  2,
-                Ingredient.fromItems(Items.BOOK),
-                Ingredient.fromItems(Items.QUARTZ), 1,
+                new ItemStack(Items.ENCHANTED_BOOK,  2),
+                Ingredient.of(Items.BOOK),
+                Ingredient.of(Items.QUARTZ), 1,
                 new FluidStack(FluidSetup.ENCHANT_FLUID.get(), ENCH_BOOK_2_FLUID_COST),
-                ENCH_BOOK_2_ENERGY_COST).build(consumer, "ench_book_2");
+                ENCH_BOOK_2_ENERGY_COST).save(recipeOutput, "ench_book_2");
         InfuserRecipeBuilder.infuserRecipe(
-                book.getItem(),  3,
-                Ingredient.fromItems(Items.BOOK),
-                Ingredient.fromItems(Items.REDSTONE_BLOCK), 1,
+                new ItemStack(Items.ENCHANTED_BOOK,  3),
+                Ingredient.of(Items.BOOK),
+                Ingredient.of(Items.REDSTONE_BLOCK), 1,
                 new FluidStack(FluidSetup.ENCHANT_FLUID.get(), ENCH_BOOK_3_FLUID_COST),
-                ENCH_BOOK_3_ENERGY_COST).build(consumer, "ench_book_3");
+                ENCH_BOOK_3_ENERGY_COST).save(recipeOutput, "ench_book_3");
         InfuserRecipeBuilder.infuserRecipe(
-                book.getItem(),  4,
-                Ingredient.fromItems(Items.BOOK),
-                Ingredient.fromItems(Items.QUARTZ_BLOCK), 1,
+                new ItemStack(Items.ENCHANTED_BOOK,  4),
+                Ingredient.of(Items.BOOK),
+                Ingredient.of(Items.QUARTZ_BLOCK), 1,
                 new FluidStack(FluidSetup.ENCHANT_FLUID.get(), ENCH_BOOK_4_FLUID_COST),
-                ENCH_BOOK_4_ENERGY_COST).build(consumer, "ench_book_4");
+                ENCH_BOOK_4_ENERGY_COST).save(recipeOutput, "ench_book_4");
         InfuserRecipeBuilder.infuserRecipe(
-                book.getItem(),  5,
-                Ingredient.fromItems(Items.BOOK),
-                Ingredient.fromItems(Blocks.LAPIS_BLOCK), 1,
+                new ItemStack(Items.ENCHANTED_BOOK,  5),
+                Ingredient.of(Items.BOOK),
+                Ingredient.of(Blocks.LAPIS_BLOCK), 1,
                 new FluidStack(FluidSetup.ENCHANT_FLUID.get(), ENCH_BOOK_5_FLUID_COST),
-                ENCH_BOOK_5_ENERGY_COST).build(consumer, "ench_book_5");
+                ENCH_BOOK_5_ENERGY_COST).save(recipeOutput, "ench_book_5");
 
         InfuserRecipeBuilder.infuserRecipe(
-                GenericSetup.ENCH_PLATE_1.get(), 1,
-                Ingredient.fromItems(GenericSetup.SI_PLATE_ITEM.get()),
-                Ingredient.fromTag(Tags.Items.INGOTS_IRON), 1,
+                new ItemStack(GenericSetup.ENCH_PLATE_1.get(), 1),
+                Ingredient.of(GenericSetup.SI_PLATE_ITEM.get()),
+                Ingredient.of(Tags.Items.INGOTS_IRON), 1,
                 new FluidStack(FluidSetup.ENCHANT_FLUID.get(), ENCH_PLATE_1_FLUID_COST),
-                ENCH_PLATE_1_ENERGY_COST).build(consumer, "ench_plate_1");
+                ENCH_PLATE_1_ENERGY_COST).save(recipeOutput, "ench_plate_1");
         InfuserRecipeBuilder.infuserRecipe(
-                GenericSetup.ENCH_PLATE_2.get(), 1,
-                Ingredient.fromItems(GenericSetup.SI_PLATE_ITEM.get()),
-                Ingredient.fromTag(Tags.Items.INGOTS_GOLD), 1,
+                new ItemStack(GenericSetup.ENCH_PLATE_2.get(), 1),
+                Ingredient.of(GenericSetup.SI_PLATE_ITEM.get()),
+                Ingredient.of(Tags.Items.INGOTS_GOLD), 1,
                 new FluidStack(FluidSetup.ENCHANT_FLUID.get(), ENCH_PLATE_2_FLUID_COST),
-                ENCH_PLATE_2_ENERGY_COST).build(consumer, "ench_plate_2");
+                ENCH_PLATE_2_ENERGY_COST).save(recipeOutput, "ench_plate_2");
         InfuserRecipeBuilder.infuserRecipe(
-                GenericSetup.ENCH_PLATE_3.get(), 1,
-                Ingredient.fromItems(GenericSetup.SI_PLATE_ITEM.get()),
-                Ingredient.fromTag(Tags.Items.GEMS_DIAMOND), 1,
+                new ItemStack(GenericSetup.ENCH_PLATE_3.get(), 1),
+                Ingredient.of(GenericSetup.SI_PLATE_ITEM.get()),
+                Ingredient.of(Tags.Items.GEMS_DIAMOND), 1,
                 new FluidStack(FluidSetup.ENCHANT_FLUID.get(), ENCH_PLATE_3_FLUID_COST),
-                ENCH_PLATE_3_ENERGY_COST).build(consumer, "ench_plate_3");
+                ENCH_PLATE_3_ENERGY_COST).save(recipeOutput, "ench_plate_3");
 
 
         /**
          * Plates
          */
         class Plate {
-            RegistryObject<DyeCasingItem> casing;
-            RegistryObject<DyePlateItem> plate;
+            DeferredHolder<Item, DyeCasingItem> casing;
+            DeferredHolder<Item, DyePlateItem> plate;
             String name;
-            public Plate(RegistryObject<DyeCasingItem> casing, RegistryObject<DyePlateItem> plate, String name) {
+            public Plate(DeferredHolder<Item, DyeCasingItem> casing,  DeferredHolder<Item, DyePlateItem> plate, String name) {
                 this.casing = casing;
                 this.plate = plate;
                 this.name = name + "_plate";
@@ -201,11 +199,11 @@ public class Infuser {
         for (Plate p : plates) {
             Woot.setup.getLogger().info("Generating Infuser recipe for {} plate", p.name);
             InfuserRecipeBuilder.infuserRecipe(
-                    p.plate.get(), 1,
-                    Ingredient.fromItems(p.casing.get()),
+                    new ItemStack(p.plate.get(), 1),
+                    Ingredient.of(p.casing.get()),
                     Ingredient.EMPTY, 0,
                     new FluidStack(FluidSetup.PUREDYE_FLUID.get(), DYE_FLUID_COST),
-                    DYE_ENERGY_COST).build(consumer, p.name);
+                    DYE_ENERGY_COST).save(recipeOutput, p.name);
         }
 
     }

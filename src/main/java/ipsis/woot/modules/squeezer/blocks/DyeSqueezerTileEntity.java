@@ -1,7 +1,6 @@
 package ipsis.woot.modules.squeezer.blocks;
 
-import ipsis.woot.Woot;
-import ipsis.woot.crafting.DyeSqueezerRecipe;
+import ipsis.woot.crafting.dyesqueezer.DyeSqueezerRecipe;
 import ipsis.woot.fluilds.FluidSetup;
 import ipsis.woot.fluilds.network.TankPacket;
 import ipsis.woot.mod.ModNBT;
@@ -12,53 +11,44 @@ import ipsis.woot.util.WootDebug;
 import ipsis.woot.util.WootEnergyStorage;
 import ipsis.woot.util.WootFluidTank;
 import ipsis.woot.util.WootMachineTileEntity;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.INamedContainerProvider;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.Constants;
-import net.minecraftforge.common.util.INBTSerializable;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.energy.CapabilityEnergy;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.fluids.capability.templates.FluidTank;
-import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.IItemHandlerModifiable;
-import net.minecraftforge.items.ItemStackHandler;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.common.util.INBTSerializable;
+import net.neoforged.neoforge.energy.EnergyStorage;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.items.ItemStackHandler;
+
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
-import static ipsis.woot.crafting.DyeSqueezerRecipe.DYE_SQUEEZER_TYPE;
+import static ipsis.woot.crafting.dyesqueezer.DyeSqueezerRecipe.DYE_SQUEEZER_TYPE;
 
-public class DyeSqueezerTileEntity extends WootMachineTileEntity implements WootDebug, INamedContainerProvider {
+public class DyeSqueezerTileEntity extends WootMachineTileEntity implements WootDebug, MenuProvider {
 
     private int red = 0;
     private int yellow = 0;
     private int blue = 0;
     private int white = 0;
 
-    public DyeSqueezerTileEntity() {
-        super(SqueezerSetup.SQUEEZER_BLOCK_TILE.get());
+    public DyeSqueezerTileEntity(BlockPos pos, BlockState state) {
+        super(SqueezerSetup.SQUEEZER_BLOCK_TILE.get(), pos, state);
     }
 
     public final IItemHandler inventory = new ItemStackHandler(1)
@@ -66,7 +56,7 @@ public class DyeSqueezerTileEntity extends WootMachineTileEntity implements Woot
         @Override
         protected void onContentsChanged(int slot) {
             DyeSqueezerTileEntity.this.onContentsChanged(slot);
-            markDirty();
+            setChanged();
         }
 
         public boolean isItemValidForSlot(int slot, @Nonnull ItemStack stack) {
@@ -90,95 +80,93 @@ public class DyeSqueezerTileEntity extends WootMachineTileEntity implements Woot
 
     //-------------------------------------------------------------------------
     //region Tanks
-    private LazyOptional<WootFluidTank> outputTank = LazyOptional.of(this::createTank);
+    private Optional<WootFluidTank> outputTank = Optional.of(this.createTank());
     private WootFluidTank createTank() {
-        return new WootFluidTank(SqueezerConfiguration.DYE_SQUEEZER_TANK_CAPACITY.get(), h -> h.isFluidEqual(new FluidStack(FluidSetup.PUREDYE_FLUID.get(), 1))).setAccess(false, true);
+        return new WootFluidTank(SqueezerConfiguration.DYE_SQUEEZER_TANK_CAPACITY.get(), h -> h.is(new FluidStack(FluidSetup.PUREDYE_FLUID.get(), 1).getFluidType())).setAccess(false, true);
     }
     public FluidStack getOutputTankFluid() { return outputTank.map(h -> h.getFluid()).orElse(FluidStack.EMPTY); }
     //endregion
 
     //-------------------------------------------------------------------------
     //region Energy
-    private LazyOptional<WootEnergyStorage> energyStorage = LazyOptional.of(this::createEnergy);
+    private Optional<WootEnergyStorage> energyStorage = Optional.of(this.createEnergy());
     private WootEnergyStorage createEnergy() {
-        return new WootEnergyStorage(SqueezerConfiguration.DYE_SQUEEZER_MAX_ENERGY.get(), SqueezerConfiguration.DYE_SQUEEZER_MAX_ENERGY_RX.get());
+        return new WootEnergyStorage(SqueezerConfiguration.DYE_SQUEEZER_MAX_ENERGY.get());
     }
 
-    public int getEnergy() { return energyStorage.map(h -> h.getEnergyStored()).orElse(0); }
-    public void setEnergy(int v) { energyStorage.ifPresent(h -> h.setEnergy(v)); }
+    public int getEnergy() { return energyStorage.map(EnergyStorage::getEnergyStored).orElse(0); }
     //endregion
 
     //-------------------------------------------------------------------------
     //region Inventory
     public static int INPUT_SLOT = 0;
-    private final LazyOptional<IItemHandler> inventoryGetter = LazyOptional.of(() -> inventory);
+    private final Optional<IItemHandler> inventoryGetter = Optional.of(() -> inventory);
     public IItemHandler getInventory() { return inventory; }
     //endregion
 
     //-------------------------------------------------------------------------
     //region NBT
     @Override
-    public void read(BlockState blockState, CompoundNBT compoundNBT) {
-        readFromNBT(compoundNBT);
-        super.read(blockState, compoundNBT);
+    public void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        readFromNBT(tag);
+        super.loadAdditional(tag, registries);
     }
 
-    @Override
-    public void deserializeNBT(CompoundNBT compoundNBT) {
-        readFromNBT(compoundNBT);
-        super.deserializeNBT(compoundNBT);
-    }
 
-    private void readFromNBT(CompoundNBT compoundNBT) {
 
-        if (compoundNBT.contains(ModNBT.INPUT_INVENTORY_TAG, Constants.NBT.TAG_LIST))
+    private void readFromNBT(CompoundTag tag, HolderLookup.Provider registries) {
+
+        if (tag.contains(ModNBT.INPUT_INVENTORY_TAG, Constants.NBT.TAG_LIST))
             CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.readNBT(
-                    inventory, null, compoundNBT.getList(ModNBT.INPUT_INVENTORY_TAG, Constants.NBT.TAG_COMPOUND));
+                    inventory, null, tag.getList(ModNBT.INPUT_INVENTORY_TAG, Constants.NBT.TAG_COMPOUND));
 
-        CompoundNBT tankTag = compoundNBT.getCompound(ModNBT.OUTPUT_TANK_TAG);
-        outputTank.ifPresent(h -> h.readFromNBT(tankTag));
+        CompoundTag tankTag = tag.getCompound(ModNBT.OUTPUT_TANK_TAG);
+        FluidStack fluidStack = FluidStack.parseOptional(registries, tankTag);
+        outputTank.get().setFluid(fluidStack);
 
-        CompoundNBT energyTag = compoundNBT.getCompound(ModNBT.ENERGY_TAG);
-        energyStorage.ifPresent(h -> ((INBTSerializable<CompoundNBT>)h).deserializeNBT(energyTag));
+        CompoundTag energyTag = tag.getCompound(ModNBT.ENERGY_TAG);
+        int cap = SqueezerConfiguration.DYE_SQUEEZER_MAX_ENERGY.get();
+        energyStorage = Optional.of(new WootEnergyStorage(cap, cap, cap, energyTag.getInt("energy")));
 
-        if (compoundNBT.contains(ModNBT.DyeSqueezer.INTERNAL_DYE_TANKS_TAG)) {
-            CompoundNBT dyeTag = compoundNBT.getCompound(ModNBT.DyeSqueezer.INTERNAL_DYE_TANKS_TAG);
+        if (tag.contains(ModNBT.DyeSqueezer.INTERNAL_DYE_TANKS_TAG)) {
+            CompoundTag dyeTag = tag.getCompound(ModNBT.DyeSqueezer.INTERNAL_DYE_TANKS_TAG);
             red = dyeTag.getInt(ModNBT.DyeSqueezer.RED_TAG);
             yellow = dyeTag.getInt(ModNBT.DyeSqueezer.YELLOW_TAG);
             blue = dyeTag.getInt(ModNBT.DyeSqueezer.BLUE_TAG);
             white = dyeTag.getInt(ModNBT.DyeSqueezer.WHITE_TAG);
         }
 
-        if (compoundNBT.contains(ModNBT.DyeSqueezer.EXCESS_TAG)) {
-            dumpExcess = compoundNBT.getBoolean(ModNBT.DyeSqueezer.EXCESS_TAG);
+        if (tag.contains(ModNBT.DyeSqueezer.EXCESS_TAG)) {
+            dumpExcess = tag.getBoolean(ModNBT.DyeSqueezer.EXCESS_TAG);
         }
     }
 
 
 
     @Override
-    public CompoundNBT write(CompoundNBT compoundNBT) {
-        compoundNBT.put(ModNBT.INPUT_INVENTORY_TAG,
+    public void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        tag.put(ModNBT.INPUT_INVENTORY_TAG,
                 Objects.requireNonNull(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.writeNBT(inventory, null)));
 
         outputTank.ifPresent(h -> {
-            CompoundNBT tankTag = h.writeToNBT(new CompoundNBT());
-            compoundNBT.put(ModNBT.OUTPUT_TANK_TAG, tankTag);
+            CompoundTag tankTag = h.writeToNBT(new CompoundTag());
+            tag.put(ModNBT.OUTPUT_TANK_TAG, tankTag);
         });
 
         energyStorage.ifPresent(h -> {
-            CompoundNBT energyTag = ((INBTSerializable<CompoundNBT>)h).serializeNBT();
-            compoundNBT.put(ModNBT.ENERGY_TAG, energyTag);
+            CompoundTag energyTag = new CompoundTag();
+            energyTag.putInt("energy", h.getEnergyStored());
+            tag.put(ModNBT.ENERGY_TAG, energyTag);
         });
 
-        CompoundNBT dyeTag = new CompoundNBT();
+        CompoundTag dyeTag = new CompoundTag();
         dyeTag.putInt(ModNBT.DyeSqueezer.RED_TAG, red);
         dyeTag.putInt(ModNBT.DyeSqueezer.YELLOW_TAG, yellow);
         dyeTag.putInt(ModNBT.DyeSqueezer.BLUE_TAG, blue);
         dyeTag.putInt(ModNBT.DyeSqueezer.WHITE_TAG, white);
-        compoundNBT.put(ModNBT.DyeSqueezer.INTERNAL_DYE_TANKS_TAG, dyeTag);
-        compoundNBT.putBoolean(ModNBT.DyeSqueezer.EXCESS_TAG, dumpExcess);
-        return super.write(compoundNBT);
+        tag.put(ModNBT.DyeSqueezer.INTERNAL_DYE_TANKS_TAG, dyeTag);
+        tag.putBoolean(ModNBT.DyeSqueezer.EXCESS_TAG, dumpExcess);
+        super.saveAdditional(tag, registries);
     }
     //endregion
 
@@ -389,7 +377,7 @@ public class DyeSqueezerTileEntity extends WootMachineTileEntity implements Woot
         return super.getCapability(cap, side);
     }
 
-    public void dropContents(World world, BlockPos pos) {
+    public void dropContents(Level level, BlockPos pos) {
 
         List<ItemStack> drops = new ArrayList<>();
         ItemStack itemStack = inventory.getStackInSlot(INPUT_SLOT).copy();
@@ -409,4 +397,13 @@ public class DyeSqueezerTileEntity extends WootMachineTileEntity implements Woot
         dumpExcess = !dumpExcess;
     }
 
+    @Override
+    public List<String> getDebugText(List<String> debug, UseOnContext itemUseContext) {
+        return List.of();
+    }
+
+    @Override
+    public @org.jetbrains.annotations.Nullable AbstractContainerMenu createMenu(int i, Inventory inventory, Player player) {
+        return null;
+    }
 }

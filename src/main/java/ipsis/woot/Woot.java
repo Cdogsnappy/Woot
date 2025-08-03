@@ -26,8 +26,8 @@ public class Woot {
 
         NeoForge.EVENT_BUS.register(new Registration());
 
-        FMLJavaModLoadingContext.get().getModEventBus().addListener((FMLCommonSetupEvent e) -> setup.commonSetup(e));
-        FMLJavaModLoadingContext.get().getModEventBus().addListener((FMLClientSetupEvent e) -> setup.clientSetup(e));
+        NeoForge.EVENT_BUS.addListener((FMLCommonSetupEvent e) -> setup.commonSetup(e));
+        NeoForge.EVENT_BUS.addListener((FMLClientSetupEvent e) -> setup.clientSetup(e));
 
         Config.loadConfig(Config.CLIENT_CONFIG, FMLPaths.CONFIGDIR.get().resolve("woot-client.toml"));
         Config.loadConfig(Config.COMMON_CONFIG, FMLPaths.CONFIGDIR.get().resolve("woot-common.toml"));
