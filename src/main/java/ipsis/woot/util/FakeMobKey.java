@@ -1,7 +1,6 @@
 package ipsis.woot.util;
 
 import ipsis.woot.util.helper.MathHelper;
-import net.minecraft.nbt.CompoundNBT;
 
 import javax.annotation.Nonnull;
 import java.util.Objects;

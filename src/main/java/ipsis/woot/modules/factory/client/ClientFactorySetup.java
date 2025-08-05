@@ -8,12 +8,17 @@ import ipsis.woot.modules.factory.Tier;
 import ipsis.woot.util.FakeMob;
 import ipsis.woot.util.NetworkHelper;
 import ipsis.woot.util.oss.NetworkTools;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.codec.StreamEncoder;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.fluids.FluidStack;
+import org.checkerframework.checker.units.qual.K;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.rmi.registry.Registry;
+import java.util.*;
 
 public class ClientFactorySetup {
 
@@ -34,77 +39,104 @@ public class ClientFactorySetup {
     public double shardDropChance = 0.0F;
     public double[] shardDrops = new double[]{ 0.0F, 0.0F, 0.0F };
 
-    public static class Mob {
-        public List<ItemStack> drops = new ArrayList<>();
+    public static record Mob (List<ItemStack> drops) {
+        public Mob(){
+            this(new ArrayList<>());
+        }
+
+        public static final StreamCodec<RegistryFriendlyByteBuf, Mob> STREAM_CODEC =
+                StreamCodec.composite(ByteBufCodecs.collection(ArrayList::new,ItemStack.STREAM_CODEC), Mob::drops,
+                        Mob::new);
     }
 
+
     public List<ItemStack> itemIng = new ArrayList<>();
+    public static final StreamCodec<RegistryFriendlyByteBuf, List<ItemStack>> ITEM_LIST_CODEC = ByteBufCodecs.collection(
+            ArrayList::new, ItemStack.STREAM_CODEC);
+
     public List<FluidStack> fluidIng = new ArrayList<>();
+
+    public static final StreamCodec<RegistryFriendlyByteBuf, List<FluidStack>> FLUID_LIST_CODEC = ByteBufCodecs.collection(
+            ArrayList::new, FluidStack.STREAM_CODEC);
 
     private ClientFactorySetup() {}
 
-    public static ClientFactorySetup fromBytes(ByteBuf buf) {
 
-        ClientFactorySetup factorySetup = new ClientFactorySetup();
+    public static final StreamCodec<RegistryFriendlyByteBuf, HashMap<FakeMob, Mob>> MAP_CODEC =
+            StreamCodec.of(
+                    (buf, map) -> {
+                        buf.writeVarInt(map.size());
+                        map.forEach((key, value) -> {
+                            FakeMob.STREAM_CODEC.encode(buf, key);
+                            Mob.STREAM_CODEC.encode(buf, value);
+                        });
+                    },
+                    (buf) -> {
+                        int size = buf.readVarInt();
+                        HashMap<FakeMob, Mob> map = new HashMap<>(size);
+                        for (int i = 0; i < size; i++) {
+                            FakeMob key = FakeMob.STREAM_CODEC.decode(buf);
+                            Mob value = Mob.STREAM_CODEC.decode(buf);
+                            map.put(key, value);
+                        }
+                        return map;
+                    }
+            );
 
-        factorySetup.tier = Tier.byIndex(buf.readInt());
-        factorySetup.cellCapacity = buf.readInt();
-        buf.readInt(); /// fluid amount
-        factorySetup.looting = buf.readInt();
-        factorySetup.exotic = Exotic.getExotic(buf.readInt());
+    public static final StreamCodec<RegistryFriendlyByteBuf, ClientFactorySetup> STREAM_CODEC =
+            StreamCodec.of(
+                    (buf,data) ->{
+                        buf.writeInt(data.tier.ordinal());
+                        buf.writeInt(data.cellCapacity);
+                        buf.writeInt(data.looting);
+                        buf.writeInt(data.exotic.ordinal());
+                        buf.writeInt(data.recipeTicks);
+                        buf.writeInt(data.recipeFluid);
+                        buf.writeInt(data.shardRolls);
+                        buf.writeDouble(data.shardDropChance);
+                        buf.writeArray(Arrays.stream(data.shardDrops).boxed().toArray(Double[]::new), ByteBufCodecs.DOUBLE);
+                        buf.writeMap(data.mobParams, FakeMob.STREAM_CODEC, MobParam.STREAM_CODEC);
+                        MAP_CODEC.encode(buf, data.mobInfo);
+                        buf.writeBoolean(data.perkCapped);
+                        buf.writeVarInt(data.perks.size());
+                        data.perks.forEach((p) -> {
+                            buf.writeVarInt(p.ordinal());
+                        });
 
-        factorySetup.recipeTicks = buf.readInt();
-        factorySetup.recipeFluid = buf.readInt();
-        factorySetup.shardRolls = buf.readInt();
-        factorySetup.shardDropChance = buf.readDouble();
-        factorySetup.shardDrops[0] = buf.readDouble();
-        factorySetup.shardDrops[1] = buf.readDouble();
-        factorySetup.shardDrops[2] = buf.readDouble();
+                        ITEM_LIST_CODEC.encode(buf, data.itemIng);
+                        FLUID_LIST_CODEC.encode(buf, data.fluidIng);
 
-        int mobCount = buf.readInt();
-        for (int x = 0; x < mobCount; x++) {
-            String mobString = NetworkTools.readString(buf);
-            FakeMob fakeMob = new FakeMob(mobString);
-            MobParam mobParam = new MobParam();
-            mobParam.baseSpawnTicks = buf.readInt();
-            mobParam.baseMassCount = buf.readInt();
-            mobParam.baseFluidCost = buf.readInt();
-            mobParam.setPerkRateValue(buf.readInt());
-            mobParam.setPerkEfficiencyValue(buf.readInt());
-            mobParam.setPerkMassValue(buf.readInt());
-            mobParam.setPerkXpValue(buf.readInt());
-            mobParam.setPerkHeadlessValue(buf.readInt());
-            factorySetup.controllerMobs.add(fakeMob);
-            factorySetup.mobParams.put(fakeMob, mobParam);
+                    },
+                    (buf) -> {
+                        ClientFactorySetup factorySetup = new ClientFactorySetup();
+                        factorySetup.tier = Tier.byIndex(buf.readInt());
+                        factorySetup.cellCapacity = buf.readInt();
+                        buf.readInt(); /// fluid amount
+                        factorySetup.looting = buf.readInt();
+                        factorySetup.exotic = Exotic.getExotic(buf.readInt());
 
-            Mob mob = new Mob();
-            int drops = buf.readInt();
-            for (int y = 0; y < drops; y++) {
-                ItemStack itemStack = NetworkTools.readItemStack(buf);
-                itemStack.setCount((int)(buf.readFloat() * 100.0F));
-                if (!itemStack.isEmpty())
-                    mob.drops.add(itemStack);
-            }
-            factorySetup.mobInfo.put(fakeMob, mob);
-        }
+                        factorySetup.recipeTicks = buf.readInt();
+                        factorySetup.recipeFluid = buf.readInt();
+                        factorySetup.shardRolls = buf.readInt();
+                        factorySetup.shardDropChance = buf.readDouble();
+                        factorySetup.shardDrops[0] = buf.readDouble();
+                        factorySetup.shardDrops[1] = buf.readDouble();
+                        factorySetup.shardDrops[2] = buf.readDouble();
+                        factorySetup.mobParams = (HashMap<FakeMob,MobParam>)(buf.readMap(FakeMob.STREAM_CODEC,MobParam.STREAM_CODEC));
+                        factorySetup.mobInfo = MAP_CODEC.decode(buf);
+                        factorySetup.controllerMobs = factorySetup.mobParams.keySet().stream().toList();
+                        factorySetup.perkCapped = buf.readBoolean();
+                        int size = buf.readVarInt();
+                        for(int i = 0; i < size; ++i){
+                            factorySetup.perks.add(Perk.byIndex(buf.readVarInt()));
+                        }
 
-        factorySetup.perkCapped = buf.readBoolean();
-        int perkCount = buf.readInt();
-        for (int x = 0; x < perkCount; x++)
-            factorySetup.perks.add(Perk.byIndex(buf.readInt()));
+                        factorySetup.itemIng = ITEM_LIST_CODEC.decode(buf);
+                        factorySetup.fluidIng = FLUID_LIST_CODEC.decode(buf);
 
-        int itemIng = buf.readInt();
-        for (int y = 0; y < itemIng; y++) {
-            ItemStack itemStack = NetworkTools.readItemStack(buf);
-            factorySetup.itemIng.add(itemStack);
-        }
 
-        int fluidIng = buf.readInt();
-        for (int y = 0; y < fluidIng; y++) {
-            FluidStack fluidStack = NetworkHelper.readFluidStack(buf);
-            factorySetup.fluidIng.add(fluidStack);
-        }
+                        return factorySetup;
 
-        return factorySetup;
-    }
+                    }
+            );
 }

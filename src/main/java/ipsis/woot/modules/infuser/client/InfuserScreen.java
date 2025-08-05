@@ -1,16 +1,14 @@
 package ipsis.woot.modules.infuser.client;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+
 import com.mojang.blaze3d.platform.GlStateManager;
 import ipsis.woot.Woot;
 import ipsis.woot.modules.infuser.InfuserConfiguration;
-import ipsis.woot.modules.infuser.blocks.InfuserContainer;
+import ipsis.woot.modules.infuser.blocks.InfuserMenu;
 import ipsis.woot.util.WootContainerScreen;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
 
-public class InfuserScreen extends WootContainerScreen<InfuserContainer> {
+
+public class InfuserScreen extends WootContainerScreen<InfuserMenu> {
 
     private ResourceLocation GUI = new ResourceLocation(Woot.MODID, "textures/gui/infuser.png");
 
@@ -31,7 +29,7 @@ public class InfuserScreen extends WootContainerScreen<InfuserContainer> {
     private static final int TANK_WIDTH = TANK_RX - TANK_LX + 1;
     private static final int TANK_HEIGHT = TANK_RY - TANK_LY + 1;
 
-    public InfuserScreen(InfuserContainer container, PlayerInventory playerInventory, ITextComponent name) {
+    public InfuserScreen(InfuserMenu container, PlayerInventory playerInventory, ITextComponent name) {
         super(container, playerInventory, name);
         xSize = GUI_XSIZE;
         ySize = GUI_YSIZE;

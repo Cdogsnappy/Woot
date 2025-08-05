@@ -2,7 +2,6 @@ package ipsis.woot.modules.squeezer;
 
 import ipsis.woot.Woot;
 import ipsis.woot.modules.squeezer.blocks.*;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.BlockItem;
@@ -32,12 +31,12 @@ public class SqueezerSetup {
     public static final String SQUEEZER_TAG = "squeezer";
     public static final DeferredHolder<Block, DyeSqueezerBlock> SQUEEZER_BLOCK = BLOCKS.register(
             SQUEEZER_TAG, () -> new DyeSqueezerBlock());
-    public static final DeferredHolder<Item> SQUEEZER_BLOCK_ITEM = ITEMS.register(
+    public static final DeferredHolder<Item, BlockItem> SQUEEZER_BLOCK_ITEM = ITEMS.register(
             SQUEEZER_TAG, () ->
                     new BlockItem(SQUEEZER_BLOCK.get(), Woot.createStandardProperties()));
-    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<DyeSqueezerTileEntity>> SQUEEZER_BLOCK_TILE = TILES.register(
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<DyeSqueezerBlockEntity>> SQUEEZER_BLOCK_TILE = TILES.register(
             SQUEEZER_TAG, () ->
-                    BlockEntityType.Builder.of(DyeSqueezerTileEntity::new, SQUEEZER_BLOCK.get()).build(null));
+                    BlockEntityType.Builder.of(DyeSqueezerBlockEntity::new, SQUEEZER_BLOCK.get()).build(null));
 
     public static final DeferredHolder<MenuType<?>, MenuType<DyeSqueezerContainer>> SQUEEZER_BLOCK_CONTAINER = CONTAINERS.register(
             SQUEEZER_TAG, () ->
@@ -56,9 +55,9 @@ public class SqueezerSetup {
     public static final DeferredHolder<Item, BlockItem> ENCHANT_SQUEEZER_BLOCK_ITEM = ITEMS.register(
             ENCHANT_SQUEEZER_TAG, () ->
                     new BlockItem(ENCHANT_SQUEEZER_BLOCK.get(), Woot.createStandardProperties()));
-    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<EnchantSqueezerTileEntity>> ENCHANT_SQUEEZER_BLOCK_TILE = TILES.register(
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<EnchantSqueezerBlockEntity>> ENCHANT_SQUEEZER_BLOCK_TILE = TILES.register(
             ENCHANT_SQUEEZER_TAG, () ->
-                    BlockEntityType.Builder.of(EnchantSqueezerTileEntity::new, ENCHANT_SQUEEZER_BLOCK.get()).build(null));
+                    BlockEntityType.Builder.of(EnchantSqueezerBlockEntity::new, ENCHANT_SQUEEZER_BLOCK.get()).build(null));
 
     public static final DeferredHolder<MenuType<?>, MenuType<EnchantSqueezerContainer>> ENCHANT_SQUEEZER_BLOCK_CONTAINER = CONTAINERS.register(
             ENCHANT_SQUEEZER_TAG, () ->

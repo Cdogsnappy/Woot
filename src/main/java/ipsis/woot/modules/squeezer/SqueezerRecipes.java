@@ -1,10 +1,11 @@
 package ipsis.woot.modules.squeezer;
 
 import ipsis.woot.crafting.dyesqueezer.DyeSqueezerRecipe;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.item.crafting.RecipeManager;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeManager;
+
 
 import javax.annotation.Nonnull;
 
@@ -14,11 +15,11 @@ public class SqueezerRecipes {
 
         // Setup the valid items for slot 0
         DyeSqueezerRecipe.clearValidInputs();
-        for (IRecipe recipe : manager.getRecipes()) {
-            if (recipe instanceof DyeSqueezerRecipe) {
-                DyeSqueezerRecipe dRecipe = (DyeSqueezerRecipe)recipe;
-                Ingredient ingredient = dRecipe.getIngredient();
-                for (ItemStack itemStack :  ingredient.getMatchingStacks())
+        for (RecipeHolder<?> recipe : manager.getRecipes()) {
+            if (recipe.value() instanceof DyeSqueezerRecipe) {
+                DyeSqueezerRecipe dRecipe = (DyeSqueezerRecipe)recipe.value();
+                Ingredient ingredient = dRecipe.input();
+                for (ItemStack itemStack :  ingredient.getItems())
                     DyeSqueezerRecipe.addValidInput(itemStack);
             }
         }

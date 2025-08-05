@@ -11,7 +11,8 @@ import ipsis.woot.modules.layout.LayoutSetup;
 import ipsis.woot.modules.oracle.OracleSetup;
 import ipsis.woot.modules.squeezer.SqueezerSetup;
 import net.minecraft.data.DataGenerator;
-import net.minecraftforge.common.data.LanguageProvider;
+import net.minecraft.data.PackOutput;
+import net.neoforged.neoforge.common.data.LanguageProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +20,7 @@ import java.util.Set;
 
 public class Languages extends LanguageProvider {
 
-    public Languages(DataGenerator gen, String locale) {
+    public Languages(PackOutput gen, String locale) {
         super(gen, Woot.MODID, locale);
     }
 

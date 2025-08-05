@@ -6,7 +6,7 @@ import ipsis.woot.modules.fluidconvertor.FluidConvertorConfiguration;
 import ipsis.woot.modules.fluidconvertor.FluidConvertorSetup;
 import ipsis.woot.util.WootDebug;
 import ipsis.woot.util.WootFluidTank;
-import ipsis.woot.util.WootMachineTileEntity;
+import ipsis.woot.util.WootMachineBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -36,7 +36,7 @@ import java.util.Optional;
 
 import static ipsis.woot.crafting.fluidconvertor.FluidConvertorRecipe.FLUID_CONV_TYPE;
 
-public class FluidConvertorBlockEntity extends WootMachineTileEntity implements WootDebug, MenuProvider {
+public class FluidConvertorBlockEntity extends WootMachineBlockEntity implements WootDebug, MenuProvider {
 
     public FluidConvertorBlockEntity(BlockPos pos, BlockState state) {
         super(FluidConvertorSetup.FLUID_CONVERTOR_BLOCK_TILE.get(), pos, state);

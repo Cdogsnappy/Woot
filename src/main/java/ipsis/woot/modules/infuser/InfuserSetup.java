@@ -2,7 +2,7 @@ package ipsis.woot.modules.infuser;
 
 import ipsis.woot.Woot;
 import ipsis.woot.modules.infuser.blocks.InfuserBlock;
-import ipsis.woot.modules.infuser.blocks.InfuserContainer;
+import ipsis.woot.modules.infuser.blocks.InfuserMenu;
 import ipsis.woot.modules.infuser.blocks.InfuserBlockEntity;
 import ipsis.woot.modules.infuser.items.DyeCasingItem;
 import ipsis.woot.modules.infuser.items.DyePlateItem;
@@ -41,10 +41,10 @@ public class InfuserSetup {
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<InfuserBlockEntity>> INFUSER_BLOCK_TILE = TILES.register(
             INFUSER_TAG, () ->
                     BlockEntityType.Builder.of(InfuserBlockEntity::new, INFUSER_BLOCK.get()).build(null));
-    public static final DeferredHolder<MenuType<?>, MenuType<InfuserContainer>> INFUSER_BLOCK_CONTAINER = CONTAINERS.register(
+    public static final DeferredHolder<MenuType<?>, MenuType<InfuserMenu>> INFUSER_BLOCK_CONTAINER = CONTAINERS.register(
             INFUSER_TAG, () ->
                     IForgeMenuType.create((windowId, inv, data) -> {
-                        return new InfuserContainer(
+                        return new InfuserMenu(
                                 windowId,
                                 Woot.proxy.getClientWorld(),
                                 data.readBlockPos(),

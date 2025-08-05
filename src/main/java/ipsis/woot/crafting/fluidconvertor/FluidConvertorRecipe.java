@@ -1,17 +1,19 @@
 package ipsis.woot.crafting.fluidconvertor;
 
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import ipsis.woot.Woot;
-import net.minecraft.data.IFinishedRecipe;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.IRecipeType;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.registries.ObjectHolder;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.ExtraCodecs;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.fluids.FluidStack;
+
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,27 +21,7 @@ import java.util.List;
 
 import static ipsis.woot.crafting.fluidconvertor.FluidConvertorRecipeBuilder.SERIALIZER;
 
-public class FluidConvertorRecipe implements IRecipe<IInventory> {
-
-    private final Ingredient catalyst;
-    private final int catalystCount;
-    private final FluidStack inputFluid;
-    private final FluidStack outputFluid;
-    private final int energy;
-    private final ResourceLocation id;
-    private final IRecipeType<?> type;
-
-    public FluidConvertorRecipe(ResourceLocation id, Ingredient catalyst, int catalystCount, FluidStack fluidStack, FluidStack outputFluid, int energy) {
-        this.id = id;
-        this.catalyst = catalyst;
-        this.catalystCount = catalystCount;
-        this.inputFluid = fluidStack;
-        this.outputFluid = outputFluid;
-        this.type = FLUID_CONV_TYPE;
-        this.energy = energy;
-
-        inputs.add(Arrays.asList(catalyst.getMatchingStacks()));
-    }
+public record FluidConvertorRecipe (Ingredient catalyst, int catalystCount, FluidStack inputFluid, FluidStack outputFluid, int energy) implements Recipe<RecipeInput> {
 
     public Ingredient getCatalyst() { return this.catalyst; }
     public int getCatalystCount() { return this.catalystCount; }
@@ -58,7 +40,6 @@ public class FluidConvertorRecipe implements IRecipe<IInventory> {
                 '}';
     }
 
-    public static final IRecipeType<FluidConvertorRecipe> FLUID_CONV_TYPE = IRecipeType.register(Woot.MODID + ":fluidconvertor");
 
 
     /**
@@ -72,7 +53,7 @@ public class FluidConvertorRecipe implements IRecipe<IInventory> {
             return false;
 
         for (ItemStack i : validCatalysts) {
-            if (i.isItemEqual(itemStack))
+            if (i.is(itemStack.getItem()))
                 return true;
         }
         return false;
@@ -86,7 +67,7 @@ public class FluidConvertorRecipe implements IRecipe<IInventory> {
             return false;
 
         for (FluidStack f : validInputs) {
-            if (f.isFluidEqual(fluidStack))
+            if (f.is(fluidStack.getFluid()))
                 return true;
         }
         return false;
@@ -95,7 +76,7 @@ public class FluidConvertorRecipe implements IRecipe<IInventory> {
     /**
      * Jei
      */
-    private List<List<ItemStack>> inputs = new ArrayList<>();
+    private static List<List<ItemStack>> inputs = new ArrayList<>();
     public List<List<ItemStack>> getInputs() { return inputs; }
 
     /**
@@ -103,38 +84,68 @@ public class FluidConvertorRecipe implements IRecipe<IInventory> {
      * Matches catalyst
      * Any fluid lookup will have to be done externally from all matching recipes
      */
+
+
+
     @Override
-    public boolean matches(IInventory inv, World worldIn) {
-        return catalyst.test(inv.getStackInSlot(0));
+    public boolean matches(RecipeInput recipeInput, Level level) {
+        return catalyst.test(recipeInput.getItem(0));
     }
 
     @Override
-    public ItemStack getCraftingResult(IInventory inv) {
+    public ItemStack assemble(RecipeInput recipeInput, HolderLookup.Provider provider) {
         return null;
     }
 
     @Override
-    public boolean canFit(int width, int height) {
+    public boolean canCraftInDimensions(int i, int i1) {
         return false;
     }
 
     @Override
-    public ItemStack getRecipeOutput() {
+    public ItemStack getResultItem(HolderLookup.Provider provider) {
         return ItemStack.EMPTY;
     }
 
-    @Override
-    public ResourceLocation getId() {
-        return id;
+    
+
+    public static class FluidConvertorRecipeType implements RecipeSerializer<FluidConvertorRecipe>, RecipeType<FluidConvertorRecipe>{
+
+        public static final MapCodec<FluidConvertorRecipe> CODEC = RecordCodecBuilder.mapCodec((inst) -> inst.group(
+                Ingredient.CODEC.fieldOf("catalyst").forGetter(FluidConvertorRecipe::catalyst),
+                ExtraCodecs.NON_NEGATIVE_INT.fieldOf("catalystcount").forGetter(FluidConvertorRecipe::catalystCount),
+                FluidStack.CODEC.fieldOf("inputFluid").forGetter(FluidConvertorRecipe::inputFluid),
+                FluidStack.CODEC.fieldOf("outputFluid").forGetter(FluidConvertorRecipe::outputFluid),
+                ExtraCodecs.NON_NEGATIVE_INT.fieldOf("energy").forGetter(FluidConvertorRecipe::energy)
+                ).apply(inst, FluidConvertorRecipe::new));
+
+        public static final StreamCodec<RegistryFriendlyByteBuf, FluidConvertorRecipe> STREAM_CODEC = StreamCodec.composite(
+                Ingredient.CONTENTS_STREAM_CODEC, FluidConvertorRecipe::catalyst,
+                ByteBufCodecs.VAR_INT, FluidConvertorRecipe::catalystCount,
+                FluidStack.STREAM_CODEC, FluidConvertorRecipe::inputFluid,
+                FluidStack.STREAM_CODEC, FluidConvertorRecipe::outputFluid,
+                ByteBufCodecs.VAR_INT, FluidConvertorRecipe::energy,
+                FluidConvertorRecipe::new
+        );
+
+        @Override
+        public MapCodec<FluidConvertorRecipe> codec() {
+            return CODEC;
+        }
+
+        @Override
+        public StreamCodec<RegistryFriendlyByteBuf, FluidConvertorRecipe> streamCodec() {
+            return STREAM_CODEC;
+        }
     }
 
     @Override
-    public IRecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<?> getSerializer() {
         return SERIALIZER;
     }
 
     @Override
-    public IRecipeType<?> getType() {
+    public RecipeType<?> getType() {
         return type;
     }
 

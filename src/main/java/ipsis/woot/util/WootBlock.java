@@ -6,8 +6,7 @@ import net.neoforged.neoforge.common.property.Properties;
 
 public class WootBlock extends Block {
 
-    public WootBlock(Properties properties, String name) {
+    public WootBlock(Properties properties) {
         super(properties);
-        setRegistryName(Woot.MODID, name);
     }
 }

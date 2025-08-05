@@ -1,0 +1,21 @@
+modLoader="javafml"
+loaderVersion="[33,)"
+issueTrackerURL="https://github.com/Ipsis/Woot/issues"
+license="LGPLv3 (https://github.com/Ipsis/Woot/blob/1.16.x/LICENSE)"
+
+[[mods]]
+modId="woot"
+version="${file.jarVersion}"
+displayName="Woot"
+authors="Ipsis"
+credits="McJty, Draco18s, Forge Devs"
+description='''A big, bad, magic, multiblock for mob drops. Aparrently you will either love it or hate it. There is no inbetween.'''
+
+[[dependencies.woot]]
+modId="forge"
+mandatory=true
+versionRange="[33,)"
+ordering="NONE"
+side="BOTH"
+
+

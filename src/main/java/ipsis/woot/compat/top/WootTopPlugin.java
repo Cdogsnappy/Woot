@@ -8,8 +8,8 @@ import ipsis.woot.modules.factory.layout.PatternRepository;
 import ipsis.woot.modules.factory.perks.Perk;
 import ipsis.woot.modules.infuser.blocks.InfuserBlockEntity;
 import ipsis.woot.modules.layout.blocks.LayoutBlockEntity;
-import ipsis.woot.modules.squeezer.blocks.DyeSqueezerTileEntity;
-import ipsis.woot.modules.squeezer.blocks.EnchantSqueezerTileEntity;
+import ipsis.woot.modules.squeezer.blocks.DyeSqueezerBlockEntity;
+import ipsis.woot.modules.squeezer.blocks.EnchantSqueezerBlockEntity;
 import ipsis.woot.util.FakeMob;
 import ipsis.woot.util.helper.StringHelper;
 import mcjty.theoneprobe.api.*;
@@ -95,10 +95,10 @@ public class WootTopPlugin {
 
         private void addDyeSqueezerProbeInfo(ProbeMode probeMode, IProbeInfo iProbeInfo, TileEntity te, PlayerEntity playerEntity, BlockState blockState) {
 
-            if (!(te instanceof DyeSqueezerTileEntity))
+            if (!(te instanceof DyeSqueezerBlockEntity))
                 return;
 
-            DyeSqueezerTileEntity squeezer = (DyeSqueezerTileEntity) te;
+            DyeSqueezerBlockEntity squeezer = (DyeSqueezerBlockEntity) te;
             iProbeInfo.text(
                     CompoundText.createLabelInfo(
                             StringHelper.translate("top.woot.squeezer.red.label") + ": ",
@@ -129,10 +129,10 @@ public class WootTopPlugin {
 
         private void addEnchantSqueezerProbeInfo(ProbeMode probeMode, IProbeInfo iProbeInfo, TileEntity te, PlayerEntity playerEntity, BlockState blockState) {
 
-            if (!(te instanceof EnchantSqueezerTileEntity))
+            if (!(te instanceof EnchantSqueezerBlockEntity))
                 return;
 
-            EnchantSqueezerTileEntity squeezer = (EnchantSqueezerTileEntity) te;
+            EnchantSqueezerBlockEntity squeezer = (EnchantSqueezerBlockEntity) te;
         }
 
         private void addInfuserProbeInfo(ProbeMode probeMode, IProbeInfo iProbeInfo, TileEntity te, PlayerEntity playerEntity, BlockState blockState) {

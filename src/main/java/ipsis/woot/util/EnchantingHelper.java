@@ -1,13 +1,12 @@
 package ipsis.woot.util;
 
 import ipsis.woot.Woot;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.EnchantmentData;
-import net.minecraft.item.EnchantedBookItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.WeightedRandom;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.Enchantment;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +49,7 @@ public class EnchantingHelper {
 
     private static List<EnchantmentData> getEnchantsAtLevel(int level) {
         List<EnchantmentData> list = new ArrayList<>();
-        for (Enchantment enchantment : ForgeRegistries.ENCHANTMENTS) {
+        for (Enchantment enchantment : Registries.ENCHANTMENT) {
             if (!enchantment.isTreasureEnchantment() && enchantment.isAllowedOnBooks()) {
                 if (level >= enchantment.getMinLevel() && level <= enchantment.getMaxLevel())
                     list.add(new EnchantmentData(enchantment, level));

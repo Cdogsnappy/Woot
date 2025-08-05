@@ -6,10 +6,15 @@ import ipsis.woot.fluilds.FluidSetup;
 import ipsis.woot.modules.factory.FactorySetup;
 import ipsis.woot.modules.fluidconvertor.FluidConvertorSetup;
 import ipsis.woot.modules.generic.GenericSetup;
+import net.minecraft.advancements.critereon.InventoryChangeTrigger;
+import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
+import net.minecraft.data.recipes.ShapedRecipeBuilder;
+import net.minecraft.data.recipes.ShapelessRecipeBuilder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.fluids.FluidStack;
 
@@ -17,23 +22,23 @@ public class FluidConvertor {
 
     public static void registerRecipes(RecipeOutput recipeOutput) {
 
-        ShapedRecipeBuilder.shapedRecipe(FluidConvertorSetup.FLUID_CONVERTOR_BLOCK.get())
-                .patternLine(" s ")
-                .patternLine(" c ")
-                .patternLine("bfb")
-                .key('s', Blocks.BREWING_STAND)
-                .key('c', GenericSetup.MACHINE_CASING_ITEM.get())
-                .key('b', Items.BUCKET)
-                .key('f', Blocks.FURNACE)
-                .setGroup(Woot.MODID)
-                .addCriterion("cobblestone", InventoryChangeTrigger.Instance.forItems(Blocks.COBBLESTONE))
-                .build(consumer);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, FluidConvertorSetup.FLUID_CONVERTOR_BLOCK.get())
+                .pattern(" s ")
+                .pattern(" c ")
+                .pattern("bfb")
+                .define('s', Blocks.BREWING_STAND)
+                .define('c', GenericSetup.MACHINE_CASING_ITEM.get())
+                .define('b', Items.BUCKET)
+                .define('f', Blocks.FURNACE)
+                .group(Woot.MODID)
+                .unlockedBy("cobblestone", InventoryChangeTrigger.TriggerInstance.hasItems(Blocks.COBBLESTONE))
+                .save(recipeOutput);
 
-        ShapelessRecipeBuilder.shapelessRecipe(FluidConvertorSetup.FLUID_CONVERTOR_BLOCK.get())
-                .addIngredient(FluidConvertorSetup.FLUID_CONVERTOR_BLOCK.get())
-                .setGroup(Woot.MODID)
-                .addCriterion("cobblestone", InventoryChangeTrigger.Instance.forItems(Blocks.COBBLESTONE))
-                .build(consumer, "fluid_conv_1");
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, FluidConvertorSetup.FLUID_CONVERTOR_BLOCK.get())
+                .requires(FluidConvertorSetup.FLUID_CONVERTOR_BLOCK.get())
+                .group(Woot.MODID)
+                .unlockedBy("cobblestone", InventoryChangeTrigger.TriggerInstance.hasItems(Blocks.COBBLESTONE))
+                .save(recipeOutput, "fluid_conv_1");
 
         /**
          * Contaus Fluid
@@ -55,26 +60,26 @@ public class FluidConvertor {
                         1000,
                         conatus_ingredients[i], 1,
                         new FluidStack(FluidSetup.MOB_ESSENCE_FLUID.get(), 1000))
-                .build(consumer, "conatus" + i);
+                .save(recipeOutput, ResourceLocation.fromNamespaceAndPath(Woot.MODID, "fluidconvertor/conatus" + i));
             }
         } else {
             Woot.setup.getLogger().error("FluidConvertor recipes ingredients != outputAmount");
         }
 
-        rl = new ResourceLocation(Woot.MODID, "fluidconvertor/conatus_ench1");
+        rl = ResourceLocation.fromNamespaceAndPath(Woot.MODID, "fluidconvertor/conatus_ench1");
         FluidConvertorRecipeBuilder.fluidConvertorRecipe(
                 new FluidStack(FluidSetup.CONATUS_FLUID.get(), 1250),
                 1000,
                 Ingredient.of(Items.MAGMA_BLOCK), 1,
                 new FluidStack(FluidSetup.ENCHANT_FLUID.get(), 1000))
-                .build(consumer, "conatus_ench1");
+                .save(recipeOutput, ResourceLocation.fromNamespaceAndPath(Woot.MODID, "fluidconvertor/conatus_ench1"));
 
         FluidConvertorRecipeBuilder.fluidConvertorRecipe(
                 new FluidStack(FluidSetup.CONATUS_FLUID.get(), 1450),
                 1000,
                 Ingredient.of(Items.END_STONE), 1,
                 new FluidStack(FluidSetup.ENCHANT_FLUID.get(), 1000))
-                .build(consumer, "conatus_ench2");
+                .save(recipeOutput, ResourceLocation.fromNamespaceAndPath(Woot.MODID, "fluidconvertor/conatus_ench2"));
 
         /**
          * Purge Fluid
@@ -94,7 +99,7 @@ public class FluidConvertor {
                         1000,
                         ingredients[i], 1,
                         new FluidStack(Fluids.WATER, 1000))
-                        .build(consumer, "purge" + i);
+                        .save(recipeOutput, ResourceLocation.fromNamespaceAndPath(Woot.MODID, "fluidconvertor/purge" + i));
             }
         } else {
             Woot.setup.getLogger().error("FluidConvertor recipes ingredients != outputAmount");

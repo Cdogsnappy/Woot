@@ -26,11 +26,11 @@ import net.minecraftforge.items.SlotItemHandler;
 
 public class EnchantSqueezerContainer extends WootContainer implements TankPacketHandler {
 
-    public EnchantSqueezerTileEntity tileEntity;
+    public EnchantSqueezerBlockEntity tileEntity;
 
     public EnchantSqueezerContainer(int windowId, World world, BlockPos pos, PlayerInventory playerInventory, PlayerEntity playerEntity) {
         super(SqueezerSetup.ENCHANT_SQUEEZER_BLOCK_CONTAINER.get(), windowId);
-        tileEntity = (EnchantSqueezerTileEntity)world.getTileEntity(pos);
+        tileEntity = (EnchantSqueezerBlockEntity)world.getTileEntity(pos);
         addOwnSlots(tileEntity.getInventory());
         addPlayerSlots(playerInventory);
         addListeners();

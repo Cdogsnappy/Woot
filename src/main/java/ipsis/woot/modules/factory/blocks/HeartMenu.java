@@ -23,10 +23,12 @@ import net.neoforged.neoforge.network.PacketDistributor;
 public class HeartMenu extends WootContainer implements TankPacketHandler  {
 
     private HeartBlockEntity tileEntity;
+    private Inventory pInventory;
 
     public HeartMenu(int windowId, Level world, BlockPos pos, Inventory playerInventory, Player playerEntity) {
         super(FactorySetup.HEART_BLOCK_CONTAINER.get(), windowId);
         tileEntity = (HeartBlockEntity)world.getBlockEntity(pos);
+        this.pInventory = playerInventory;
         addListeners();
 
         /**
@@ -52,10 +54,8 @@ public class HeartMenu extends WootContainer implements TankPacketHandler  {
         if (!inputFluid.is(tileEntity.getTankFluid().getFluid())) {
             inputFluid = tileEntity.getTankFluid().copy();
             TankPacket tankPacket = new TankPacket(inputFluid, 0);
-            for (ContainerListener l : this.) {
-                if (l instanceof ServerPlayer) {
-                    PacketDistributor.sendToPlayer(((ServerPlayer) l), tankPacket);
-                }
+            if(pInventory.player instanceof ServerPlayer pl) {
+                PacketDistributor.sendToPlayer(pl, tankPacket);
             }
         }
     }
@@ -68,6 +68,7 @@ public class HeartMenu extends WootContainer implements TankPacketHandler  {
     public FluidStack getInputFluid() { return inputFluid; }
     @OnlyIn(Dist.CLIENT)
     public int getProgress() { return this.progress; }
+
     @OnlyIn(Dist.CLIENT)
     public int getCellType() { return this.cellType; }
 

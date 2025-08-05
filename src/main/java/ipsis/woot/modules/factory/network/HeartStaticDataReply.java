@@ -28,17 +28,16 @@ public record HeartStaticDataReply(FormedSetup formedSetup, HeartRecipe recipe, 
 
 
 
-    public HeartStaticDataReply() { }
+
 
 
     public HeartStaticDataReply(FormedSetup formedSetup, HeartRecipe recipe) {
-        this.formedSetup = formedSetup;
-        this.recipe = recipe;
+        this(formedSetup, recipe, null);
     }
 
     public static HeartStaticDataReply fromBytes(ByteBuf buf) {
         HeartStaticDataReply pkt = new HeartStaticDataReply();
-        pkt.clientFactorySetup = ClientFactorySetup.fromBytes(buf);
+        pkt.clientFactorySetup = ClientFactorySetup.STREAM_CODEC.decode(buf);
         return pkt;
     }
 

@@ -11,21 +11,22 @@ import ipsis.woot.modules.layout.LayoutConfiguration;
 import ipsis.woot.simulator.MobSimulatorConfiguration;
 import ipsis.woot.modules.squeezer.SqueezerConfiguration;
 import ipsis.woot.policy.PolicyConfiguration;
-import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.common.ModConfigSpec;
+
 
 import java.nio.file.Path;
 
-@Mod.EventBusSubscriber
+@EventBusSubscriber
 public class Config {
 
     public static ConfigOverride OVERRIDE = new ConfigOverride();
 
-    private static final ForgeConfigSpec.Builder COMMON_BUILDER = new ForgeConfigSpec.Builder();
-    private static final ForgeConfigSpec.Builder CLIENT_BUILDER = new ForgeConfigSpec.Builder();
+    private static final ModConfigSpec.Builder COMMON_BUILDER = new ModConfigSpec.Builder();
+    private static final ModConfigSpec.Builder CLIENT_BUILDER = new ModConfigSpec.Builder();
 
-    public static ForgeConfigSpec COMMON_CONFIG;
-    public static ForgeConfigSpec CLIENT_CONFIG;
+    public static ModConfigSpec COMMON_CONFIG;
+    public static ModConfigSpec CLIENT_CONFIG;
 
     static {
         setupGeneralConfig();
@@ -52,7 +53,7 @@ public class Config {
         COMMON_BUILDER.pop();
     }
 
-    public static void loadConfig(ForgeConfigSpec spec, Path path) {
+    public static void loadConfig(ModConfigSpec spec, Path path) {
         final CommentedFileConfig configData = CommentedFileConfig.builder(path)
                 .sync()
                 .autosave()

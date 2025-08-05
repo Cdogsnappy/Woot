@@ -1,0 +1,118 @@
+{
+  "type": "woot:factory",
+  "mob": "minecraft:ender_dragon",
+  "items": [
+    {
+      "item": "minecraft:end_crystal",
+      "count": 4
+    }
+  ],
+  "fluids": [],
+  "drops": [
+    {
+      "item": "minecraft:dragon_egg",
+      "sizes": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "chances": [
+        100.0,
+        100.0,
+        100.0,
+        100.0
+      ]
+    },
+    {
+      "item": "minecraft:dragon_breath",
+      "sizes": [
+        2,
+        4,
+        6,
+        8
+      ],
+      "chances": [
+        100.0,
+        100.0,
+        100.0,
+        100.0
+      ]
+    },
+    {
+      "item": "quark:dragon_scale",
+      "sizes": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "chances": [
+        100.0,
+        100.0,
+        100.0,
+        100.0
+      ]
+    },
+    {
+      "item": "bhc:green_heart",
+      "sizes": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "chances": [
+        100.0,
+        100.0,
+        100.0,
+        100.0
+      ]
+    },
+    {
+      "item": "tetra:dragon_sinew",
+      "sizes": [
+        2,
+        2,
+        2,
+        2
+      ],
+      "chances": [
+        100.0,
+        100.0,
+        100.0,
+        100.0
+      ]
+    },
+    {
+      "item": "draconicevolution:dragon_heart",
+      "sizes": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "chances": [
+        100.0,
+        100.0,
+        100.0,
+        100.0
+      ]
+    },
+    {
+      "item": "draconicevolution:draconium_dust",
+      "sizes": [
+        57,
+        64,
+        71,
+        78
+      ],
+      "chances": [
+        100.0,
+        100.0,
+        100.0,
+        100.0
+      ]
+    }
+  ]
+}

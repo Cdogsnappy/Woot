@@ -18,7 +18,7 @@ import java.util.Map;
  * Currently Forge 6358 causes a NPE when potion effects
  * are applied to FakePlayer
  */
-@Mod.EventBusSubscriber(modid = Woot.MODID, bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = Woot.MODID)
 public class WootFakePlayerFactory {
 
     private static Map<GameProfile, WootFakePlayer> fakePlayers = Maps.newHashMap();

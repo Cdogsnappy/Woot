@@ -8,11 +8,22 @@ import ipsis.woot.modules.factory.FactorySetup;
 import ipsis.woot.policy.PolicyRegistry;
 import ipsis.woot.policy.PolicyConfiguration;
 import ipsis.woot.util.FakeMob;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.CustomData;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -27,7 +38,7 @@ public class MobShardItem extends Item {
     public MobShardItem() { super(new Item.Properties().stacksTo(1)); }
 
     @Override
-    public boolean hitEntity(ItemStack stack, LivingEntity target, LivingEntity attacker) {
+    public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
 
         if (attacker.level().isClientSide || !(attacker instanceof Player))
             return false;
@@ -44,12 +55,12 @@ public class MobShardItem extends Item {
             return false;
 
         if (!PolicyRegistry.get().canCaptureEntity(fakeMob.getResourceLocation()) || !canShardCaptureMob(fakeMob.getResourceLocation())) {
-            ((Player)attacker).sendStatusMessage(new TranslationTextComponent("chat.woot.mobshard.failure"), true);
+            attacker.sendSystemMessage(Component.translatable("chat.woot.mobshard.failure"));
             return false;
         }
 
         setProgrammedMob(stack, fakeMob);
-        ((PlayerEntity)attacker).sendStatusMessage(new TranslationTextComponent("chat.woot.mobshard.success"), true);
+        attacker.sendSystemMessage(Component.translatable("chat.woot.mobshard.success"));
         return true;
 
     }
@@ -77,19 +88,20 @@ public class MobShardItem extends Item {
 
     public static FakeMob getProgrammedMob(ItemStack itemStack) {
         FakeMob fakeMob = new FakeMob();
-        CompoundNBT compoundNBT = itemStack.getOrCreateTag();
-        if (itemStack.getTag().contains(NBT_MOB))
-            fakeMob = new FakeMob(itemStack.getTag().getCompound(NBT_MOB));
+        CompoundTag tag = itemStack.get(DataComponents.CUSTOM_DATA).copyTag();
+        if (tag.contains(NBT_MOB))
+            fakeMob = new FakeMob(tag.getCompound(NBT_MOB));
 
         return fakeMob;
     }
 
     private void setProgrammedMob(ItemStack itemStack, FakeMob fakeMob) {
-        CompoundNBT compoundNBT = itemStack.getOrCreateTag();
-        CompoundNBT mobNbt = new CompoundNBT();
+        CompoundTag mobNbt = new CompoundTag();
         FakeMob.writeToNBT(fakeMob, mobNbt);
-        compoundNBT.put(NBT_MOB, mobNbt);
-        compoundNBT.putInt(NBT_KILLS, 0);
+        itemStack.get(DataComponents.CUSTOM_DATA).update(data -> {
+            data.put(NBT_MOB, mobNbt);
+            data.putInt(NBT_KILLS, 0);
+        });
     }
 
     private static boolean isMatchingMob(ItemStack itemStack, FakeMob fakeMob) {
@@ -107,12 +119,12 @@ public class MobShardItem extends Item {
         return programmedMob.equals(fakeMob);
     }
 
-    public static void handleKill(PlayerEntity playerEntity, FakeMob fakeMob) {
+    public static void handleKill(Player playerEntity, FakeMob fakeMob) {
         ItemStack foundStack = ItemStack.EMPTY;
 
         // Hotbar only
         for (int i = 0; i <= 9; i++) {
-            ItemStack itemStack = playerEntity.inventory.getStackInSlot(i);
+            ItemStack itemStack = playerEntity.getInventory().getItem(i);
             if (!itemStack.isEmpty() && isMatchingMob(itemStack, fakeMob)) {
                 foundStack = itemStack;
                 break;
@@ -121,8 +133,8 @@ public class MobShardItem extends Item {
 
         if (!foundStack.isEmpty()) {
             incrementKills(foundStack, 1);
-            if (isFullyProgrammed(foundStack) && playerEntity instanceof ServerPlayerEntity)
-                Advancements.MOB_CAPTURE_TRIGGER.trigger((ServerPlayerEntity) playerEntity, fakeMob);
+            if (isFullyProgrammed(foundStack) && playerEntity instanceof ServerPlayer)
+                Advancements.MOB_CAPTURE_TRIGGER.trigger((ServerPlayer) playerEntity, fakeMob);
         }
     }
 
@@ -138,16 +150,22 @@ public class MobShardItem extends Item {
         if (!PolicyRegistry.get().canCaptureEntity(fakeMob.getResourceLocation()) || !canShardCaptureMob(fakeMob.getResourceLocation()))
             return;
 
-        int killCount = itemStack.getTag().getInt(NBT_KILLS);
-        if (!isFull(itemStack)) {
-            killCount += v;
-            itemStack.getTag().putInt(NBT_KILLS, killCount);
+        itemStack.get(DataComponents.CUSTOM_DATA).update(data -> {
+            int killCount = data.getInt(NBT_KILLS);
+            if (!isFull(itemStack)) {
+                killCount += v;
+                data.putInt(NBT_KILLS, killCount);
+            }
+        });
+
+        if (isFull(itemStack) && isProgrammed(itemStack)){
+            itemStack.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true);
         }
     }
 
     private static boolean isFull(ItemStack itemStack) {
 
-        int killCount = itemStack.getTag().getInt(NBT_KILLS);
+        int killCount = itemStack.get(DataComponents.CUSTOM_DATA).copyTag().getInt(NBT_KILLS);
         FakeMob fakeMob = getProgrammedMob(itemStack);
         if (!fakeMob.isValid())
             return false;
@@ -160,14 +178,10 @@ public class MobShardItem extends Item {
     }
 
     public static void setJEIEnderShard(ItemStack itemStack) {
-        CompoundNBT nbt = new CompoundNBT();
+        CompoundTag nbt = new CompoundTag();
         nbt.putInt("nbt_jei_shard", 1);
-        itemStack.setTag(nbt);
-    }
-
-    @Override
-    public boolean hasEffect(ItemStack itemStack) {
-        return isFullyProgrammed(itemStack) || itemStack.getTag().contains("nbt_jei_shard");
+        itemStack.set(DataComponents.CUSTOM_DATA, CustomData.of(nbt));
+        itemStack.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true);
     }
 
     /**
@@ -175,31 +189,31 @@ public class MobShardItem extends Item {
      */
     @OnlyIn(Dist.CLIENT)
     @Override
-    public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-        super.addInformation(stack, worldIn, tooltip, flagIn);
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flagIn) {
+        super.appendHoverText(stack, context, tooltip, flagIn);
 
-        tooltip.add(new TranslationTextComponent("info.woot.mobshard.0"));
-        tooltip.add(new TranslationTextComponent("info.woot.mobshard.1"));
-        tooltip.add(new TranslationTextComponent("info.woot.mobshard.2"));
-        tooltip.add(new TranslationTextComponent("info.woot.mobshard.3"));
+        tooltip.add(Component.translatable("info.woot.mobshard.0"));
+        tooltip.add(Component.translatable("info.woot.mobshard.1"));
+        tooltip.add(Component.translatable("info.woot.mobshard.2"));
+        tooltip.add(Component.translatable("info.woot.mobshard.3"));
 
         FakeMob fakeMob = getProgrammedMob(stack);
         if (!fakeMob.isValid()) {
-            tooltip.add(new TranslationTextComponent("info.woot.mobshard.a.0"));
+            tooltip.add(Component.translatable("info.woot.mobshard.a.0"));
             return;
         }
 
-        EntityType<?> entityType = ForgeRegistries.ENTITIES.getValue(fakeMob.getResourceLocation());
+        EntityType<?> entityType = BuiltInRegistries.ENTITY_TYPE.get(fakeMob.getResourceLocation());
         if (entityType != null)
-            tooltip.add(new TranslationTextComponent(entityType.getTranslationKey()));
+            tooltip.add(Component.translatable(entityType.getDescriptionId()));
         if (fakeMob.hasTag())
-            tooltip.add(new StringTextComponent("[" + fakeMob.getTag() + "]"));
+            tooltip.add(Component.translatable("[" + fakeMob.getTag() + "]"));
 
-        int killCount = stack.getTag().getInt(NBT_KILLS);
+        int killCount = stack.get(DataComponents.CUSTOM_DATA).copyTag().getInt(NBT_KILLS);
         if (isFull(stack)) {
-            tooltip.add(new TranslationTextComponent("info.woot.mobshard.a.1"));
+            tooltip.add(Component.translatable("info.woot.mobshard.a.1"));
         } else {
-            tooltip.add(new TranslationTextComponent("info.woot.mobshard.b.0",
+            tooltip.add(Component.translatable("info.woot.mobshard.b.0",
                     killCount,
                     Config.OVERRIDE.getIntegerOrDefault(fakeMob, ConfigOverride.OverrideKey.SHARD_KILLS)));
         }

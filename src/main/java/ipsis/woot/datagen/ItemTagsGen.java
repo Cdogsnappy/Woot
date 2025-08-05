@@ -6,9 +6,12 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.tags.ItemTagsProvider;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.neoforged.neoforge.common.Tags;
+import net.neoforged.neoforge.common.data.BlockTagsProvider;
+import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 
@@ -17,7 +20,7 @@ import java.util.function.Consumer;
 
 public class ItemTagsGen extends ItemTagsProvider {
 
-    public static final ITag.INamedTag<Item> FACTORY_BLOCK = ItemTags.makeWrapperTag(Woot.MODID + ":factory_blocks");
+    public static final TagKey<Item> FACTORY_BLOCK = ItemTags.create(ResourceLocation.parse(Woot.MODID + ":factory_blocks"));
     //public static final ITag.INamedTag<Item> BLACK_DYE = ItemTags.makeWrapperTag("forge:dyes/black");
 
     public static final TagKey<Item> SKULLS = TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "skull"));

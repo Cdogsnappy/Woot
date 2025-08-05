@@ -1,6 +1,10 @@
 package ipsis.woot.modules.factory.blocks;
 
+import ipsis.woot.mod.ModNBT;
 import ipsis.woot.util.FakeMob;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.fluids.FluidStack;
 
@@ -12,12 +16,16 @@ import java.util.List;
 /**
  * Currently running recipe
  */
-public class HeartRecipe {
+public record HeartRecipe (int numTicks, int numUnits, List<ItemStack> recipeItems, List<FluidStack> recipeFluids){
 
-    int numTicks;
-    int numUnits;
-    public List<ItemStack> recipeItems = new ArrayList<>();
-    public List<FluidStack> recipeFluids = new ArrayList<>();
+
+    public static final StreamCodec<RegistryFriendlyByteBuf, HeartRecipe> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.VAR_INT, HeartRecipe::numTicks,
+            ByteBufCodecs.VAR_INT, HeartRecipe::numUnits,
+            ByteBufCodecs.collection(ArrayList::new, ItemStack.STREAM_CODEC), HeartRecipe::recipeItems,
+            ByteBufCodecs.collection(ArrayList::new, FluidStack.STREAM_CODEC), HeartRecipe::recipeFluids,
+            HeartRecipe::new
+    );
 
     public int getNumTicks() {
         return numTicks;
@@ -25,16 +33,6 @@ public class HeartRecipe {
 
     public int getNumUnits() {
         return numUnits;
-    }
-
-    public HeartRecipe() {
-        numTicks = 1;
-        numUnits = 1;
-    }
-
-    public HeartRecipe(int numTicks, int numUnits) {
-        this.numTicks = Math.clamp(numTicks, 1, Integer.MAX_VALUE);
-        this.numUnits = Math.clamp(numUnits, 1, Integer.MAX_VALUE);
     }
 
     public void addItem(ItemStack itemStack) {

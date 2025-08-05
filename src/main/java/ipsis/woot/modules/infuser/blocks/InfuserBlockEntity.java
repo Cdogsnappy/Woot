@@ -1,5 +1,6 @@
 package ipsis.woot.modules.infuser.blocks;
 
+import ipsis.woot.crafting.WootRecipes;
 import ipsis.woot.crafting.infuser.InfuserRecipe;
 import ipsis.woot.mod.ModNBT;
 import ipsis.woot.modules.infuser.InfuserConfiguration;
@@ -7,22 +8,40 @@ import ipsis.woot.modules.infuser.InfuserSetup;
 import ipsis.woot.util.EnchantingHelper;
 import ipsis.woot.util.WootDebug;
 import ipsis.woot.util.WootEnergyStorage;
-import ipsis.woot.util.WootMachineTileEntity;
+import ipsis.woot.util.WootMachineBlockEntity;
 import ipsis.woot.util.oss.OutputOnlyItemStackHandler;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
+import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
+import net.neoforged.neoforge.items.wrapper.CombinedInvWrapper;
 
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
 
-import static ipsis.woot.crafting.infuser.InfuserRecipe.INFUSER_TYPE;
 
-public class InfuserBlockEntity extends WootMachineTileEntity implements WootDebug, NamedContainerProvider {
+public class InfuserBlockEntity extends WootMachineBlockEntity implements WootDebug, MenuProvider {
 
     public InfuserBlockEntity(BlockPos pos, BlockState state) {
         super(InfuserSetup.INFUSER_BLOCK_TILE.get(), pos, state);
@@ -47,7 +66,7 @@ public class InfuserBlockEntity extends WootMachineTileEntity implements WootDeb
     }
 
     public void configureSides() {
-        Direction direction = world.getBlockState(getPos()).get(BlockStateProperties.HORIZONTAL_FACING);
+        Direction direction = level.getBlockState(getBlockPos()).getValue(BlockStateProperties.HORIZONTAL_FACING);
         if (direction == Direction.NORTH) {
             settings.put(Direction.UP, Mode.INPUT);
             settings.put(Direction.DOWN, Mode.OUTPUT);
@@ -86,19 +105,19 @@ public class InfuserBlockEntity extends WootMachineTileEntity implements WootDeb
     private boolean firstTick = true;
 
     @Override
-    public void tick() {
-        if (firstTick && world != null) {
+    public void tick(Level level) {
+        if (firstTick && level != null) {
             // Configure sides needs to access the block state so cannot do onLoad
             configureSides();
             firstTick = false;
         }
 
-        super.tick();
+        super.tick(level);
     }
 
     //-------------------------------------------------------------------------
     //region Tanks
-    private LazyOptional<FluidTank> inputTank = LazyOptional.of(this::createTank);
+    private Optional<FluidTank> inputTank =Optional.of(createTank());
     private FluidTank createTank() {
         return new FluidTank(InfuserConfiguration.INFUSER_TANK_CAPACITY.get(), h -> InfuserRecipe.isValidFluid(h));
     }
@@ -114,7 +133,7 @@ public class InfuserBlockEntity extends WootMachineTileEntity implements WootDeb
 
     //-------------------------------------------------------------------------
     //region Energy
-    private LazyOptional<WootEnergyStorage> energyStorage = LazyOptional.of(this::createEnergy);
+    private Optional<WootEnergyStorage> energyStorage = Optional.of(createEnergy());
     private WootEnergyStorage createEnergy() {
         return new WootEnergyStorage(InfuserConfiguration.INFUSER_MAX_ENERGY.get(), InfuserConfiguration.INFUSER_MAX_ENERGY_RX.get());
     }
@@ -133,88 +152,66 @@ public class InfuserBlockEntity extends WootMachineTileEntity implements WootDeb
     private ItemStackHandler inputSlots;
     private ItemStackHandler outputSlot;
     private ItemStackHandler outputWrappedSlot;
-    private final LazyOptional<IItemHandler> inputSlotHandler = LazyOptional.of(() -> inputSlots);
-    private final LazyOptional<IItemHandler> outputWrappedSlotHandler = LazyOptional.of(() -> outputWrappedSlot);
-    private final LazyOptional<IItemHandler> allSlotHandler = LazyOptional.of(() -> new CombinedInvWrapper(inputSlots, outputSlot));
+    private final Optional<IItemHandler> inputSlotHandler = Optional.of(inputSlots);
+    private final Optional<IItemHandler> outputWrappedSlotHandler = Optional.of(outputWrappedSlot);
+    private final Optional<IItemHandler> allSlotHandler = Optional.of(new CombinedInvWrapper(inputSlots, outputSlot));
     //endregion
 
     //-------------------------------------------------------------------------
     //region NBT
 
     @Override
-    public void deserializeNBT(CompoundNBT compoundNBT) {
-        readFromNBT(compoundNBT);
-        super.deserializeNBT(compoundNBT);
+    public void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        if (tag.contains(ModNBT.INPUT_INVENTORY_TAG))
+            inputSlots.deserializeNBT(registries, tag.getCompound(ModNBT.INPUT_INVENTORY_TAG));
+
+        if (tag.contains(ModNBT.OUTPUT_INVENTORY_TAG))
+            outputSlot.deserializeNBT(registries, tag.getCompound(ModNBT.OUTPUT_INVENTORY_TAG));
+
+        CompoundTag tankTag = tag.getCompound(ModNBT.INPUT_TANK_TAG);
+        inputTank.ifPresent(h -> h.readFromNBT(registries, tankTag));
+
+        CompoundTag energyTag = tag.getCompound(ModNBT.ENERGY_TAG);
+        energyStorage.ifPresent(h -> h.deserializeNBT(registries, energyTag));
+        super.loadAdditional(tag, registries);
     }
 
     @Override
-    public void read(BlockState blockState, CompoundNBT compoundNBT) {
-        readFromNBT(compoundNBT);
-        super.read(blockState, compoundNBT);
-    }
-
-    private void readFromNBT(CompoundNBT compoundNBT) {
-        if (compoundNBT.contains(ModNBT.INPUT_INVENTORY_TAG, Constants.NBT.TAG_LIST))
-            CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.readNBT(
-                    inputSlots, null, compoundNBT.getList(ModNBT.INPUT_INVENTORY_TAG, Constants.NBT.TAG_COMPOUND));
-
-        if (compoundNBT.contains(ModNBT.OUTPUT_INVENTORY_TAG, Constants.NBT.TAG_LIST))
-            CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.readNBT(
-                    outputSlot, null, compoundNBT.getList(ModNBT.OUTPUT_INVENTORY_TAG, Constants.NBT.TAG_COMPOUND));
-
-        CompoundNBT tankTag = compoundNBT.getCompound(ModNBT.INPUT_TANK_TAG);
-        inputTank.ifPresent(h -> h.readFromNBT(tankTag));
-
-        CompoundNBT energyTag = compoundNBT.getCompound(ModNBT.ENERGY_TAG);
-        energyStorage.ifPresent(h -> ((INBTSerializable<CompoundNBT>)h).deserializeNBT(energyTag));
-    }
-
-    @Override
-    public CompoundNBT write(CompoundNBT compoundNBT) {
-
-        compoundNBT.put(ModNBT.INPUT_INVENTORY_TAG,
-                Objects.requireNonNull(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.writeNBT(inputSlots, null)));
-
-        compoundNBT.put(ModNBT.OUTPUT_INVENTORY_TAG,
-                Objects.requireNonNull(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.writeNBT(outputSlot, null)));
+    public void saveAdditional(CompoundTag compoundNBT, HolderLookup.Provider registries) {
+        if(inputSlots != null) {
+            compoundNBT.put(ModNBT.INPUT_INVENTORY_TAG, inputSlots.serializeNBT(registries));
+        }
+        if(outputSlot != null) {
+            compoundNBT.put(ModNBT.OUTPUT_INVENTORY_TAG,
+                    outputSlot.serializeNBT(registries));
+        }
 
         inputTank.ifPresent(h -> {
-            CompoundNBT tankTag = h.writeToNBT(new CompoundNBT());
+            CompoundTag tankTag = h.writeToNBT(registries, new CompoundTag());
             compoundNBT.put(ModNBT.INPUT_TANK_TAG, tankTag);
         });
 
         energyStorage.ifPresent(h -> {
-            CompoundNBT energyTag = ((INBTSerializable<CompoundNBT>)h).serializeNBT();
+            Tag energyTag = h.serializeNBT(registries);
             compoundNBT.put(ModNBT.ENERGY_TAG, energyTag);
         });
 
-        return super.write(compoundNBT);
+        super.saveAdditional(compoundNBT, registries);
     }
     //endregion
 
     //-------------------------------------------------------------------------
     //region IWootDebug
-    @Override
-    public List<String> getDebugText(List<String> debug, ItemUseContext itemUseContext) {
-        debug.add("====> InfuserTileEntity");
-        debug.add("      Tank " + getTankFluid().getTranslationKey() + " " + getTankFluid().getAmount());
-        debug.add("      Energy " + getEnergy());
-        return debug;
-    }
     //endregion
 
     //-------------------------------------------------------------------------
     //region Container
     @Override
-    public ITextComponent getDisplayName() {
-        return new TranslationTextComponent("gui.woot.infuser.name");
+    public Component getDisplayName() {
+        return Component.translatable("gui.woot.infuser.name");
     }
 
-    @Nullable
-    @Override
-    public Container createMenu(int i, PlayerInventory playerInventory, PlayerEntity playerEntity) {
-        return new InfuserContainer(i, world, pos, playerInventory, playerEntity);
-    }
+
     //endregion
 
 
@@ -259,8 +256,8 @@ public class InfuserBlockEntity extends WootMachineTileEntity implements WootDeb
         }
 
         InfuserRecipe finishedRecipe = currRecipe;
-        final int inputSize = finishedRecipe.getIngredient().getMatchingStacks()[0].getCount();
-        final int augmentSize = finishedRecipe.hasAugment() ? finishedRecipe.getAugment().getMatchingStacks()[0].getCount() : 1;
+        final int inputSize = finishedRecipe.getIngredient().getItems()[0].getCount();
+        final int augmentSize = finishedRecipe.hasAugment() ? finishedRecipe.getAugment().getItems()[0].getCount() : 1;
 
         inputSlots.extractItem(INPUT_SLOT, inputSize, false);
         if (finishedRecipe.hasAugment())
@@ -276,7 +273,7 @@ public class InfuserBlockEntity extends WootMachineTileEntity implements WootDeb
 
         outputSlot.insertItem(OUTPUT_SLOT, itemStack, false);
         inputTank.ifPresent(f -> f.drain(finishedRecipe.getFluidInput().getAmount(), IFluidHandler.FluidAction.EXECUTE));
-        markDirty();
+        setChanged();
     }
 
     @Override
@@ -299,7 +296,7 @@ public class InfuserBlockEntity extends WootMachineTileEntity implements WootDeb
             return false;
 
         FluidStack fluidStack = inputTank.map(h ->h.getFluid()).orElse(FluidStack.EMPTY);
-        if (!fluidStack.containsFluid(currRecipe.getFluidInput()))
+        if (!fluidStack.is(currRecipe.getFluidInput().getFluidType()))
             return false;
 
         if (outputSlot.getStackInSlot(OUTPUT_SLOT).isEmpty())
@@ -309,7 +306,7 @@ public class InfuserBlockEntity extends WootMachineTileEntity implements WootDeb
         if (outStack.getCount() == outStack.getMaxStackSize())
             return false;
 
-        if (ItemHandlerHelper.canItemStacksStack(currRecipe.getOutput(), outputSlot.getStackInSlot(OUTPUT_SLOT)))
+        if (ItemStack.isSameItemSameComponents(currRecipe.getOutput(), outputSlot.getStackInSlot(OUTPUT_SLOT)))
             return true;
 
         return false;
@@ -331,7 +328,7 @@ public class InfuserBlockEntity extends WootMachineTileEntity implements WootDeb
             return false;
 
         FluidStack fluidStack = inputTank.map(h ->h.getFluid()).orElse(FluidStack.EMPTY);
-        if (!fluidStack.containsFluid(currRecipe.getFluidInput()))
+        if (!fluidStack.is(currRecipe.getFluidInput().getFluidType()))
             return false;
 
         return true;
@@ -349,19 +346,15 @@ public class InfuserBlockEntity extends WootMachineTileEntity implements WootDeb
             return;
         }
 
-        List<InfuserRecipe> recipes = world.getRecipeManager().getRecipes(
-                INFUSER_TYPE,
-                new Inventory(
-                        inputSlots.getStackInSlot(INPUT_SLOT),
-                        inputSlots.getStackInSlot(AUGMENT_SLOT)),
-                world);
+        List<RecipeHolder<InfuserRecipe>> recipes = level.getRecipeManager().getAllRecipesFor(
+                WootRecipes.INFUSER_TYPE.get());
 
         if (!recipes.isEmpty()) {
             // Already checked for empty so this should always be !empty
             FluidStack fluidStack = inputTank.map(h ->h.getFluid()).orElse(FluidStack.EMPTY);
-            for (InfuserRecipe r : recipes) {
-                if (r.getFluidInput().isFluidEqual(fluidStack)) {
-                        currRecipe = r;
+            for (RecipeHolder<InfuserRecipe> r : recipes) {
+                if (r.value().getFluidInput().is(fluidStack.getFluid())) {
+                        currRecipe = r.value();
                         return;
                 }
             }
@@ -370,28 +363,7 @@ public class InfuserBlockEntity extends WootMachineTileEntity implements WootDeb
         clearRecipe();
     }
 
-    @Nonnull
-    @Override
-    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
-        if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-            if (side == null)
-                // eg. player is in the gui
-                return allSlotHandler.cast();
-            else if (settings.get(side) == Mode.INPUT)
-                return inputSlotHandler.cast();
-            else if (settings.get(side) == Mode.OUTPUT)
-                return outputWrappedSlotHandler.cast();
-            else
-                return allSlotHandler.cast();
-        } else if (cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
-            return inputTank.cast();
-        } else if (cap == CapabilityEnergy.ENERGY) {
-            return energyStorage.cast();
-        }
-        return super.getCapability(cap, side);
-    }
-
-    public void dropContents(World world, BlockPos pos) {
+    public void dropContents(Level level, BlockPos pos) {
 
         List<ItemStack> drops = new ArrayList<>();
         ItemStack itemStack = inputSlots.getStackInSlot(INPUT_SLOT);
@@ -414,4 +386,16 @@ public class InfuserBlockEntity extends WootMachineTileEntity implements WootDeb
         super.dropContents(drops);
     }
 
+    @Override
+    public List<String> getDebugText(List<String> debug, UseOnContext itemUseContext) {
+        debug.add("====> InfuserTileEntity");
+        debug.add("      Tank " + getTankFluid().getDescriptionId() + " " + getTankFluid().getAmount());
+        debug.add("      Energy " + getEnergy());
+        return debug;
+    }
+
+    @Override
+    public @org.jetbrains.annotations.Nullable AbstractContainerMenu createMenu(int i, Inventory inventory, Player player) {
+        return new InfuserMenu(i, level, getBlockPos(), inventory, player);
+    }
 }

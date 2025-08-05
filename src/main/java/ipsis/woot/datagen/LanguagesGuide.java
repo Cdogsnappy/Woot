@@ -2,7 +2,7 @@ package ipsis.woot.datagen;
 
 import ipsis.woot.modules.factory.FactoryConfiguration;
 import ipsis.woot.modules.squeezer.SqueezerConfiguration;
-import net.minecraftforge.common.data.LanguageProvider;
+import net.neoforged.neoforge.common.data.LanguageProvider;
 
 public class LanguagesGuide {
 

@@ -7,8 +7,7 @@ import net.minecraft.world.item.Item;
 
 public class WootItem extends Item {
 
-    public WootItem(Properties properties, String name) {
+    public WootItem(Properties properties) {
         super(properties);
-        setRegistryName(Woot.MODID, name);
     }
 }

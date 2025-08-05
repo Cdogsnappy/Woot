@@ -13,6 +13,10 @@ public class WootEnergyStorage extends EnergyStorage implements IEnergyStorage {
         super(capacity);
     }
 
+    public WootEnergyStorage(int capacity, int maxReceive){
+        super(capacity, maxReceive, capacity, capacity);
+    }
+
     public WootEnergyStorage(int capacity, int maxReceive, int maxExtract, int energy) {
         super(capacity, maxReceive, maxExtract, energy);
     }

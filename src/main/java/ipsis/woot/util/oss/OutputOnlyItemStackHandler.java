@@ -1,7 +1,9 @@
 package ipsis.woot.util.oss;
 
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.items.ItemStackHandler;
+
+
+import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
 

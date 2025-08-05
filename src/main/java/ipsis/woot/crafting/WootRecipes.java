@@ -4,6 +4,7 @@ import ipsis.woot.Woot;
 import ipsis.woot.crafting.anvil.AnvilRecipe;
 import ipsis.woot.crafting.dyesqueezer.DyeSqueezerRecipe;
 import ipsis.woot.crafting.factory.FactoryRecipe;
+import ipsis.woot.crafting.fluidconvertor.FluidConvertorRecipe;
 import ipsis.woot.crafting.infuser.InfuserRecipe;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -53,4 +54,11 @@ public class WootRecipes {
 
     public static final DeferredHolder<RecipeType<?>, RecipeType<InfuserRecipe>> INFUSER_TYPE =
             TYPES.register("infuser", InfuserRecipe.InfuserRecipeType::new);
+
+
+    public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<FluidConvertorRecipe>> FLUID_CONVERTOR_SERIALIZER =
+            SERIALIZERS.register("fluidconvertor", FluidConvertorRecipe.FluidConvertorRecipeType::new);
+
+    public static final DeferredHolder<RecipeType<?>, RecipeType<FluidConvertorRecipe>> FLUID_CONVERTOR_TYPE =
+            TYPES.register("fluidconvertor", FluidConvertorRecipe.FluidConvertorRecipeType::new);
 }

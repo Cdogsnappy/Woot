@@ -5,17 +5,30 @@ import ipsis.woot.modules.infuser.InfuserConfiguration;
 import ipsis.woot.util.WootDebug;
 import ipsis.woot.util.helper.StringHelper;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.phys.BlockHitResult;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.fluids.FluidStack;
@@ -25,55 +38,59 @@ import net.neoforged.neoforge.fluids.FluidUtil;
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class InfuserBlock extends Block implements WootDebug {
+public class InfuserBlock extends Block implements WootDebug, EntityBlock {
 
     public InfuserBlock() {
-        super(Properties.create(Material.IRON).sound(SoundType.METAL).hardnessAndResistance(3.5F));
-        setDefaultState(getStateContainer().getBaseState().with(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH));
+        super(Properties.of().sound(SoundType.METAL).strength(3.5F));
+        registerDefaultState(getStateDefinition().any().setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH));
     }
 
     @Nullable
     @Override
-    public BlockState getStateForPlacement(BlockItemUseContext context) {
-        return this.getDefaultState().with(BlockStateProperties.HORIZONTAL_FACING, context.getPlacementHorizontalFacing().getOpposite());
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        return this.defaultBlockState().setValue(BlockStateProperties.HORIZONTAL_FACING, context.getHorizontalDirection().getOpposite());
     }
 
     @Override
-    protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(BlockStateProperties.HORIZONTAL_FACING);
     }
 
-    @Override
-    public boolean hasTileEntity(BlockState state) {
-        return true;
-    }
 
     @Nullable
     @Override
-    public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-        return new InfuserBlockEntity();
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return new InfuserBlockEntity(pos, state);
     }
 
     @Override
-    public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult blockRayTraceResult) {
-        if (worldIn.isRemote)
-            return ActionResultType.SUCCESS;
+    public ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos,
+                                           Player player, InteractionHand hand, BlockHitResult hitResult) {
 
-        if (!(worldIn.getTileEntity(pos) instanceof InfuserBlockEntity))
+
+        if (!level.isClientSide)
+            return ItemInteractionResult.SUCCESS;
+
+        if (super.useItemOn(stack, state, level, pos,
+                player, hand, hitResult) != ItemInteractionResult.FAIL){
+            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        }
+
+        if (!(level.getBlockEntity(pos) instanceof InfuserBlockEntity))
             throw new IllegalStateException("Tile entity is missing");
 
-        InfuserBlockEntity infuser = (InfuserBlockEntity)worldIn.getTileEntity(pos);
-        ItemStack heldItem = player.getHeldItem(handIn);
+        InfuserBlockEntity infuser = (InfuserBlockEntity)level.getBlockEntity(pos);
+        ItemStack heldItem = player.getItemInHand(hand);
 
         if (FluidUtil.getFluidHandler(heldItem).isPresent()) {
-            return FluidUtil.interactWithFluidHandler(player, handIn, worldIn, pos, null) ? ActionResultType.SUCCESS : ActionResultType.FAIL;
+            return FluidUtil.interactWithFluidHandler(player, hand, level, pos, null) ? ItemInteractionResult.SUCCESS : ItemInteractionResult.FAIL;
         } else  {
             // open the gui
-            if (infuser instanceof INamedContainerProvider)
-                NetworkHooks.openGui((ServerPlayerEntity) player, infuser, infuser.getPos());
+            if (infuser != null)
+                player.openMenu(infuser, infuser.getBlockPos());
             else
                 throw new IllegalStateException("Named container provider is missing");
-            return ActionResultType.SUCCESS;
+            return ItemInteractionResult.SUCCESS;
 
         }
     }

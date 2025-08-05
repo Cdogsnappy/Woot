@@ -1,7 +1,7 @@
 package ipsis.woot.mod;
 
 import ipsis.woot.Woot;
-import net.minecraftforge.fml.loading.FMLPaths;
+import net.neoforged.fml.loading.FMLPaths;
 
 import java.io.File;
 import java.nio.file.Path;

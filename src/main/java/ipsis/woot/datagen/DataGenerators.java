@@ -1,10 +1,10 @@
 package ipsis.woot.datagen;
 
-import net.minecraft.data.BlockTagsProvider;
 import net.minecraft.data.DataGenerator;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.GatherDataEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.common.data.BlockTagsProvider;
+import net.neoforged.neoforge.data.event.GatherDataEvent;
+
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 public class DataGenerators {
@@ -13,9 +13,9 @@ public class DataGenerators {
     public static void gatherData(GatherDataEvent event) {
         DataGenerator generator = event.getGenerator();
         if (event.includeServer()) {
-            generator.addProvider(new Recipes(generator));
+            generator.addProvider(true, new Recipes(generator.getPackOutput(), event.getLookupProvider()));
             BlockTagsProvider blockTagsProvider = new BlockTagsGen(generator, event.getExistingFileHelper());
-            generator.addProvider(blockTagsProvider);
+            generator.addProvider(true, blockTagsProvider);
             generator.addProvider(new ItemTagsGen(generator, blockTagsProvider, event.getExistingFileHelper()));
             generator.addProvider(new Advancements(generator));
         }

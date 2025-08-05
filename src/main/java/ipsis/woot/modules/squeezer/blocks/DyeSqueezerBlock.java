@@ -3,7 +3,6 @@ package ipsis.woot.modules.squeezer.blocks;
 import ipsis.woot.modules.debug.items.DebugItem;
 import ipsis.woot.modules.squeezer.SqueezerConfiguration;
 import ipsis.woot.util.WootDebug;
-import ipsis.woot.util.helper.PlayerHelper;
 import ipsis.woot.util.helper.StringHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -18,7 +17,6 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 import javax.annotation.Nullable;
 import java.util.List;
-import java.util.Properties;
 
 public class DyeSqueezerBlock extends Block implements WootDebug {
 
@@ -42,7 +40,7 @@ public class DyeSqueezerBlock extends Block implements WootDebug {
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState blockState) {
-        return new DyeSqueezerTileEntity(pos, blockState);
+        return new DyeSqueezerBlockEntity(pos, blockState);
     }
 
     @Override
@@ -50,10 +48,10 @@ public class DyeSqueezerBlock extends Block implements WootDebug {
         if (world.isRemote)
             return ActionResultType.SUCCESS;
 
-        if (!(world.getTileEntity(pos) instanceof DyeSqueezerTileEntity))
+        if (!(world.getTileEntity(pos) instanceof DyeSqueezerBlockEntity))
             throw new IllegalStateException("Tile entity is missing");
 
-        DyeSqueezerTileEntity squeezer = (DyeSqueezerTileEntity)world.getTileEntity(pos);
+        DyeSqueezerBlockEntity squeezer = (DyeSqueezerBlockEntity)world.getTileEntity(pos);
         ItemStack heldItem = playerEntity.getHeldItem(hand);
 
         if (FluidUtil.getFluidHandler(heldItem).isPresent())
@@ -79,8 +77,8 @@ public class DyeSqueezerBlock extends Block implements WootDebug {
     public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
         if (state.getBlock() != newState.getBlock()) {
             TileEntity te = worldIn.getTileEntity(pos);
-            if (te instanceof DyeSqueezerTileEntity)
-                ((DyeSqueezerTileEntity) te).dropContents(worldIn, pos);
+            if (te instanceof DyeSqueezerBlockEntity)
+                ((DyeSqueezerBlockEntity) te).dropContents(worldIn, pos);
             super.onReplaced(state, worldIn, pos, newState, isMoving);
         }
     }

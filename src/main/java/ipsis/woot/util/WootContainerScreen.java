@@ -6,9 +6,12 @@ import com.mojang.blaze3d.vertex.BufferBuilder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 
+import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.neoforged.neoforge.fluids.FluidStack;
@@ -18,93 +21,93 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public abstract class WootContainerScreen<T extends AbstractContainerMenu> extends Screen {
+public abstract class WootContainerScreen<T extends AbstractContainerMenu> extends AbstractContainerScreen<T> {
 
-    public WootContainerScreen(Component name) {
-        super(name);
+    public WootContainerScreen(T menu, Inventory playerInventory, Component name) {
+        super(menu, playerInventory, name);
     }
 
     /**
      * x1, y1 is the bottom right of the energy bar
      */
-    public void renderEnergyBar(GuiGraphics matrixStack, int x1, int y1, int height, int width, int curr, int max) {
+    public void renderEnergyBar(GuiGraphics guiGraphics, int x1, int y1, int height, int width, int curr, int max) {
         int filled = 0;
         if (max > 0)
             filled = curr * 100 / max;
         filled = Math.clamp(filled, 0, 100);
         int h = filled * height / 100;
-        fill(matrixStack,
-                guiLeft + x1,
-             guiTop + y1 - h + 1,
-             guiLeft + x1 + width,
-             guiTop + y1 + 1, 0xffff0000);
+        guiGraphics.fill(this.getRectangle().left() + x1,
+                this.getRectangle().top() + y1 - h + 1,
+                this.getRectangle().left() + x1 + width,
+                this.getRectangle().top() + y1 + 1, 0xffff0000);
     }
 
     /**
      * x1, y1 is the bottom right of the fluid tank
      */
-    public void renderFluidTank(int x1, int y1, int height, int width, int curr, int max, FluidStack fluidStack)  {
+    public void renderFluidTank(GuiGraphics guiGraphics, int x1, int y1, int height, int width, int curr, int max, FluidStack fluidStack)  {
         int filled = 0;
         if (max > 0)
             filled = curr * 100 / max;
         filled = Math.clamp(filled, 0, 100);
         int h = filled * height / 100;
-        drawFluid(this.getRectangle().left() + x1, getRectangle().top() + y1 - h + 1, fluidStack, width,  h);
+        drawFluid(guiGraphics, this.getRectangle().left() + x1, getRectangle().top() + y1 - h + 1, fluidStack, width,  h);
     }
 
-    public void renderFluidTank(MatrixStack matrixStack, int x1, int y1, int height, int width, int max, FluidStack fluidStack)  {
+    public void renderFluidTank(GuiGraphics guiGraphics, int x1, int y1, int height, int width, int max, FluidStack fluidStack)  {
         int filled = 0;
         if (max > 0)
             filled = fluidStack.getAmount() * 100 / max;
-        filled = MathHelper.clamp(filled, 0, 100);
+        filled = Math.clamp(filled, 0, 100);
         int h = filled * height / 100;
-        drawFluid(guiLeft + x1, guiTop + y1 - h + 1, fluidStack, width,  h);
+        drawFluid(guiGraphics, this.getRectangle().left() + x1, this.getRectangle().top() + y1 - h + 1, fluidStack, width,  h);
     }
 
-    public void renderHorizontalBar(MatrixStack matrixStack, int x1, int y1, int x2, int y2, int curr, int max, int color) {
+    public void renderHorizontalBar(GuiGraphics guiGraphics, int x1, int y1, int x2, int y2, int curr, int max, int color) {
         int filled = 0;
         if (max > 0)
             filled = curr * max / 100;
-        filled = MathHelper.clamp(filled, 0, 100);
+        filled = Math.clamp(filled, 0, 100);
         int l = filled * (x2 - x1) / 100;
-        fill(matrixStack, guiLeft + x1, guiTop + y2,
-                guiLeft + x2 + l, guiTop + y2, color);
+        ScreenRectangle rect = this.getRectangle();
+        guiGraphics.fill(rect.left() + x1, rect.top() + y2,
+                rect.left() + x2 + l, rect.top() + y2, color);
     }
 
-    public void renderHorizontalGauge(MatrixStack matrixStack, int x1, int y1, int x2, int y2, int curr, int max, int color) {
-        fill(matrixStack, guiLeft + x1, guiTop + y1, guiLeft + x2, guiTop + y2, color);
+    public void renderHorizontalGauge(GuiGraphics guiGraphics, int x1, int y1, int x2, int y2, int curr, int max, int color) {
+        ScreenRectangle rect = this.getRectangle();
+        guiGraphics.fill(rect.left() + x1, rect.top() + y1, rect.left() + x2, rect.top() + y2, color);
 
         if (max > 0) {
             int p = curr * (x2 - x1) / max;
             for (int i = 0; i < p; i++)
-                vLine(
-                        matrixStack,
-                        guiLeft + x1 + 1 + i,
-                        guiTop + y1,
-                        guiTop + y2 - 1,
+                guiGraphics.vLine(
+                        rect.left() + x1 + 1 + i,
+                        rect.top() + y1,
+                        rect.top() + y2 - 1,
                         i % 2 == 0 ? color : 0xff000000);
         }
     }
 
-    public void renderFluidTankTooltip(MatrixStack matrixStack, int mouseX, int mouseY, FluidStack fluidStack, int capacity) {
-        List<ITextComponent> tooltip = new ArrayList<>();
+    public void renderFluidTankTooltip(GuiGraphics guiGraphics, int mouseX, int mouseY, FluidStack fluidStack, int capacity) {
+        List<Component> tooltip = new ArrayList<>();
         if (!fluidStack.isEmpty()) {
-            tooltip.add(fluidStack.getDisplayName());
-            tooltip.add(new StringTextComponent(String.format("%d/%d mb", fluidStack.getAmount(), capacity)));
+            tooltip.add(fluidStack.getHoverName());
+            tooltip.add(Component.literal(String.format("%d/%d mb", fluidStack.getAmount(), capacity)));
         } else {
-            tooltip.add(new StringTextComponent(String.format("0/%d mb", capacity)));
+            tooltip.add(Component.literal(String.format("0/%d mb", capacity)));
         }
-        func_243308_b(matrixStack, tooltip, mouseX, mouseY);
+        guiGraphics.renderComponentTooltip(this.font, tooltip, mouseX, mouseY);
     }
 
-    public void renderEnergyTooltip(MatrixStack matrixStack, int mouseX, int mouseY, int curr, int capacity, int rate) {
-        List<ITextComponent> tooltip = Arrays.asList(
-                new StringTextComponent(String.format("%d/%d RF", curr, capacity)),
-                new StringTextComponent( String.format("%d RF/tick", rate)));
-        func_243308_b(matrixStack, tooltip, mouseX, mouseY);
+    public void renderEnergyTooltip(GuiGraphics guiGraphics, int mouseX, int mouseY, int curr, int capacity, int rate) {
+        List<Component> tooltip = Arrays.asList(
+                Component.literal(String.format("%d/%d RF", curr, capacity)),
+                Component.literal( String.format("%d RF/tick", rate)));
+        guiGraphics.renderComponentTooltip(this.font, tooltip, mouseX, mouseY);
     }
 
-    public void drawFluid(int x, int y, FluidStack fluid, int width, int height) {
+    public void drawFluid(GuiGraphics guiGraphics, int x, int y, FluidStack fluid, int width, int height) {
 
         if (fluid == null)
             return;
@@ -112,9 +115,9 @@ public abstract class WootContainerScreen<T extends AbstractContainerMenu> exten
         Minecraft.getInstance().getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
         int color = fluid.getFluid().getAttributes().getColor(fluid);
         setGLColorFromInt(color);
-        ResourceLocation resourceLocation = fluid.getFluid().getAttributes().getStillTexture();
+        ResourceLocation resourceLocation = fluid.getFluid().;
         TextureAtlasSprite textureAtlasSprite = Minecraft.getInstance().getAtlasSpriteGetter(AtlasTexture.LOCATION_BLOCKS_TEXTURE).apply(resourceLocation);
-        drawTiledTexture(x, y, textureAtlasSprite, width, height);
+        drawTiledTexture(guiGraphics, x, y, textureAtlasSprite, width, height);
     }
 
     private void setGLColorFromInt(int color) {
@@ -122,10 +125,10 @@ public abstract class WootContainerScreen<T extends AbstractContainerMenu> exten
         float green = (float)(color >> 8 & 255) / 255.0F;
         float blue = (float)(color & 255) / 255.0F;
         float alpha = (float)(color >> 24 & 255) / 255.0F;
-        GlStateManager.color4f(red, green, blue, alpha);
+        GlStateManager._clearColor(red, green, blue, alpha);
     }
 
-    private void drawTiledTexture(int x, int y, TextureAtlasSprite icon, int width, int height) {
+    private void drawTiledTexture(GuiGraphics guiGraphics, int x, int y, TextureAtlasSprite icon, int width, int height) {
         int i;
         int j;
         int drawHeight;
@@ -135,28 +138,32 @@ public abstract class WootContainerScreen<T extends AbstractContainerMenu> exten
             for (j = 0; j < height; j += 16) {
                 drawWidth = Math.min(width - i, 16);
                 drawHeight = Math.min(height - j, 16);
-                drawScaledTexturedModelRectFromIcon(x + i, y + j, icon, drawWidth, drawHeight);
+                drawScaledTexturedModelRectFromIcon(guiGraphics,x + i, y + j, icon, drawWidth, drawHeight);
             }
         }
-        GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager._clearColor(1.0F, 1.0F, 1.0F, 1.0F);
     }
 
-    public void drawScaledTexturedModelRectFromIcon(int x, int y, TextureAtlasSprite icon, int width, int height) {
+    public void drawScaledTexturedModelRectFromIcon(GuiGraphics guiGraphics, int x, int y, TextureAtlasSprite icon, int width, int height) {
 
         if (icon == null) {
             return;
         }
-        float minU = icon.getMinU();
-        float maxU = icon.getMaxU();
-        float minV = icon.getMinV();
-        float maxV = icon.getMaxV();
+        float minU = icon.getU0();
+        float maxU = icon.getU1();
+        float minV = icon.getV0();
+        float maxV = icon.getV1();
 
-        BufferBuilder buffer = Tessellator.getInstance().getBuffer();
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-        buffer.pos(x, y + height, this.itemRenderer.zLevel).tex(minU, minV + (maxV - minV) * height / 16F).endVertex();
-        buffer.pos(x + width, y + height, this.itemRenderer.zLevel).tex(minU + (maxU - minU) * width / 16F, minV + (maxV - minV) * height / 16F).endVertex();
-        buffer.pos(x + width, y, this.itemRenderer.zLevel).tex(minU + (maxU - minU) * width / 16F, minV).endVertex();
-        buffer.pos(x, y, this.itemRenderer.zLevel).tex(minU, minV).endVertex();
-        Tessellator.getInstance().draw();
+        float u1 = minU + (maxU - minU) * width / 16F;
+        float v1 = minV + (maxV - minV) * height / 16F;
+
+        guiGraphics.blit(
+                icon.atlasLocation(),  // Resource location of the texture atlas
+                x, y,                  // x, y position
+                0,                     // z level (usually 0 for GUI elements)
+                minU, minV,           // starting UV coordinates
+                width, height,        // width and height to render
+                icon.contents().width(), icon.contents().height()  // texture width and height
+        );
     }
 }

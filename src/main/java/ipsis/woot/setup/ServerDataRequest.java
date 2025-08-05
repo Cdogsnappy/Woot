@@ -8,6 +8,7 @@ import ipsis.woot.modules.oracle.network.SimulatedMobDropsSummaryReply;
 import ipsis.woot.modules.oracle.network.SimulatedMobsReply;
 import ipsis.woot.util.oss.NetworkTools;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -28,7 +29,7 @@ import java.util.function.Supplier;
 public record ServerDataRequest(String s, BlockPos pos, int requestType) implements CustomPacketPayload{
 
 
-    public static final StreamCodec STREAM_CODEC = StreamCodec.composite(
+    public static final StreamCodec<RegistryFriendlyByteBuf, ServerDataRequest> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.STRING_UTF8, ServerDataRequest::s,
             BlockPos.STREAM_CODEC, ServerDataRequest::pos,
             ByteBufCodecs.VAR_INT, ServerDataRequest::requestType,

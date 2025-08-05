@@ -19,14 +19,10 @@ import ipsis.woot.modules.squeezer.SqueezerSetup;
 import ipsis.woot.modules.squeezer.client.DyeSqueezerScreen;
 import ipsis.woot.modules.squeezer.client.EnchantSqueezerScreen;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.ScreenManager;
-import net.minecraft.client.renderer.color.ItemColors;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.ColorHandlerEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.client.registry.ClientRegistry;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraft.client.color.item.ItemColors;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+
 
 @Mod.EventBusSubscriber(modid = Woot.MODID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ClientRegistration {
@@ -47,8 +43,8 @@ public class ClientRegistration {
     @SubscribeEvent
     public static void registerItemColors(ColorHandlerEvent.Item event) {
         Woot.setup.getLogger().debug("registerItemColors");
-        ItemColors items = event.getItemColors();
-        items.register((s, t) -> ((DyePlateItem)s.getItem()).getColor().getColorValue(), InfuserSetup.WHITE_DYE_PLATE_ITEM.get());
+        ItemColors items = event.get;
+        items.register((s, t) -> ((DyePlateItem)s.getItem()).getColor()., InfuserSetup.WHITE_DYE_PLATE_ITEM.get());
         items.register((s, t) -> ((DyePlateItem)s.getItem()).getColor().getColorValue(), InfuserSetup.ORANGE_DYE_PLATE_ITEM.get());
         items.register((s, t) -> ((DyePlateItem)s.getItem()).getColor().getColorValue(), InfuserSetup.MAGENTA_DYE_PLATE_ITEM.get());
         items.register((s, t) -> ((DyePlateItem)s.getItem()).getColor().getColorValue(), InfuserSetup.LIGHT_BLUE_DYE_PLATE_ITEM.get());

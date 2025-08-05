@@ -152,7 +152,7 @@ public class CalculatorVersion2 {
         actualSpawnTicks = calcSpawnTick(actualSpawnTicks, baseSpawnTicks, setup);
         LOGGER.debug("Calculator actualSpawnTick:{}", actualSpawnTicks);
 
-        HeartRecipe recipe = new HeartRecipe(actualSpawnTicks, fluidCost);
+        HeartRecipe recipe = new HeartRecipe( Math.clamp(actualSpawnTicks, 1, Integer.MAX_VALUE), Math.clamp(fluidCost, 1, Integer.MAX_VALUE), new ArrayList<>(), new ArrayList<>());
 
         /**
          * Recipe ingredients
@@ -166,8 +166,8 @@ public class CalculatorVersion2 {
 
             for (FactoryRecipe factoryRecipe : recipes) {
                 if (factoryRecipe.getFakeMob().equals(fakeMob)) {
-                    List<ItemStack> recipeItems = getRecipeItems(fakeMob, factoryRecipe.getItems(), setup);
-                    List<FluidStack> recipeFluids = getRecipeFluids(fakeMob, factoryRecipe.getFluids(), setup);
+                    List<ItemStack> recipeItems = getRecipeItems(fakeMob, (NonNullList<ItemStack>) factoryRecipe.getItems(), setup);
+                    List<FluidStack> recipeFluids = getRecipeFluids(fakeMob, (NonNullList<FluidStack>) factoryRecipe.getFluids(), setup);
                     recipeItems.forEach(i -> recipe.addItem(i.copy()));
                     recipeFluids.forEach(i -> recipe.addFluid(i.copy()));
                     break;

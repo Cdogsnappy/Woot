@@ -127,10 +127,10 @@ public class OracleScreen extends AbstractContainerScreen<OracleContainer> {
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float v, int i, int i1) {
         guiGraphics.setColor(1.0F, 1.0F, 1.0F, 1.0F);
-        getMinecraft().getTextureManager().bindForSetup(GUI);
+        getMinecraft().getTextureManager().getTexture(GUI).bind();
         int relX = (this.width - this.imageWidth) / 2;
         int relY = (this.height - this.imageHeight) / 2;
-        guiGraphics.blit(relX, relY, 0, imageWidth, imageHeight);
+        guiGraphics.blit(GUI, relX, relY,0, 0.0F, 0.0F, imageWidth, imageHeight, 32, 32);
 
         if (!menu.simulatedDrops.isEmpty()) {
             int currRow = 0;
@@ -140,9 +140,7 @@ public class OracleScreen extends AbstractContainerScreen<OracleContainer> {
                 int stackX = leftPos + (currCol * 18) + 10;
                 int stackY = topPos + (currRow * 18) + 41;
 
-                RenderHelper.enableStandardItemLighting();
-                itemRenderer.renderItemIntoGUI(summary.itemStack, stackX, stackY);
-                RenderHelper.disableStandardItemLighting();
+                guiGraphics.renderItem(summary.stack(), stackX, stackY);
 
                 currCol++;
                 if (currCol == 9) {

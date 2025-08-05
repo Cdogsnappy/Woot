@@ -34,7 +34,7 @@ public class FakeMob {
     private String tag;
     private String name;
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, FakeMob> STREAM_CODEC = StreamCodec.composite(
+    public static final StreamCodec<FriendlyByteBuf, FakeMob> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.STRING_UTF8, FakeMob::getEntityKey,
             ByteBufCodecs.STRING_UTF8, FakeMob::getTag,
             FakeMob::new

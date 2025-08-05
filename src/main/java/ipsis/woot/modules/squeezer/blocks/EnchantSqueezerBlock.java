@@ -42,7 +42,7 @@ public class EnchantSqueezerBlock extends Block implements WootDebug {
     @Nullable
     @Override
     public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-        return new EnchantSqueezerTileEntity();
+        return new EnchantSqueezerBlockEntity();
     }
 
     @Override
@@ -50,10 +50,10 @@ public class EnchantSqueezerBlock extends Block implements WootDebug {
         if (world.isRemote)
             return ActionResultType.SUCCESS;
 
-        if (!(world.getTileEntity(pos) instanceof EnchantSqueezerTileEntity))
+        if (!(world.getTileEntity(pos) instanceof EnchantSqueezerBlockEntity))
             throw new IllegalStateException("Tile entity is missing");
 
-        EnchantSqueezerTileEntity squeezer = (EnchantSqueezerTileEntity) world.getTileEntity(pos);
+        EnchantSqueezerBlockEntity squeezer = (EnchantSqueezerBlockEntity) world.getTileEntity(pos);
         ItemStack heldItem = playerEntity.getHeldItem(hand);
 
         if (FluidUtil.getFluidHandler(heldItem).isPresent())
@@ -72,8 +72,8 @@ public class EnchantSqueezerBlock extends Block implements WootDebug {
     public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
         if (state.getBlock() != newState.getBlock()) {
             TileEntity te = worldIn.getTileEntity(pos);
-            if (te instanceof EnchantSqueezerTileEntity)
-                ((EnchantSqueezerTileEntity) te).dropContents(worldIn, pos);
+            if (te instanceof EnchantSqueezerBlockEntity)
+                ((EnchantSqueezerBlockEntity) te).dropContents(worldIn, pos);
             super.onReplaced(state, worldIn, pos, newState, isMoving);
         }
     }
