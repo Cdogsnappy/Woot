@@ -6,11 +6,16 @@ import ipsis.woot.Woot;
 import ipsis.woot.modules.infuser.InfuserConfiguration;
 import ipsis.woot.modules.infuser.blocks.InfuserMenu;
 import ipsis.woot.util.WootContainerScreen;
+import ipsis.woot.util.helper.RenderHelper;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
 
 
 public class InfuserScreen extends WootContainerScreen<InfuserMenu> {
 
-    private ResourceLocation GUI = new ResourceLocation(Woot.MODID, "textures/gui/infuser.png");
+    private ResourceLocation GUI = ResourceLocation.fromNamespaceAndPath(Woot.MODID, "textures/gui/infuser.png");
 
     private static final int GUI_XSIZE = 180;
     private static final int GUI_YSIZE = 177;
@@ -29,55 +34,56 @@ public class InfuserScreen extends WootContainerScreen<InfuserMenu> {
     private static final int TANK_WIDTH = TANK_RX - TANK_LX + 1;
     private static final int TANK_HEIGHT = TANK_RY - TANK_LY + 1;
 
-    public InfuserScreen(InfuserMenu container, PlayerInventory playerInventory, ITextComponent name) {
+    public InfuserScreen(InfuserMenu container, Inventory playerInventory, Component name) {
         super(container, playerInventory, name);
-        xSize = GUI_XSIZE;
-        ySize = GUI_YSIZE;
-        playerInventoryTitleY = ySize - 94;
+        imageWidth = GUI_XSIZE;
+        imageHeight = GUI_YSIZE;
+        inventoryLabelY = imageHeight - 94;
     }
 
-    @Override
-    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-        this.renderBackground(matrixStack);
-        super.render(matrixStack, mouseX, mouseY, partialTicks);
-        this.renderHoveredTooltip(matrixStack, mouseX, mouseY);
+    
 
-        if (isPointInRegion(TANK_LX, TANK_LY, TANK_WIDTH, TANK_HEIGHT, mouseX, mouseY))
-            renderFluidTankTooltip(matrixStack, mouseX, mouseY, container.getInputFluid(),
+    @Override
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+        this.renderBg(guiGraphics, partialTicks, mouseX, mouseY);
+        super.render(guiGraphics, mouseX, mouseY, partialTicks);
+        this.renderTooltip(guiGraphics, mouseX, mouseY);
+
+        if (RenderHelper.isPointInRegion(TANK_LX, TANK_LY, TANK_WIDTH, TANK_HEIGHT, mouseX, mouseY, getGuiLeft(), getGuiTop()))
+            renderFluidTankTooltip(guiGraphics, mouseX, mouseY, menu.getInputFluid(),
                     InfuserConfiguration.INFUSER_TANK_CAPACITY.get());
-        if (isPointInRegion(ENERGY_LX, ENERGY_LY, ENERGY_WIDTH, ENERGY_HEIGHT, mouseX, mouseY))
-            renderEnergyTooltip(matrixStack, mouseX, mouseY, container.getEnergy(),
+        if (RenderHelper.isPointInRegion(ENERGY_LX, ENERGY_LY, ENERGY_WIDTH, ENERGY_HEIGHT, mouseX, mouseY, getGuiLeft(), getGuiTop()))
+            renderEnergyTooltip(guiGraphics, mouseX, mouseY, menu.getEnergy(),
                     InfuserConfiguration.INFUSER_MAX_ENERGY.get(), InfuserConfiguration.INFUSER_ENERGY_PER_TICK.get());
     }
 
     @Override
-    protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY) {
-        GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-        getMinecraft().getTextureManager().bindTexture(GUI);
-        int relX = (this.width - this.xSize) / 2;
-        int relY = (this.height - this.ySize) / 2;
-        this.blit(matrixStack, relX, relY, 0, 0, this.xSize, this.ySize);
+    protected void renderBg(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
+        guiGraphics.setColor(1.0F, 1.0F, 1.0F, 1.0F);
+        int relX = (this.width - this.imageWidth) / 2;
+        int relY = (this.height - this.imageHeight) / 2;
+        guiGraphics.blit(GUI, relX, relY, 0, 0, this.imageWidth, this.imageHeight);
 
         // Progress
-        int progress = container.getProgress();
-        this.blit(matrixStack, this.guiLeft + 90, this.guiTop + 39, 180, 0,(int)(18 * (progress / 100.0F)) , 17);
+        int progress = menu.getProgress();
+        guiGraphics.blit(GUI, getGuiLeft() + 90, getGuiTop() + 39, 180, 0,(int)(18 * (progress / 100.0F)) , 17);
 
         renderEnergyBar(
-                matrixStack,
+                guiGraphics,
                 ENERGY_LX,
                 ENERGY_RY,
                 ENERGY_HEIGHT,
                 ENERGY_WIDTH,
-                container.getEnergy(), InfuserConfiguration.INFUSER_MAX_ENERGY.get());
+                menu.getEnergy(), InfuserConfiguration.INFUSER_MAX_ENERGY.get());
 
         renderFluidTank(
-                matrixStack,
+                guiGraphics,
                 TANK_LX,
                 TANK_RY,
                 TANK_HEIGHT,
                 TANK_WIDTH,
                 InfuserConfiguration.INFUSER_TANK_CAPACITY.get(),
-                container.getInputFluid());
+                menu.getInputFluid());
 
     }
 }

@@ -3,6 +3,7 @@ package ipsis.woot.crafting.fluidconvertor;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import ipsis.woot.Woot;
+import ipsis.woot.crafting.WootRecipes;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -16,12 +17,10 @@ import net.neoforged.neoforge.fluids.FluidStack;
 
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import static ipsis.woot.crafting.fluidconvertor.FluidConvertorRecipeBuilder.SERIALIZER;
 
-public record FluidConvertorRecipe (Ingredient catalyst, int catalystCount, FluidStack inputFluid, FluidStack outputFluid, int energy) implements Recipe<RecipeInput> {
+public record FluidConvertorRecipe (Ingredient catalyst, int catalystCount, FluidStack inputFluid, FluidStack outputFluid, int energy) implements Recipe<ConvertorRecipeInput> {
 
     public Ingredient getCatalyst() { return this.catalyst; }
     public int getCatalystCount() { return this.catalystCount; }
@@ -88,18 +87,18 @@ public record FluidConvertorRecipe (Ingredient catalyst, int catalystCount, Flui
 
 
     @Override
-    public boolean matches(RecipeInput recipeInput, Level level) {
-        return catalyst.test(recipeInput.getItem(0));
+    public boolean matches(ConvertorRecipeInput recipeInput, Level level) {
+        return catalyst.test(recipeInput.getItem(0)) && recipeInput.getFluidStack().is(inputFluid.getFluidType());
     }
 
     @Override
-    public ItemStack assemble(RecipeInput recipeInput, HolderLookup.Provider provider) {
+    public ItemStack assemble(ConvertorRecipeInput recipeInput, HolderLookup.Provider provider) {
         return null;
     }
 
     @Override
     public boolean canCraftInDimensions(int i, int i1) {
-        return false;
+        return true;
     }
 
     @Override
@@ -141,12 +140,12 @@ public record FluidConvertorRecipe (Ingredient catalyst, int catalystCount, Flui
 
     @Override
     public RecipeSerializer<?> getSerializer() {
-        return SERIALIZER;
+        return WootRecipes.FLUID_CONVERTOR_SERIALIZER.get();
     }
 
     @Override
     public RecipeType<?> getType() {
-        return type;
+        return WootRecipes.FLUID_CONVERTOR_TYPE.get();
     }
 
 }

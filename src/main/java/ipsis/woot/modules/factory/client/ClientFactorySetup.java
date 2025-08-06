@@ -1,23 +1,17 @@
 package ipsis.woot.modules.factory.client;
 
-import io.netty.buffer.ByteBuf;
 import ipsis.woot.modules.factory.Exotic;
 import ipsis.woot.modules.factory.MobParam;
 import ipsis.woot.modules.factory.perks.Perk;
 import ipsis.woot.modules.factory.Tier;
+import ipsis.woot.util.ExtraWootCodecs;
 import ipsis.woot.util.FakeMob;
-import ipsis.woot.util.NetworkHelper;
-import ipsis.woot.util.oss.NetworkTools;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.codec.StreamEncoder;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.fluids.FluidStack;
-import org.checkerframework.checker.units.qual.K;
 
-import java.rmi.registry.Registry;
 import java.util.*;
 
 public class ClientFactorySetup {
@@ -51,37 +45,21 @@ public class ClientFactorySetup {
 
 
     public List<ItemStack> itemIng = new ArrayList<>();
-    public static final StreamCodec<RegistryFriendlyByteBuf, List<ItemStack>> ITEM_LIST_CODEC = ByteBufCodecs.collection(
-            ArrayList::new, ItemStack.STREAM_CODEC);
+
 
     public List<FluidStack> fluidIng = new ArrayList<>();
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, List<FluidStack>> FLUID_LIST_CODEC = ByteBufCodecs.collection(
-            ArrayList::new, FluidStack.STREAM_CODEC);
 
     private ClientFactorySetup() {}
 
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, HashMap<FakeMob, Mob>> MAP_CODEC =
-            StreamCodec.of(
-                    (buf, map) -> {
-                        buf.writeVarInt(map.size());
-                        map.forEach((key, value) -> {
-                            FakeMob.STREAM_CODEC.encode(buf, key);
-                            Mob.STREAM_CODEC.encode(buf, value);
-                        });
-                    },
-                    (buf) -> {
-                        int size = buf.readVarInt();
-                        HashMap<FakeMob, Mob> map = new HashMap<>(size);
-                        for (int i = 0; i < size; i++) {
-                            FakeMob key = FakeMob.STREAM_CODEC.decode(buf);
-                            Mob value = Mob.STREAM_CODEC.decode(buf);
-                            map.put(key, value);
-                        }
-                        return map;
-                    }
-            );
+
+    public static final StreamCodec<RegistryFriendlyByteBuf, HashMap<FakeMob, ClientFactorySetup.Mob>> MAP_CODEC =
+            ExtraWootCodecs.mapStreamCodec(FakeMob.STREAM_CODEC, ClientFactorySetup.Mob.STREAM_CODEC, HashMap::new);
+
+    public static final StreamCodec<RegistryFriendlyByteBuf, HashMap<FakeMob, MobParam>> PARAM_MAP_CODEC =
+            ExtraWootCodecs.mapStreamCodec(FakeMob.STREAM_CODEC, MobParam.STREAM_CODEC, HashMap::new);
+
 
     public static final StreamCodec<RegistryFriendlyByteBuf, ClientFactorySetup> STREAM_CODEC =
             StreamCodec.of(
@@ -95,7 +73,7 @@ public class ClientFactorySetup {
                         buf.writeInt(data.shardRolls);
                         buf.writeDouble(data.shardDropChance);
                         buf.writeArray(Arrays.stream(data.shardDrops).boxed().toArray(Double[]::new), ByteBufCodecs.DOUBLE);
-                        buf.writeMap(data.mobParams, FakeMob.STREAM_CODEC, MobParam.STREAM_CODEC);
+                        PARAM_MAP_CODEC.encode(buf, data.mobParams);
                         MAP_CODEC.encode(buf, data.mobInfo);
                         buf.writeBoolean(data.perkCapped);
                         buf.writeVarInt(data.perks.size());
@@ -103,8 +81,8 @@ public class ClientFactorySetup {
                             buf.writeVarInt(p.ordinal());
                         });
 
-                        ITEM_LIST_CODEC.encode(buf, data.itemIng);
-                        FLUID_LIST_CODEC.encode(buf, data.fluidIng);
+                        ExtraWootCodecs.ITEM_LIST_CODEC.encode(buf, data.itemIng);
+                        ExtraWootCodecs.FLUID_LIST_CODEC.encode(buf, data.fluidIng);
 
                     },
                     (buf) -> {
@@ -122,7 +100,7 @@ public class ClientFactorySetup {
                         factorySetup.shardDrops[0] = buf.readDouble();
                         factorySetup.shardDrops[1] = buf.readDouble();
                         factorySetup.shardDrops[2] = buf.readDouble();
-                        factorySetup.mobParams = (HashMap<FakeMob,MobParam>)(buf.readMap(FakeMob.STREAM_CODEC,MobParam.STREAM_CODEC));
+                        factorySetup.mobParams = PARAM_MAP_CODEC.decode(buf);
                         factorySetup.mobInfo = MAP_CODEC.decode(buf);
                         factorySetup.controllerMobs = factorySetup.mobParams.keySet().stream().toList();
                         factorySetup.perkCapped = buf.readBoolean();
@@ -131,8 +109,8 @@ public class ClientFactorySetup {
                             factorySetup.perks.add(Perk.byIndex(buf.readVarInt()));
                         }
 
-                        factorySetup.itemIng = ITEM_LIST_CODEC.decode(buf);
-                        factorySetup.fluidIng = FLUID_LIST_CODEC.decode(buf);
+                        factorySetup.itemIng = ExtraWootCodecs.ITEM_LIST_CODEC.decode(buf);
+                        factorySetup.fluidIng = ExtraWootCodecs.FLUID_LIST_CODEC.decode(buf);
 
 
                         return factorySetup;

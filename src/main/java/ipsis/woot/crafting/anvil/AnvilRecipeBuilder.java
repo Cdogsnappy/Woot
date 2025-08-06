@@ -41,14 +41,6 @@ public class AnvilRecipeBuilder implements RecipeBuilder{
         return this;
     }
 
-    public void build(Consumer<CraftingRecipe> recipe, String name) {
-        recipe.accept(new AnvilRecipeBuilder.Result(
-                ResourceLocation.fromNamespaceAndPath(Woot.MODID, "anvil/" + name),
-                this.baseIngredient,
-                this.result,
-                this.ingredients
-        ));
-    }
 
     @Override
     public RecipeBuilder unlockedBy(String s, Criterion<?> criterion) {
@@ -62,7 +54,7 @@ public class AnvilRecipeBuilder implements RecipeBuilder{
 
     @Override
     public Item getResult() {
-        return null;
+        return result.getItem();
     }
 
     @Override

@@ -1,6 +1,7 @@
 package ipsis.woot.modules.factory.calculators;
 
 import ipsis.woot.Woot;
+import ipsis.woot.crafting.WootRecipes;
 import ipsis.woot.crafting.factory.FactoryRecipe;
 import ipsis.woot.modules.factory.FactoryConfiguration;
 import ipsis.woot.modules.factory.FormedSetup;
@@ -10,9 +11,13 @@ import ipsis.woot.modules.factory.perks.Perk;
 import ipsis.woot.util.FakeMob;
 import ipsis.woot.util.FluidStackHelper;
 import ipsis.woot.util.ItemStackHelper;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeInput;
+import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.neoforged.neoforge.fluids.FluidStack;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -160,14 +165,13 @@ public class CalculatorVersion2 {
          */
         for (FakeMob fakeMob : setup.getAllMobs()) {
             ItemStack controller = ControllerBlockEntity.getItemStack(fakeMob);
-            List<FactoryRecipe> recipes = setup.getWorld().getRecipeManager().getRecipes(
-                    FactoryRecipe.FACTORY_TYPE,
-                    new Inventory(controller), setup.getWorld());
+            List<RecipeHolder<FactoryRecipe>> recipes = setup.getWorld().getRecipeManager().getRecipesFor(
+                    WootRecipes.FACTORY_RECIPE_TYPE.get(), new SingleRecipeInput(controller),setup.getWorld());
 
-            for (FactoryRecipe factoryRecipe : recipes) {
-                if (factoryRecipe.getFakeMob().equals(fakeMob)) {
-                    List<ItemStack> recipeItems = getRecipeItems(fakeMob, (NonNullList<ItemStack>) factoryRecipe.getItems(), setup);
-                    List<FluidStack> recipeFluids = getRecipeFluids(fakeMob, (NonNullList<FluidStack>) factoryRecipe.getFluids(), setup);
+            for (RecipeHolder<FactoryRecipe> factoryRecipe : recipes) {
+                if (factoryRecipe.value().getFakeMob().equals(fakeMob)) {
+                    List<ItemStack> recipeItems = getRecipeItems(fakeMob, (NonNullList<ItemStack>) factoryRecipe.value().getItems(), setup);
+                    List<FluidStack> recipeFluids = getRecipeFluids(fakeMob, (NonNullList<FluidStack>) factoryRecipe.value().getFluids(), setup);
                     recipeItems.forEach(i -> recipe.addItem(i.copy()));
                     recipeFluids.forEach(i -> recipe.addFluid(i.copy()));
                     break;

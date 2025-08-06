@@ -4,14 +4,19 @@ import ipsis.woot.Woot;
 import ipsis.woot.config.Config;
 import ipsis.woot.config.ConfigOverride;
 import ipsis.woot.modules.factory.blocks.*;
+import ipsis.woot.modules.factory.client.ClientFactorySetup;
 import ipsis.woot.modules.factory.layout.Layout;
 import ipsis.woot.modules.factory.layout.PatternBlock;
 import ipsis.woot.modules.factory.perks.Perk;
 import ipsis.woot.simulator.spawning.SpawnController;
+import ipsis.woot.util.ExtraWootCodecs;
 import ipsis.woot.util.FakeMob;
 import ipsis.woot.util.helper.MathHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.capabilities.Capabilities;
@@ -340,4 +345,46 @@ public class FormedSetup {
         formedSetup.setupMobParams();
         return formedSetup;
     }
+
+    public static final StreamCodec<RegistryFriendlyByteBuf, HashMap<FakeMob, MobParam>> PARAM_MAP_CODEC =
+            ExtraWootCodecs.mapStreamCodec(FakeMob.STREAM_CODEC, MobParam.STREAM_CODEC, HashMap::new);
+
+    public static final StreamCodec<RegistryFriendlyByteBuf, HashMap<Perk.Group, Integer>> GROUP_MAP_CODEC =
+            ExtraWootCodecs.mapStreamCodec(Perk.Group.STREAM_CODEC,ByteBufCodecs.VAR_INT, HashMap::new);
+
+    public static final StreamCodec<RegistryFriendlyByteBuf, List<FakeMob>> MOB_LIST_CODEC =
+            ExtraWootCodecs.listStreamCodec(FakeMob.STREAM_CODEC);
+
+
+
+    public static final StreamCodec<RegistryFriendlyByteBuf, FormedSetup> STREAM_CODEC =
+            StreamCodec.of(
+                    (buf,data) ->{
+                        Tier.STREAM_CODEC.encode(buf,data.tier);
+                        buf.writeInt(data.cellCapacity);
+                        MOB_LIST_CODEC.encode(buf, data.controllerMobs);
+                        GROUP_MAP_CODEC.encode(buf, data.perks);
+                        PARAM_MAP_CODEC.encode(buf, data.mobParams);
+                        buf.writeInt(data.exotic.ordinal());
+                        buf.writeDouble(data.shardDropChance);
+                        buf.writeVarIntArray(data.shardDropWeights);
+                        buf.writeBoolean(data.perkCapped);
+                        buf.writeVarInt(data.perks.size());
+
+                    },
+                    (buf) -> {
+                        FormedSetup factorySetup = new FormedSetup();
+                        factorySetup.tier = Tier.byIndex(buf.readInt());
+                        factorySetup.cellCapacity = buf.readInt();
+                        factorySetup.controllerMobs = MOB_LIST_CODEC.decode(buf);
+                        factorySetup.perks = GROUP_MAP_CODEC.decode(buf);
+                        factorySetup.mobParams = PARAM_MAP_CODEC.decode(buf);
+                        factorySetup.exotic = Exotic.getExotic(buf.readInt());
+                        factorySetup.shardDropChance = buf.readDouble();
+                        factorySetup.shardDropWeights = buf.readVarIntArray();
+                        factorySetup.perkCapped = buf.readBoolean();
+                        return factorySetup;
+
+                    }
+            );
 }

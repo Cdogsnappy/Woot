@@ -1,6 +1,9 @@
 package ipsis.woot.modules.factory;
 
 import ipsis.woot.Woot;
+import ipsis.woot.util.ExtraWootCodecs;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 
 import java.util.EnumSet;
 import java.util.Locale;
@@ -55,4 +58,6 @@ public enum Tier {
     public String getTranslationKey() {
         return "misc.woot." + this.name().toLowerCase(Locale.ROOT);
     }
+
+    public static final StreamCodec<RegistryFriendlyByteBuf, Tier> STREAM_CODEC = ExtraWootCodecs.enumStreamCodec(Tier.class);
 }

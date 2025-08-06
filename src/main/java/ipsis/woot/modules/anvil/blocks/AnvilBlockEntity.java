@@ -1,6 +1,8 @@
 package ipsis.woot.modules.anvil.blocks;
 
+import ipsis.woot.crafting.WootRecipes;
 import ipsis.woot.crafting.anvil.AnvilRecipe;
+import ipsis.woot.crafting.anvil.AnvilRecipeInput;
 import ipsis.woot.mod.ModNBT;
 import ipsis.woot.modules.anvil.AnvilSetup;
 import ipsis.woot.modules.factory.FactorySetup;
@@ -21,6 +23,8 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -130,12 +134,12 @@ public class AnvilBlockEntity extends BlockEntity implements WootDebug {
             return;
         }
 
-        AnvilRecipe recipe = level.getRecipeManager().getRecipeFor(ANVIL_TYPE,
-                new BlockContainer(baseItem, ingredients[0], ingredients[1], ingredients[2], ingredients[3]), level).orElse(null);
+        RecipeHolder<AnvilRecipe> recipe = level.getRecipeManager().getRecipeFor(WootRecipes.ANVIL_RECIPE_TYPE.get(),
+                new AnvilRecipeInput(baseItem, Arrays.asList(ingredients)), level).orElse(null);
         if (recipe == null)
             return;
 
-        ItemStack output = recipe.output();
+        ItemStack output = recipe.value().output();
         /**
          * Handle the shard programming
          */

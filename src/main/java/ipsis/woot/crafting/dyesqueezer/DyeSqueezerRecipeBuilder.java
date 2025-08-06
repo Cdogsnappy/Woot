@@ -81,22 +81,7 @@ public class DyeSqueezerRecipeBuilder implements RecipeBuilder {
             this.white = dyes[3];
         }
 
-        @Override
-        public RecipeSerializer<?> getSerializer() {
-            return WootRecipes.DYE_SQUEEZER_SERIALIZER.get();
-        }
 
-        @Nullable
-        @Override
-        public JsonObject getAdvancementJson() {
-            return null;
-        }
-
-        @Nullable
-        @Override
-        public ResourceLocation getAdvancementID() {
-            return null;
-        }
 
         @Override
         public Advancement.Builder advancement() {

@@ -48,6 +48,8 @@ public class HeartScreen extends WootContainerScreen<HeartMenu> {
 
     public HeartScreen(HeartMenu menu, Inventory pInventory, Component name) {
         super(menu, pInventory, name);
+        imageHeight = GUI_HEIGHT;
+        imageWidth = GUI_WIDTH;
     }
 
     private List<GuiItemStackElement> dropElements = new ArrayList<>();
@@ -132,15 +134,10 @@ public class HeartScreen extends WootContainerScreen<HeartMenu> {
      */
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
-        this.renderBackground(guiGraphics, mouseX, mouseY, partialTicks);
-        super.render(guiGraphics, mouseX, mouseY, partialTicks);
-        //renderHoveredTooltip(this.font,mouseX, mouseY);
+        renderBg(guiGraphics, partialTicks, mouseX, mouseY);
+        renderFg(guiGraphics, mouseX, mouseY);
 
-        mobElements.forEach(e -> e.drawTooltip(guiGraphics, mouseX, mouseY));
-        upgradeElements.forEach(e -> e.drawTooltip(guiGraphics, mouseX, mouseY));
-        dropElements.forEach(e -> e.drawTooltip(guiGraphics, mouseX, mouseY));
-        recipeElements.forEach(e -> e.drawTooltip(guiGraphics, mouseX, mouseY));
-        exoticElement.drawTooltip(guiGraphics, mouseX, mouseY);
+
 
         if (renderTime == 0L)
             renderTime = Util.getMillis();
@@ -153,14 +150,31 @@ public class HeartScreen extends WootContainerScreen<HeartMenu> {
 
         ScreenRectangle rect = this.getRectangle();
 
-        if (mouseX > rect.left() + TANK_LX && mouseX < rect.left() + TANK_RX && mouseY > rect.top() + TANK_LY && mouseY < rect.top() + TANK_RY)
+        if (mouseX > getGuiLeft() + TANK_LX && mouseX < getGuiLeft() + TANK_RX && mouseY > getGuiTop() + TANK_LY && mouseY < getGuiTop() + TANK_RY)
             renderFluidTankTooltip(guiGraphics, mouseX, mouseY,
-                    ((HeartMenu)menu).getInputFluid(), getCapacity());
+                    menu.getInputFluid(), getCapacity());
     }
 
     @Override
-    protected void renderBg(GuiGraphics guiGraphics, float v, int i, int i1) {
+    protected void renderBg(GuiGraphics guiGraphics, float v, int mouseX, int mouseY) {
+        int relX = (width - imageWidth) / 2;
+        int relY = (height - imageHeight) / 2;
+        guiGraphics.blit(GUI, relX, relY,0, 0.0F, 0.0F, width, height, GUI_WIDTH, GUI_HEIGHT);
 
+        mobElements.forEach(e -> e.drawBackground(guiGraphics, mouseX, mouseY));
+        upgradeElements.forEach(e -> e.drawBackground(guiGraphics, mouseX, mouseY));
+        dropElements.forEach(e -> e.drawBackground(guiGraphics, mouseX, mouseY));
+        recipeElements.forEach(e -> e.drawBackground(guiGraphics, mouseX, mouseY));
+        exoticElement.drawBackground(mouseX, mouseY);
+
+        renderFluidTank(
+                guiGraphics,
+                TANK_LX,
+                TANK_RY,
+                TANK_RY - TANK_LY + 1,
+                TANK_RX - TANK_LX + 1,
+                getCapacity(),
+                menu.getInputFluid());
     }
 
     /**
@@ -197,7 +211,7 @@ public class HeartScreen extends WootContainerScreen<HeartMenu> {
     }
 
 
-    protected void drawGuiContainerForegroundLayer(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+    protected void renderFg(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         ClientFactorySetup clientFactorySetup = ((HeartMenu)menu).getTileEntity().clientFactorySetup;
         if (clientFactorySetup == null)
             return;
@@ -336,28 +350,6 @@ public class HeartScreen extends WootContainerScreen<HeartMenu> {
         guiGraphics.drawString(font, value, INFO_X + 80, INFO_Y + (TEXT_HEIGHT * offset), TEXT_COLOR);
     }
 
-    @Override
-    protected void renderMenuBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, int width, int height) {
-        GlStateManager._clearColor(1.0F, 1.0F, 1.0F, 1.0F);
-        int relX = (width - GUI_WIDTH) / 2;
-        int relY = (height - GUI_HEIGHT) / 2;
-        guiGraphics.blit(GUI, relX, relY,0, 0.0F, 0.0F, width, height, GUI_WIDTH, GUI_HEIGHT);
-
-        mobElements.forEach(e -> e.drawBackground(guiGraphics, mouseX, mouseY));
-        upgradeElements.forEach(e -> e.drawBackground(guiGraphics, mouseX, mouseY));
-        dropElements.forEach(e -> e.drawBackground(guiGraphics, mouseX, mouseY));
-        recipeElements.forEach(e -> e.drawBackground(guiGraphics, mouseX, mouseY));
-        exoticElement.drawBackground(mouseX, mouseY);
-
-        renderFluidTank(
-                guiGraphics,
-                TANK_LX,
-                TANK_RY,
-                TANK_RY - TANK_LY + 1,
-                TANK_RX - TANK_LX + 1,
-                getCapacity(),
-                ((HeartMenu)menu).getInputFluid());
-    }
 
     class StackElement {
         int x;

@@ -26,26 +26,43 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public record AnvilRecipe(Ingredient baseItem, List<Ingredient> ingredients, ItemStack output) implements Recipe<RecipeInput> {
+public record AnvilRecipe(Ingredient baseItem, List<Ingredient> ingredients, ItemStack output) implements Recipe<AnvilRecipeInput> {
 
 
-    public NonNullList<Ingredient> getIngredients(){
-        NonNullList<Ingredient> list = NonNullList.create();
-        list.add(baseItem);
-        return list;
-    }
 
     @Override
-    public boolean matches(RecipeInput anvilRecipeInput, Level level) {
-        if(level.isClientSide){
+    public boolean matches(AnvilRecipeInput anvilRecipeInput, Level level) {
+        if (!baseItem.test(anvilRecipeInput.getBase()))
             return false;
+
+        int count = 0;
+        for (int i = 1; i < 4; i++) {
+            if (!anvilRecipeInput.getItem(i).isEmpty())
+                count++;
         }
 
-        return baseItem.test(anvilRecipeInput.getItem(0));
+        if (ingredients.size() != count)
+            return false;
+
+        List<Integer> matchedSlots = new ArrayList<>();
+        for (Ingredient ingredient : ingredients) {
+            for (int i = 1; i < 4; i++) {
+                if (!matchedSlots.contains(i) && ingredient.test(anvilRecipeInput.getItem(i))) {
+                    // found ingredient in one of the slots
+                    matchedSlots.add(i);
+                    break;
+                }
+            }
+        }
+
+        if (matchedSlots.size() == ingredients.size())
+            return true;
+
+        return false;
     }
 
     @Override
-    public ItemStack assemble(RecipeInput anvilRecipeInput, HolderLookup.Provider provider) {
+    public ItemStack assemble(AnvilRecipeInput anvilRecipeInput, HolderLookup.Provider provider) {
         return output.copy();
     }
 

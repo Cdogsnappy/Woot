@@ -27,7 +27,7 @@ public class MobParam {
         this(1,1,1,
                 new int[]{MOB_PARAM_UNDEFINED,MOB_PARAM_UNDEFINED,MOB_PARAM_UNDEFINED,MOB_PARAM_UNDEFINED,MOB_PARAM_UNDEFINED});
     }
-    public static final StreamCodec<FriendlyByteBuf, MobParam> STREAM_CODEC = StreamCodec.composite(
+    public static final StreamCodec<RegistryFriendlyByteBuf, MobParam> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.VAR_INT, MobParam::getBaseSpawnTicks,
             ByteBufCodecs.VAR_INT, MobParam::getBaseMassCount,
             ByteBufCodecs.VAR_INT, MobParam::getBaseFluidCost,

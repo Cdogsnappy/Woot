@@ -2,6 +2,7 @@ package ipsis.woot.modules.factory.perks;
 
 
 
+import ipsis.woot.util.ExtraWootCodecs;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -143,5 +144,9 @@ public enum Perk implements StringRepresentable {
         public String getLowerCaseName() {
             return this.name().toLowerCase(Locale.ROOT);
         }
+
+        public static final StreamCodec<RegistryFriendlyByteBuf, Group> STREAM_CODEC = ExtraWootCodecs.enumStreamCodec(Group.class);
     }
+
+    public static final StreamCodec<RegistryFriendlyByteBuf, Perk> STREAM_CODEC = ExtraWootCodecs.enumStreamCodec(Perk.class);
 }

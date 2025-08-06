@@ -21,7 +21,7 @@ import net.neoforged.neoforge.fluids.FluidStack;
 import java.util.ArrayList;
 import java.util.List;
 
-public record InfuserRecipe(Ingredient ingredient, Ingredient augment, int augmentCount, FluidStack fluid, ItemStack result, int energy) implements Recipe<RecipeInput> {
+public record InfuserRecipe(Ingredient ingredient, Ingredient augment, int augmentCount, FluidStack fluid, ItemStack result, int energy) implements Recipe<InfuserRecipeInput> {
 
 
     public Ingredient getIngredient() { return this.ingredient; }
@@ -84,22 +84,25 @@ public record InfuserRecipe(Ingredient ingredient, Ingredient augment, int augme
      */
 
     @Override
-    public boolean matches(RecipeInput recipeInput, Level level) {
+    public boolean matches(InfuserRecipeInput recipeInput, Level level) {
         if (!ingredient.test(recipeInput.getItem(0)))
             return false;
 
         if (augment != Ingredient.EMPTY) {
-            ItemStack invStack = recipeInput.getItem(1);
             // augment count must be exact
-            if (!augment.test(invStack) || augmentCount > invStack.getCount())
+            if (!augment.test(recipeInput.getAugment()) || augmentCount > recipeInput.getAugment().getCount())
                 return false;
+        }
+
+        if(fluid != FluidStack.EMPTY){
+            return fluid.is(recipeInput.fluid().getFluidType());
         }
 
         return true;
     }
 
     @Override
-    public ItemStack assemble(RecipeInput recipeInput, HolderLookup.Provider provider) {
+    public ItemStack assemble(InfuserRecipeInput recipeInput, HolderLookup.Provider provider) {
         return null;
     }
 
