@@ -11,25 +11,44 @@ import ipsis.woot.util.WootMachineBlockEntity;
 import ipsis.woot.util.helper.EnchantmentHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.ItemEnchantments;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
-public class EnchantSqueezerBlockEntity extends WootMachineBlockEntity implements WootDebug, INamedContainerProvider {
+public class EnchantSqueezerBlockEntity extends WootMachineBlockEntity implements WootDebug, MenuProvider {
 
     public EnchantSqueezerBlockEntity(BlockPos pos, BlockState blockState) {
         super(SqueezerSetup.ENCHANT_SQUEEZER_BLOCK_TILE.get(), pos, blockState);
     }
 
-    public final IItemHandler inventory = new ItemStackHandler(1)
+    public final ItemStackHandler inventory = new ItemStackHandler(1)
     {
         @Override
         protected void onContentsChanged(int slot) {
@@ -57,7 +76,7 @@ public class EnchantSqueezerBlockEntity extends WootMachineBlockEntity implement
     }
 
     @Override
-    public void tick() {
+    public void tick(Level level) {
         super.tick(level);
 
         if (level.isClientSide)
@@ -72,18 +91,18 @@ public class EnchantSqueezerBlockEntity extends WootMachineBlockEntity implement
             if (settings.get(direction) != Mode.OUTPUT)
                 continue;
 
-            TileEntity te = world.getTileEntity(getPos().offset(direction));
-            if (!(te instanceof TileEntity))
+            BlockEntity te = level.getBlockEntity(getBlockPos().offset(direction.getNormal()));
+            if (te == null)
                 continue;
 
-            LazyOptional<IFluidHandler> lazyOptional = te.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction.getOpposite());
+            Optional<IFluidHandler> lazyOptional = Optional.ofNullable(level.getCapability(Capabilities.FluidHandler.BLOCK, te.getBlockPos(), direction.getOpposite()));
             if (lazyOptional.isPresent()) {
                 IFluidHandler iFluidHandler = lazyOptional.orElseThrow(NullPointerException::new);
                 FluidStack fluidStack = outputTank.map(WootFluidTank::getFluid).orElse(FluidStack.EMPTY);
                 if (!fluidStack.isEmpty()) {
                     int filled = iFluidHandler.fill(fluidStack, IFluidHandler.FluidAction.EXECUTE);
                     outputTank.ifPresent(f -> f.internalDrain(filled, IFluidHandler.FluidAction.EXECUTE));
-                    markDirty();
+                    setChanged();
                 }
             }
         }
@@ -91,16 +110,16 @@ public class EnchantSqueezerBlockEntity extends WootMachineBlockEntity implement
 
     //-------------------------------------------------------------------------
     //region Tanks
-    private LazyOptional<WootFluidTank> outputTank = LazyOptional.of(this::createTank);
+    private Optional<WootFluidTank> outputTank = Optional.of(createTank());
     private WootFluidTank createTank() {
-        return new WootFluidTank(SqueezerConfiguration.ENCH_SQUEEZER_TANK_CAPACITY.get(), h -> h.isFluidEqual(new FluidStack(FluidSetup.ENCHANT_FLUID.get(), 1))).setAccess(false, true);
+        return new WootFluidTank(SqueezerConfiguration.ENCH_SQUEEZER_TANK_CAPACITY.get(), h -> h.is(FluidSetup.ENCHANT_FLUID.get())).setAccess(false, true);
     }
     public FluidStack getOutputTankFluid() { return outputTank.map(h -> h.getFluid()).orElse(FluidStack.EMPTY); }
     //endregion
 
     //-------------------------------------------------------------------------
     //region Energy
-    private LazyOptional<WootEnergyStorage> energyStorage = LazyOptional.of(this::createEnergy);
+    private Optional<WootEnergyStorage> energyStorage = Optional.of(createEnergy());
     private WootEnergyStorage createEnergy() {
         return new WootEnergyStorage(SqueezerConfiguration.ENCH_SQUEEZER_MAX_ENERGY.get(), SqueezerConfiguration.ENCH_SQUEEZER_MAX_ENERGY_RX.get());
     }
@@ -112,80 +131,61 @@ public class EnchantSqueezerBlockEntity extends WootMachineBlockEntity implement
     //-------------------------------------------------------------------------
     //region Inventory
     public static int INPUT_SLOT = 0;
-    private final LazyOptional<IItemHandler> inventoryGetter = LazyOptional.of(() -> inventory);
+    private final Optional<IItemHandler> inventoryGetter = Optional.of(inventory);
     public IItemHandler getInventory() { return inventory; }
     //endregion
 
     //-------------------------------------------------------------------------
-    //region NBT
+
+
     @Override
-    public void deserializeNBT(CompoundNBT compoundNBT) {
-        readfromNBT(compoundNBT);
-        super.deserializeNBT(compoundNBT);
+    public void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        readfromNBT(tag, registries);
+        super.loadAdditional(tag, registries);
+    }
+
+    public void readfromNBT(CompoundTag tag, HolderLookup.Provider registries) {
+        if (tag.contains(ModNBT.INPUT_INVENTORY_TAG)){
+            inventory.deserializeNBT(registries, tag.getCompound(ModNBT.INPUT_INVENTORY_TAG));
+        }
+
+        CompoundTag tankTag = tag.getCompound(ModNBT.OUTPUT_TANK_TAG);
+        outputTank.ifPresent(h -> h.setFluid(FluidStack.parse(registries, tankTag).get()));
+
+        CompoundTag energyTag = tag.getCompound(ModNBT.ENERGY_TAG);
+        energyStorage.ifPresent(h -> h.deserializeNBT(registries, energyTag));
     }
 
     @Override
-    public void read(BlockState blockState, CompoundNBT compoundNBT) {
-        readfromNBT(compoundNBT);
-        super.read(blockState, compoundNBT);
-    }
-
-    public void readfromNBT(CompoundNBT compoundNBT) {
-        if (compoundNBT.contains(ModNBT.INPUT_INVENTORY_TAG, Constants.NBT.TAG_LIST))
-            CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.readNBT(
-                    inventory, null, compoundNBT.getList(ModNBT.INPUT_INVENTORY_TAG, Constants.NBT.TAG_COMPOUND));
-
-        CompoundNBT tankTag = compoundNBT.getCompound(ModNBT.OUTPUT_TANK_TAG);
-        outputTank.ifPresent(h -> h.readFromNBT(tankTag));
-
-        CompoundNBT energyTag = compoundNBT.getCompound(ModNBT.ENERGY_TAG);
-        energyStorage.ifPresent(h -> ((INBTSerializable<CompoundNBT>)h).deserializeNBT(energyTag));
-    }
-
-    @Override
-    public CompoundNBT write(CompoundNBT compoundNBT) {
-        compoundNBT.put(ModNBT.INPUT_INVENTORY_TAG,
-                Objects.requireNonNull(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.writeNBT(inventory, null)));
+    public void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        tag.put(ModNBT.INPUT_INVENTORY_TAG, inventory.serializeNBT(registries));
 
         outputTank.ifPresent(h -> {
-            CompoundNBT tankTag = h.writeToNBT(new CompoundNBT());
-            compoundNBT.put(ModNBT.OUTPUT_TANK_TAG, tankTag);
+            CompoundTag tankTag = (CompoundTag)h.getFluid().save(registries);
+            tag.put(ModNBT.OUTPUT_TANK_TAG, tankTag);
         });
 
         energyStorage.ifPresent(h -> {
-            CompoundNBT energyTag = ((INBTSerializable<CompoundNBT>)h).serializeNBT();
-            compoundNBT.put(ModNBT.ENERGY_TAG, energyTag);
+            CompoundTag energyTag = (CompoundTag)h.serializeNBT(registries);
+            tag.put(ModNBT.ENERGY_TAG, energyTag);
         });
 
-        return super.write(compoundNBT);
+        super.saveAdditional(tag, registries);
     }
     //endregion
 
     //-------------------------------------------------------------------------
     //region WootDebug
-    @Override
-    public List<String> getDebugText(List<String> debug, ItemUseContext itemUseContext) {
-        debug.add("====> EnchantSqueezerTileEntity");
-        outputTank.ifPresent(h -> {
-            debug.add("     p:" + h.getFluidAmount());
-        });
-        debug.add("      Settings " + settings);
-        return debug;
-    }
+    
     //endregion
 
     //-------------------------------------------------------------------------
     //region Container
     @Override
-    public ITextComponent getDisplayName() {
-        return new TranslationTextComponent("gui.woot.enchsqueezer.name");
+    public Component getDisplayName() {
+        return Component.translatable("gui.woot.enchsqueezer.name");
     }
 
-    @Nullable
-    @Override
-    public Container createMenu(int i, PlayerInventory playerInventory, PlayerEntity playerEntity) {
-        return new EnchantSqueezerContainer(i, world, pos, playerInventory, playerEntity);
-    }
     //endregion
 
     //-------------------------------------------------------------------------
@@ -233,7 +233,7 @@ public class EnchantSqueezerBlockEntity extends WootMachineBlockEntity implement
             h.internalFill(new FluidStack(FluidSetup.ENCHANT_FLUID.get(), amount), IFluidHandler.FluidAction.EXECUTE);
         });
 
-        markDirty();
+        setChanged();
     }
 
     @Override
@@ -277,66 +277,39 @@ public class EnchantSqueezerBlockEntity extends WootMachineBlockEntity implement
     }
     //endregion
 
-    @Nonnull
-    @Override
-    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
-        if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-                return inventoryGetter.cast();
-        } else if (cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
-            return outputTank.cast();
-        } else if (cap == CapabilityEnergy.ENERGY) {
-            return energyStorage.cast();
-        }
-        return super.getCapability(cap, side);
-    }
+
 
     private int capEnchantAmount(int amount) {
 
         int max = SqueezerConfiguration.getEnchantFluidAmount(5);
         max *= 4;
-        max = MathHelper.clamp(max, 0, SqueezerConfiguration.ENCH_SQUEEZER_TANK_CAPACITY.get());
-        return MathHelper.clamp(amount, 0, max);
+        max = Math.clamp(max, 0, SqueezerConfiguration.ENCH_SQUEEZER_TANK_CAPACITY.get());
+        return Math.clamp(amount, 0, max);
     }
 
     private int getEnchantAmount(ItemStack itemStack) {
-        int amount = 0;
+        AtomicInteger amount = new AtomicInteger();
         if (!itemStack.isEmpty() && EnchantmentHelper.isEnchanted(itemStack)) {
-            ListNBT listNBT;
-            if (itemStack.getItem() == Items.ENCHANTED_BOOK)
-                listNBT = EnchantedBookItem.getEnchantments(itemStack);
-            else
-                listNBT = itemStack.getEnchantmentTagList();
-
-            for (int i = 0; i < listNBT.size(); i++) {
-                CompoundNBT compoundNBT = listNBT.getCompound(i);
-                Enchantment enchantment = ForgeRegistries.ENCHANTMENTS.getValue(ResourceLocation.tryCreate(compoundNBT.getString("id")));
-                if (enchantment != null && compoundNBT.contains("lvl"))
-                    amount += SqueezerConfiguration.getEnchantFluidAmount(compoundNBT.getInt("lvl"));
-            }
+            ItemEnchantments enchants = itemStack.getTagEnchantments();
+            enchants.keySet().forEach((e) -> {
+                amount.addAndGet(SqueezerConfiguration.getEnchantFluidAmount(enchants.getLevel(e)));
+            });
         }
-        return capEnchantAmount(amount);
+        return capEnchantAmount(amount.get());
     }
 
     private int getEnchantEnergy(ItemStack itemStack) {
-        int amount = 0;
+        AtomicInteger amount = new AtomicInteger();
         if (!itemStack.isEmpty() && EnchantmentHelper.isEnchanted(itemStack)) {
-            ListNBT listNBT;
-            if (itemStack.getItem() == Items.ENCHANTED_BOOK)
-                listNBT = EnchantedBookItem.getEnchantments(itemStack);
-            else
-                listNBT = itemStack.getEnchantmentTagList();
-
-            for (int i = 0; i < listNBT.size(); i++) {
-                CompoundNBT compoundNBT = listNBT.getCompound(i);
-                Enchantment enchantment = ForgeRegistries.ENCHANTMENTS.getValue(ResourceLocation.tryCreate(compoundNBT.getString("id")));
-                if (enchantment != null && compoundNBT.contains("lvl"))
-                    amount += SqueezerConfiguration.getEnchantEnergy(compoundNBT.getInt("lvl"));
-            }
+            ItemEnchantments enchants = itemStack.getTagEnchantments();
+            enchants.keySet().forEach((e) -> {
+                amount.addAndGet(SqueezerConfiguration.getEnchantEnergy(enchants.getLevel(e)));
+            });
         }
-        return amount;
+        return amount.get();
     }
 
-    public void dropContents(World world, BlockPos pos) {
+    public void dropContents(Level world, BlockPos pos) {
 
         List<ItemStack> drops = new ArrayList<>();
         ItemStack itemStack = inventory.getStackInSlot(INPUT_SLOT);
@@ -347,4 +320,18 @@ public class EnchantSqueezerBlockEntity extends WootMachineBlockEntity implement
         super.dropContents(drops);
     }
 
+    @Override
+    public List<String> getDebugText(List<String> debug, UseOnContext itemUseContext) {
+        debug.add("====> EnchantSqueezerTileEntity");
+        outputTank.ifPresent(h -> {
+            debug.add("     p:" + h.getFluidAmount());
+        });
+        debug.add("      Settings " + settings);
+        return debug;
+    }
+
+    @Override
+    public @org.jetbrains.annotations.Nullable AbstractContainerMenu createMenu(int i, Inventory inventory, Player player) {
+        return new EnchantSqueezerMenu(i, level, getBlockPos(), inventory, player);
+    }
 }

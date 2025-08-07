@@ -2,45 +2,46 @@ package ipsis.woot.modules.squeezer.blocks;
 
 import ipsis.woot.crafting.dyesqueezer.DyeSqueezerRecipe;
 import ipsis.woot.fluilds.network.TankPacket;
+import ipsis.woot.modules.infuser.InfuserSetup;
 import ipsis.woot.modules.squeezer.SqueezerSetup;
 import ipsis.woot.setup.NetworkChannel;
 import ipsis.woot.util.TankPacketHandler;
 import ipsis.woot.util.WootContainer;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.container.IContainerListener;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.IWorldPosCallable;
-import net.minecraft.util.IntReferenceHolder;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fml.network.NetworkDirection;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.SlotItemHandler;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.ContainerLevelAccess;
+import net.minecraft.world.inventory.DataSlot;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.items.SlotItemHandler;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 public class DyeSqueezerContainer extends WootContainer implements TankPacketHandler {
 
     public DyeSqueezerBlockEntity tileEntity;
+    public Player player;
 
-    public DyeSqueezerContainer(int windowId, World world, BlockPos pos, PlayerInventory playerInventory, PlayerEntity playerEntity) {
+    public DyeSqueezerContainer(int windowId, Level level, BlockPos pos, Inventory playerInventory, Player playerEntity) {
         super(SqueezerSetup.SQUEEZER_BLOCK_CONTAINER.get(), windowId);
-        tileEntity = (DyeSqueezerBlockEntity)world.getTileEntity(pos);
+        tileEntity = (DyeSqueezerBlockEntity)level.getBlockEntity(pos);
         addOwnSlots(tileEntity.getInventory());
         addPlayerSlots(playerInventory);
         addListeners();
+        this.player = playerEntity;
     }
 
     private void addOwnSlots(IItemHandler inv) {
         this.addSlot(new SlotItemHandler(inv, 0, 39, 40));
     }
 
-    private void addPlayerSlots(IInventory playerInventory) {
+    private void addPlayerSlots(Inventory playerInventory) {
         // Slots for the main inventory
         for (int row = 0; row < 3; ++row) {
             for (int col = 0; col < 9; ++col) {
@@ -57,20 +58,19 @@ public class DyeSqueezerContainer extends WootContainer implements TankPacketHan
     }
 
     @Override
-    public boolean canInteractWith(PlayerEntity playerIn) {
-        return isWithinUsableDistance(IWorldPosCallable.of(tileEntity.getWorld(), tileEntity.getPos()),
-                playerIn, SqueezerSetup.SQUEEZER_BLOCK.get());
+    public boolean stillValid(Player playerIn) {
+        return stillValid(ContainerLevelAccess.create(playerIn.level(),tileEntity.getBlockPos()), playerIn, SqueezerSetup.SQUEEZER_BLOCK.get());
     }
 
     @Override
-    public ItemStack transferStackInSlot(PlayerEntity playerIn, int index) {
+    public ItemStack quickMoveStack(Player playerIn, int index) {
 
         // Based off Gigaherz Elements Of Power code
-        Slot slot = this.inventorySlots.get(index);
-        if (slot == null || !slot.getHasStack())
+        Slot slot = this.slots.get(index);
+        if (slot == null || !slot.hasItem())
             return ItemStack.EMPTY;
 
-        ItemStack stack = slot.getStack();
+        ItemStack stack = slot.getItem();
         ItemStack stackCopy = stack.copy();
 
         int startIndex;
@@ -103,13 +103,13 @@ public class DyeSqueezerContainer extends WootContainer implements TankPacketHan
             endIndex = startIndex + PLAYER_INV_SIZE + TOOLBAR_INV_SIZE;
         }
 
-        if (!this.mergeItemStack(stack, startIndex, endIndex, false))
+        if (!this.moveItemStackTo(stack, startIndex, endIndex, false))
             return ItemStack.EMPTY;
 
         if (stack.getCount() == 0)
-            slot.putStack(ItemStack.EMPTY);
+            slot.set(ItemStack.EMPTY);
         else
-            slot.onSlotChanged();
+            slot.setChanged();
 
         if (stack.getCount() == stackCopy.getCount())
             return ItemStack.EMPTY;
@@ -146,49 +146,49 @@ public class DyeSqueezerContainer extends WootContainer implements TankPacketHan
     public boolean getDumpExcess() { return this.dumpExcess; }
 
     public void addListeners() {
-        addShortListener(new IntReferenceHolder() {
+        addShortListener(new DataSlot() {
             @Override
             public int get() { return tileEntity.getRed(); }
 
             @Override
             public void set(int i) { red = i; }
         });
-        addShortListener(new IntReferenceHolder() {
+        addShortListener(new DataSlot() {
             @Override
             public int get() { return tileEntity.getBlue(); }
 
             @Override
             public void set(int i) { blue = i; }
         });
-        addShortListener(new IntReferenceHolder() {
+        addShortListener(new DataSlot() {
             @Override
             public int get() { return tileEntity.getWhite(); }
 
             @Override
             public void set(int i) { white = i; }
         });
-        addShortListener(new IntReferenceHolder() {
+        addShortListener(new DataSlot() {
             @Override
             public int get() { return tileEntity.getYellow(); }
 
             @Override
             public void set(int i) { yellow = i; }
         });
-        addIntegerListener(new IntReferenceHolder() {
+        addIntegerListener(new DataSlot() {
             @Override
             public int get() { return tileEntity.getEnergy(); }
 
             @Override
             public void set(int i) { energy = i; }
         });
-        addShortListener(new IntReferenceHolder() {
+        addShortListener(new DataSlot() {
             @Override
             public int get() { return tileEntity.getProgress(); }
 
             @Override
             public void set(int i) { progress = i; }
         });
-        addShortListener(new IntReferenceHolder() {
+        addShortListener(new DataSlot() {
             @Override
             public int get() { return tileEntity.getDumpExcess() ? 1 : 0; }
 
@@ -198,23 +198,21 @@ public class DyeSqueezerContainer extends WootContainer implements TankPacketHan
     }
 
     @Override
-    public void detectAndSendChanges() {
-        super.detectAndSendChanges();
+    public void broadcastChanges() {
+        super.broadcastChanges();
 
-        if (!pureDye.isFluidStackIdentical(tileEntity.getOutputTankFluid())) {
+        if (!FluidStack.isSameFluidSameComponents(pureDye,tileEntity.getOutputTankFluid())) {
             pureDye = tileEntity.getOutputTankFluid().copy();
-            for (IContainerListener l : listeners) {
-                if (l instanceof ServerPlayerEntity) {
-                    NetworkChannel.channel.sendTo(tileEntity.getOutputTankPacket(), ((ServerPlayerEntity) l).connection.netManager,
-                            NetworkDirection.PLAY_TO_CLIENT);
-                }
-            }
+
+            PacketDistributor.sendToPlayer((ServerPlayer)player, tileEntity.getOutputTankPacket());
+
+
         }
     }
 
     @Override
     public void handlePacket(TankPacket packet) {
-        if (packet.tankId == 0)
-            pureDye = packet.fluidStack;
+        if (packet.tankId() == 0)
+            pureDye = packet.fluidStack();
     }
 }

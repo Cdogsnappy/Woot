@@ -2,7 +2,7 @@ package ipsis.woot.modules.fluidconvertor;
 
 import ipsis.woot.Woot;
 import ipsis.woot.modules.fluidconvertor.blocks.FluidConvertorBlock;
-import ipsis.woot.modules.fluidconvertor.blocks.FluidConvertorContainer;
+import ipsis.woot.modules.fluidconvertor.blocks.FluidConvertorMenu;
 import ipsis.woot.modules.fluidconvertor.blocks.FluidConvertorBlockEntity;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.inventory.MenuType;
@@ -40,10 +40,10 @@ public class FluidConvertorSetup {
             FLUID_CONVERTOR_TAG, () ->
                     BlockEntityType.Builder.of(FluidConvertorBlockEntity::new,
                             FLUID_CONVERTOR_BLOCK.get()).build((null)));
-    public static final DeferredHolder<MenuType<?>, MenuType<FluidConvertorContainer>> FLUID_CONVERTOR_BLOCK_CONTATAINER = CONTAINERS.register(
+    public static final DeferredHolder<MenuType<?>, MenuType<FluidConvertorMenu>> FLUID_CONVERTOR_BLOCK_CONTATAINER = CONTAINERS.register(
             FLUID_CONVERTOR_TAG, () ->
                     IForgeContainerType.create((windowId, inv, data) -> {
-                        return new FluidConvertorContainer(
+                        return new FluidConvertorMenu(
                                 windowId,
                                 Woot.proxy.getClientWorld(),
                                 data.readBlockPos(),

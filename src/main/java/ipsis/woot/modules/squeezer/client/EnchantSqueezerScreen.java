@@ -1,25 +1,25 @@
 package ipsis.woot.modules.squeezer.client;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+
 import com.mojang.blaze3d.platform.GlStateManager;
 import ipsis.woot.Woot;
-import ipsis.woot.fluilds.FluidSetup;
-import ipsis.woot.modules.infuser.InfuserConfiguration;
 import ipsis.woot.modules.squeezer.SqueezerConfiguration;
 import ipsis.woot.modules.squeezer.SqueezerSetup;
-import ipsis.woot.modules.squeezer.blocks.EnchantSqueezerContainer;
+import ipsis.woot.modules.squeezer.blocks.EnchantSqueezerMenu;
 import ipsis.woot.util.WootContainerScreen;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fluids.FluidStack;
+import ipsis.woot.util.helper.RenderHelper;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+
 
 @OnlyIn(Dist.CLIENT)
-public class EnchantSqueezerScreen extends WootContainerScreen<EnchantSqueezerContainer> {
+public class EnchantSqueezerScreen extends WootContainerScreen<EnchantSqueezerMenu> {
 
-    private ResourceLocation GUI = new ResourceLocation(Woot.MODID, "textures/gui/" + SqueezerSetup.ENCHANT_SQUEEZER_TAG + ".png");
+    private ResourceLocation GUI = ResourceLocation.fromNamespaceAndPath(Woot.MODID, "textures/gui/" + SqueezerSetup.ENCHANT_SQUEEZER_TAG + ".png");
 
     private static final int GUI_XSIZE = 180;
     private static final int GUI_YSIZE = 177;
@@ -38,56 +38,58 @@ public class EnchantSqueezerScreen extends WootContainerScreen<EnchantSqueezerCo
     private static final int TANK_WIDTH = TANK_RX - TANK_LX + 1;
     private static final int TANK_HEIGHT = TANK_RY - TANK_LY + 1;
 
-    public EnchantSqueezerScreen(EnchantSqueezerContainer container, PlayerInventory playerInventory, ITextComponent name) {
-        super(container, playerInventory, name);
-        xSize = GUI_XSIZE;
-        ySize = GUI_YSIZE;
-        playerInventoryTitleY = ySize - 94;
+    public EnchantSqueezerScreen(EnchantSqueezerMenu menu, Inventory playerInventory, Component name) {
+        super(menu, playerInventory, name);
+        imageWidth = GUI_XSIZE;
+        imageHeight = GUI_YSIZE;
+        inventoryLabelY = imageHeight - 94;
     }
 
     @Override
-    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-        this.renderBackground(matrixStack);
-        super.render(matrixStack, mouseX, mouseY, partialTicks);
-        this.renderHoveredTooltip(matrixStack, mouseX, mouseY);
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+        this.renderBg(guiGraphics, partialTicks, mouseX, mouseY);
+        super.render(guiGraphics, mouseX, mouseY, partialTicks);
+        this.renderTooltip(guiGraphics, mouseX, mouseY);
 
-        if (isPointInRegion(TANK_LX, TANK_LY, TANK_WIDTH, TANK_HEIGHT, mouseX, mouseY))
-            renderFluidTankTooltip(matrixStack, mouseX, mouseY,
-                    container.getOutputFluid(),
+        if (RenderHelper.isPointInRegion(TANK_LX, TANK_LY, TANK_WIDTH, TANK_HEIGHT, mouseX, mouseY, getGuiLeft(), getGuiTop()))
+            renderFluidTankTooltip(guiGraphics, mouseX, mouseY,
+                    menu.getOutputFluid(),
                     SqueezerConfiguration.ENCH_SQUEEZER_TANK_CAPACITY.get());
-        if (isPointInRegion(ENERGY_LX, ENERGY_LY, ENERGY_WIDTH, ENERGY_HEIGHT, mouseX, mouseY))
-            renderEnergyTooltip(matrixStack, mouseX, mouseY, container.getEnergy(),
+        if (RenderHelper.isPointInRegion(ENERGY_LX, ENERGY_LY, ENERGY_WIDTH, ENERGY_HEIGHT, mouseX, mouseY, getGuiLeft(), getGuiTop()))
+            renderEnergyTooltip(guiGraphics, mouseX, mouseY, menu.getEnergy(),
                     SqueezerConfiguration.ENCH_SQUEEZER_MAX_ENERGY.get(), 10);
     }
 
     @Override
-    protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY) {
-        GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-        getMinecraft().getTextureManager().bindTexture(GUI);
-        int relX = (this.width - this.xSize) / 2;
-        int relY = (this.height - this.ySize) / 2;
-        this.blit(matrixStack, relX, relY, 0, 0, xSize, ySize);
+    protected void renderBg(GuiGraphics guiGraphics, float v, int i, int i1) {
+        guiGraphics.setColor(1.0F, 1.0F, 1.0F, 1.0F);
+        int relX = (this.width - this.imageWidth) / 2;
+        int relY = (this.height - this.imageHeight) / 2;
+        guiGraphics.blit(GUI, relX, relY, 0, 0, imageWidth, imageHeight);
 
         // Progress
-        int progress = container.getProgress();
-        this.blit(matrixStack, this.guiLeft + 116, this.guiTop + 39, 180, 0,(int)(18 * (progress / 100.0F)) , 17);
+        int progress = menu.getProgress();
+        guiGraphics.blit(GUI, getGuiLeft() + 116, getGuiTop() + 39, 180, 0,(int)(18 * (progress / 100.0F)) , 17);
 
         renderEnergyBar(
-                matrixStack,
+                guiGraphics,
                 ENERGY_LX,
                 ENERGY_RY,
                 ENERGY_HEIGHT,
                 ENERGY_WIDTH,
-                container.getEnergy(),
+                menu.getEnergy(),
                 SqueezerConfiguration.ENCH_SQUEEZER_MAX_ENERGY.get());
 
         renderFluidTank(
-                matrixStack,
+                guiGraphics,
                 TANK_LX,
                 TANK_RY,
                 TANK_HEIGHT,
                 TANK_WIDTH,
                 SqueezerConfiguration.ENCH_SQUEEZER_TANK_CAPACITY.get(),
-                container.getOutputFluid());
+                menu.getOutputFluid());
+
     }
+
+
 }

@@ -1,27 +1,28 @@
 package ipsis.woot.modules.squeezer.client;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
 import ipsis.woot.Woot;
 import ipsis.woot.fluilds.FluidSetup;
 import ipsis.woot.modules.squeezer.SqueezerConfiguration;
 import ipsis.woot.modules.squeezer.blocks.DyeSqueezerContainer;
 import ipsis.woot.util.WootContainerScreen;
+import ipsis.woot.util.helper.RenderHelper;
 import ipsis.woot.util.helper.StringHelper;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.DyeColor;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fluids.FluidStack;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.DyeColor;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+
+import java.util.List;
+
 
 @OnlyIn(Dist.CLIENT)
 public class DyeSqueezerScreen extends WootContainerScreen<DyeSqueezerContainer> {
 
-    private ResourceLocation GUI = new ResourceLocation(Woot.MODID, "textures/gui/squeezer.png");
+    private ResourceLocation GUI = ResourceLocation.fromNamespaceAndPath(Woot.MODID, "textures/gui/squeezer.png");
     private static final int GUI_XSIZE = 180;
     private static final int GUI_YSIZE = 177;
 
@@ -39,103 +40,103 @@ public class DyeSqueezerScreen extends WootContainerScreen<DyeSqueezerContainer>
     private static final int TANK_WIDTH = TANK_RX - TANK_LX + 1;
     private static final int TANK_HEIGHT = TANK_RY - TANK_LY + 1;
 
-    public DyeSqueezerScreen(DyeSqueezerContainer container, PlayerInventory playerInventory, ITextComponent name) {
-        super(container, playerInventory, name);
-        xSize = GUI_XSIZE;
-        ySize = GUI_YSIZE;
-        playerInventoryTitleY = ySize - 94;
+    public DyeSqueezerScreen(DyeSqueezerContainer menu, Inventory playerInventory, Component name) {
+        super(menu, playerInventory, name);
+        imageWidth = GUI_XSIZE;
+        imageHeight = GUI_YSIZE;
+        inventoryLabelY = imageHeight - 94;
     }
 
     @Override
-    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-        this.renderBackground(matrixStack);
-        super.render(matrixStack, mouseX, mouseY, partialTicks);
-        this.renderHoveredTooltip(matrixStack, mouseX, mouseY);
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+        this.renderBg(guiGraphics, partialTicks, mouseX, mouseY);
+        super.render(guiGraphics, mouseX, mouseY, partialTicks);
+        this.renderTooltip(guiGraphics, mouseX, mouseY);
 
-        if (isPointInRegion(82, 30, 51, 8, mouseX, mouseY))
-            renderTooltip(matrixStack, new TranslationTextComponent(
+        if (RenderHelper.isPointInRegion(82, 30, 51, 8, mouseX, mouseY, getGuiLeft(), getGuiTop()))
+            guiGraphics.renderTooltip(font, Component.translatable(
                           "gui.woot.squeezer.red",
-                        container.getRedDyeAmount(),
+                        menu.getRedDyeAmount(),
                         SqueezerConfiguration.DYE_SQUEEZER_INTERNAL_FLUID_MAX.get()),
                     mouseX, mouseY);
-        if (isPointInRegion(82, 40, 51, 8, mouseX, mouseY))
-            renderTooltip(matrixStack, new TranslationTextComponent(
+        if (RenderHelper.isPointInRegion(82, 40, 51, 8, mouseX, mouseY, getGuiLeft(), getGuiTop()))
+            guiGraphics.renderTooltip(font,  Component.translatable(
                     "gui.woot.squeezer.yellow",
-                    container.getYellowDyeAmount(),
+                    menu.getYellowDyeAmount(),
                     SqueezerConfiguration.DYE_SQUEEZER_INTERNAL_FLUID_MAX.get()),
                     mouseX, mouseY);
-        if (isPointInRegion(82, 50, 51, 8, mouseX, mouseY))
-            renderTooltip(matrixStack, new TranslationTextComponent(
+        if (RenderHelper.isPointInRegion(82, 50, 51, 8, mouseX, mouseY, getGuiLeft(), getGuiTop()))
+            guiGraphics.renderTooltip(font, Component.translatable(
                     "gui.woot.squeezer.blue",
-                        container.getBlueDyeAmount(),
+                        menu.getBlueDyeAmount(),
                         SqueezerConfiguration.DYE_SQUEEZER_INTERNAL_FLUID_MAX.get()),
                     mouseX, mouseY);
-        if (isPointInRegion(82, 60, 51, 8, mouseX, mouseY))
-            renderTooltip(matrixStack, new TranslationTextComponent(
+        if (RenderHelper.isPointInRegion(82, 60, 51, 8, mouseX, mouseY, getGuiLeft(), getGuiTop()))
+            guiGraphics.renderTooltip(font, Component.translatable(
                     "gui.woot.squeezer.white",
-                    container.getWhiteDyeAmount(),
+                    menu.getWhiteDyeAmount(),
                     SqueezerConfiguration.DYE_SQUEEZER_INTERNAL_FLUID_MAX.get()),
                     mouseX, mouseY);
-        if (isPointInRegion(TANK_LX, TANK_LY, TANK_WIDTH, TANK_HEIGHT, mouseX, mouseY))
-            renderFluidTankTooltip(matrixStack, mouseX, mouseY,
-                    container.getPureDye(),
+        if (RenderHelper.isPointInRegion(TANK_LX, TANK_LY, TANK_WIDTH, TANK_HEIGHT, mouseX, mouseY, getGuiLeft(), getGuiTop()))
+            renderFluidTankTooltip(guiGraphics, mouseX, mouseY,
+                    menu.getPureDye(),
                     SqueezerConfiguration.DYE_SQUEEZER_TANK_CAPACITY.get());
-        if (isPointInRegion(ENERGY_LX, ENERGY_LY, ENERGY_WIDTH, ENERGY_HEIGHT, mouseX, mouseY))
-            renderEnergyTooltip(matrixStack, mouseX, mouseY, container.getEnergy(),
+        if (RenderHelper.isPointInRegion(ENERGY_LX, ENERGY_LY, ENERGY_WIDTH, ENERGY_HEIGHT, mouseX, mouseY, getGuiLeft(), getGuiTop()))
+            renderEnergyTooltip(guiGraphics, mouseX, mouseY, menu.getEnergy(),
                     SqueezerConfiguration.DYE_SQUEEZER_MAX_ENERGY.get(), 10);
     }
+    
 
     @Override
-    protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY) {
-        GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-        getMinecraft().getTextureManager().bindTexture(GUI);
-        int relX = (this.width - this.xSize) / 2;
-        int relY = (this.height - this.ySize) / 2;
-        this.blit(matrixStack, relX, relY, 0, 0, this.xSize, this.ySize);
+    protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+        super.renderLabels(guiGraphics, mouseX, mouseY);
+
+        String text2 = menu.getDumpExcess() ?
+                StringHelper.translate("gui.woot.squeezer.dump") :
+                StringHelper.translate("gui.woot.squeezer.strict");
+        guiGraphics.drawString(font, text2,82, 70, 4210752);
+    }
+
+    @Override
+    protected void renderBg(GuiGraphics guiGraphics, float v, int i, int i1) {
+        guiGraphics.setColor(1.0F, 1.0F, 1.0F, 1.0F);
+        int relX = (this.width - this.imageWidth) / 2;
+        int relY = (this.height - this.imageHeight) / 2;
+        guiGraphics.blit(GUI, relX, relY, 0, 0, imageWidth, imageHeight);
 
         // Progress
-        int progress = container.getProgress();
-        this.blit(matrixStack, this.guiLeft + 58, this.guiTop + 30, 180, 0,(int)(19 * (progress / 100.0F)) , 40);
+        int progress = menu.getProgress();
+        guiGraphics.blit(GUI, getGuiLeft() + 58, getGuiTop() + 30, 180, 0,(int)(19 * (progress / 100.0F)) , 40);
 
         // NB: The tanks will change the texture so progress has to be above that or rebind the texture
-        renderHorizontalGauge(matrixStack, 82, 30, 132, 37,
-                container.getRedDyeAmount(), SqueezerConfiguration.DYE_SQUEEZER_INTERNAL_FLUID_MAX.get(),
-                0xff000000 | DyeColor.RED.getColorValue());
-        renderHorizontalGauge(matrixStack, 82, 40, 132, 47,
-                container.getYellowDyeAmount(), SqueezerConfiguration.DYE_SQUEEZER_INTERNAL_FLUID_MAX.get(),
-                0xff000000 | DyeColor.YELLOW.getColorValue());
-        renderHorizontalGauge(matrixStack, 82, 50, 132, 57,
-                container.getBlueDyeAmount(), SqueezerConfiguration.DYE_SQUEEZER_INTERNAL_FLUID_MAX.get(),
-                0xff000000 | DyeColor.BLUE.getColorValue());
-        renderHorizontalGauge(matrixStack, 82, 60, 132, 67,
-                container.getWhiteDyeAmount(), SqueezerConfiguration.DYE_SQUEEZER_INTERNAL_FLUID_MAX.get(),
-                0xff000000 | DyeColor.WHITE.getColorValue());
+        renderHorizontalGauge(guiGraphics, 82, 30, 132, 37,
+                menu.getRedDyeAmount(), SqueezerConfiguration.DYE_SQUEEZER_INTERNAL_FLUID_MAX.get(),
+                0xff000000 | DyeColor.RED.getMapColor().col);
+        renderHorizontalGauge(guiGraphics, 82, 40, 132, 47,
+                menu.getYellowDyeAmount(), SqueezerConfiguration.DYE_SQUEEZER_INTERNAL_FLUID_MAX.get(),
+                0xff000000 | DyeColor.YELLOW.getMapColor().col);
+        renderHorizontalGauge(guiGraphics, 82, 50, 132, 57,
+                menu.getBlueDyeAmount(), SqueezerConfiguration.DYE_SQUEEZER_INTERNAL_FLUID_MAX.get(),
+                0xff000000 | DyeColor.BLUE.getMapColor().col);
+        renderHorizontalGauge(guiGraphics, 82, 60, 132, 67,
+                menu.getWhiteDyeAmount(), SqueezerConfiguration.DYE_SQUEEZER_INTERNAL_FLUID_MAX.get(),
+                0xff000000 | DyeColor.WHITE.getMapColor().col);
 
         renderEnergyBar(
-                matrixStack,
+                guiGraphics,
                 ENERGY_LX,
                 ENERGY_RY,
                 ENERGY_HEIGHT,
                 ENERGY_WIDTH,
-                container.getEnergy(), SqueezerConfiguration.DYE_SQUEEZER_MAX_ENERGY.get());
+                menu.getEnergy(), SqueezerConfiguration.DYE_SQUEEZER_MAX_ENERGY.get());
 
         renderFluidTank(
-                matrixStack,
+                guiGraphics,
                 TANK_LX,
                 TANK_RY,
                 TANK_HEIGHT,
                 TANK_WIDTH,
                 SqueezerConfiguration.DYE_SQUEEZER_TANK_CAPACITY.get(),
-                container.getPureDye());
-    }
-
-    @Override
-    protected void drawGuiContainerForegroundLayer(MatrixStack matrixStack, int mouseX, int mouseY) {
-        super.drawGuiContainerForegroundLayer(matrixStack, mouseX, mouseY);
-
-        String text2 = container.getDumpExcess() ?
-                StringHelper.translate("gui.woot.squeezer.dump") :
-                StringHelper.translate("gui.woot.squeezer.strict");
-        this.font.drawString(matrixStack, text2, 82.0F, 70.0F, 4210752);
+                menu.getPureDye());
     }
 }

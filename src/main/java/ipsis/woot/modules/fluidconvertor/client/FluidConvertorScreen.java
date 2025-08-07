@@ -1,19 +1,21 @@
 package ipsis.woot.modules.fluidconvertor.client;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
 import ipsis.woot.Woot;
 import ipsis.woot.modules.fluidconvertor.FluidConvertorConfiguration;
-import ipsis.woot.modules.fluidconvertor.blocks.FluidConvertorContainer;
+import ipsis.woot.modules.fluidconvertor.blocks.FluidConvertorMenu;
 import ipsis.woot.modules.infuser.InfuserConfiguration;
 import ipsis.woot.util.WootContainerScreen;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
+import ipsis.woot.util.helper.RenderHelper;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
 
-public class FluidConvertorScreen extends WootContainerScreen<FluidConvertorContainer> {
 
-    private ResourceLocation GUI = new ResourceLocation(Woot.MODID, "textures/gui/fluidconvertor.png");
+public class FluidConvertorScreen extends WootContainerScreen<FluidConvertorMenu> {
+
+    private ResourceLocation GUI = ResourceLocation.fromNamespaceAndPath(Woot.MODID, "textures/gui/fluidconvertor.png");
 
     private static final int GUI_XSIZE = 180;
     private static final int GUI_YSIZE = 177;
@@ -38,66 +40,67 @@ public class FluidConvertorScreen extends WootContainerScreen<FluidConvertorCont
     private static final int OUT_TANK_WIDTH = OUT_TANK_RX - OUT_TANK_LX + 1;
     private static final int OUT_TANK_HEIGHT = OUT_TANK_RY - OUT_TANK_LY + 1;
 
-    public FluidConvertorScreen(FluidConvertorContainer container, PlayerInventory playerInventory, ITextComponent name) {
+    public FluidConvertorScreen(FluidConvertorMenu container, Inventory playerInventory, Component name) {
         super(container, playerInventory, name);
-        xSize = GUI_XSIZE;
-        ySize = GUI_YSIZE;
-        playerInventoryTitleY = ySize - 94;
+        imageWidth = GUI_XSIZE;
+        imageHeight = GUI_YSIZE;
+        inventoryLabelY = imageHeight - 94;
     }
 
     @Override
-    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-        this.renderBackground(matrixStack);
-        super.render(matrixStack, mouseX, mouseY, partialTicks);
-        this.renderHoveredTooltip(matrixStack, mouseX, mouseY);
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+        renderBg(guiGraphics, partialTicks, mouseX, mouseY);
+        super.render(guiGraphics, mouseX, mouseY, partialTicks);
+        this.renderTooltip(guiGraphics, mouseX, mouseY);
 
-        if (isPointInRegion(IN_TANK_LX, IN_TANK_LY, IN_TANK_WIDTH, IN_TANK_HEIGHT, mouseX, mouseY))
-            renderFluidTankTooltip(matrixStack, mouseX, mouseY, container.getInputFluid(),
+        if (RenderHelper.isPointInRegion(IN_TANK_LX, IN_TANK_LY, IN_TANK_WIDTH, IN_TANK_HEIGHT, mouseX, mouseY, getGuiLeft(), getGuiTop()))
+            renderFluidTankTooltip(guiGraphics, mouseX, mouseY, menu.getInputFluid(),
                     FluidConvertorConfiguration.FLUID_CONV_INPUT_TANK_CAPACITY.get());
-        if (isPointInRegion(OUT_TANK_LX, OUT_TANK_LY, OUT_TANK_WIDTH, OUT_TANK_HEIGHT, mouseX, mouseY))
-            renderFluidTankTooltip(matrixStack, mouseX, mouseY, container.getOutputFluid(),
+        if (RenderHelper.isPointInRegion(OUT_TANK_LX, OUT_TANK_LY, OUT_TANK_WIDTH, OUT_TANK_HEIGHT, mouseX, mouseY, getGuiLeft(), getGuiTop()))
+            renderFluidTankTooltip(guiGraphics, mouseX, mouseY, menu.getOutputFluid(),
                     FluidConvertorConfiguration.FLUID_CONV_OUTPUT_TANK_CAPACITY.get());
-        if (isPointInRegion(ENERGY_LX, ENERGY_LY, ENERGY_WIDTH, ENERGY_HEIGHT, mouseX, mouseY))
-            renderEnergyTooltip(matrixStack, mouseX, mouseY, container.getEnergy(),
+        if (RenderHelper.isPointInRegion(ENERGY_LX, ENERGY_LY, ENERGY_WIDTH, ENERGY_HEIGHT, mouseX, mouseY, getGuiLeft(), getGuiTop()))
+            renderEnergyTooltip(guiGraphics, mouseX, mouseY, menu.getEnergy(),
                     InfuserConfiguration.INFUSER_MAX_ENERGY.get(), InfuserConfiguration.INFUSER_ENERGY_PER_TICK.get());
     }
 
     @Override
-    protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY) {
-        GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-        getMinecraft().getTextureManager().bindTexture(GUI);
-        int relX = (this.width - this.xSize) / 2;
-        int relY = (this.height - this.ySize) / 2;
-        this.blit(matrixStack, relX, relY, 0, 0, this.xSize, this.ySize);
+    protected void renderBg(GuiGraphics guiGraphics, float v, int i, int i1) {
+        guiGraphics.setColor(1.0F, 1.0F, 1.0F, 1.0F);
+        int relX = (this.width - imageWidth) / 2;
+        int relY = (this.height - imageHeight) / 2;
+        guiGraphics.blit(GUI, relX, relY, 0, 0, imageWidth, imageHeight);
 
         // Progress
-        int progress = container.getProgress();
-        this.blit(matrixStack, this.guiLeft + 73, this.guiTop + 39, 180, 0,(int)(72 * (progress / 100.0F)) , 28);
+        int progress = menu.getProgress();
+        guiGraphics.blit(GUI,getGuiLeft() + 73, getGuiTop() + 39, 180, 0,(int)(72 * (progress / 100.0F)) , 28);
 
         renderEnergyBar(
-                matrixStack,
+                guiGraphics,
                 ENERGY_LX,
                 ENERGY_RY,
                 ENERGY_HEIGHT,
                 ENERGY_WIDTH,
-                container.getEnergy(), InfuserConfiguration.INFUSER_MAX_ENERGY.get());
+                menu.getEnergy(), InfuserConfiguration.INFUSER_MAX_ENERGY.get());
 
         renderFluidTank(
-                matrixStack,
+                guiGraphics,
                 IN_TANK_LX,
                 IN_TANK_RY,
                 IN_TANK_HEIGHT,
                 IN_TANK_WIDTH,
                 FluidConvertorConfiguration.FLUID_CONV_INPUT_TANK_CAPACITY.get(),
-                container.getInputFluid());
+                menu.getInputFluid());
 
         renderFluidTank(
-                matrixStack,
+                guiGraphics,
                 OUT_TANK_LX,
                 OUT_TANK_RY,
                 OUT_TANK_HEIGHT,
                 OUT_TANK_WIDTH,
                 FluidConvertorConfiguration.FLUID_CONV_OUTPUT_TANK_CAPACITY.get(),
-                container.getOutputFluid());
+                menu.getOutputFluid());
     }
+
+
 }

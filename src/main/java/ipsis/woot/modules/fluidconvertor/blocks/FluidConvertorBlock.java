@@ -9,6 +9,10 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -22,6 +26,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.phys.BlockHitResult;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.fluids.FluidStack;
@@ -52,11 +57,6 @@ public class FluidConvertorBlock extends Block implements EntityBlock, WootDebug
         builder.add(BlockStateProperties.HORIZONTAL_FACING);
     }
 
-    @Override
-    public boolean hasTileEntity(BlockState state) {
-        return true;
-    }
-
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
@@ -64,25 +64,24 @@ public class FluidConvertorBlock extends Block implements EntityBlock, WootDebug
     }
 
     @Override
-    public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult blockRayTraceResult) {
-        if (worldIn.isRemote)
-            return ActionResultType.SUCCESS;
+    public ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hitResult) {
+        if (!level.isClientSide)
+            return ItemInteractionResult.SUCCESS;
 
-        if (!(worldIn.getTileEntity(pos) instanceof FluidConvertorBlockEntity))
+        if (!(level.getBlockEntity(pos) instanceof FluidConvertorBlockEntity))
             throw new IllegalStateException("Tile entity is missing");
 
-        FluidConvertorBlockEntity tileEntity = (FluidConvertorBlockEntity) worldIn.getTileEntity(pos);
-        ItemStack heldItem = player.getHeldItem(handIn);
+        FluidConvertorBlockEntity tileEntity = (FluidConvertorBlockEntity) level.getBlockEntity(pos);
 
-        if (FluidUtil.getFluidHandler(heldItem).isPresent()) {
-            return FluidUtil.interactWithFluidHandler(player, handIn, worldIn, pos, blockRayTraceResult.getFace()) ? ActionResultType.SUCCESS : ActionResultType.FAIL;
+        if (FluidUtil.getFluidHandler(stack).isPresent()) {
+            return FluidUtil.interactWithFluidHandler(player, handIn, level, pos, hitResult.getDirection()) ? ItemInteractionResult.SUCCESS : ItemInteractionResult.FAIL;
         } else {
             // open the gui
-            if (tileEntity instanceof INamedContainerProvider)
-                NetworkHooks.openGui((ServerPlayerEntity) player, tileEntity, tileEntity.getPos());
+            if (tileEntity instanceof MenuProvider)
+                player.openMenu(tileEntity, tileEntity.getBlockPos());
             else
                 throw new IllegalStateException("Named container provider is missing");
-            return ActionResultType.SUCCESS;
+            return ItemInteractionResult.SUCCESS;
         }
     }
 

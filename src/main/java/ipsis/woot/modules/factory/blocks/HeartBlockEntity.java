@@ -388,11 +388,6 @@ public class HeartBlockEntity extends BlockEntity implements TickingBlockEntity,
         return Component.literal(getType().builtInRegistryHolder().getRegisteredName());
     }
 
-    @Nullable
-    @Override
-    public AbstractContainerMenu createMenu(int windowId, Inventory playerInventory, Player playerEntity) {
-        return new HeartMenu(windowId, level, getBlockPos(), playerInventory, playerEntity);
-    }
 
     public int getFluidCapacity() {
         return formedSetup != null ? formedSetup.getCellCapacity() : 0;

@@ -109,4 +109,15 @@ public record AnvilRecipe(Ingredient baseItem, List<Ingredient> ingredients, Ite
             return STREAM_CODEC;
         }
     }
+
+    private static List<ItemStack> validInputs = new ArrayList<>();
+    public static void clearValidInputs() { validInputs.clear(); }
+    public static void addValidInput(ItemStack itemStack) { validInputs.add(itemStack); }
+    public static boolean isValidInput(ItemStack itemStack) {
+        for (ItemStack i : validInputs) {
+            if (i.is(itemStack.getItem()))
+                return true;
+        }
+        return false;
+    }
 }

@@ -1,18 +1,19 @@
 package ipsis.woot.commands;
 
 import ipsis.woot.config.ConfigPath;
-import net.minecraftforge.common.ForgeConfigSpec;
+import net.neoforged.neoforge.common.ModConfigSpec;
+
 
 public class CommandConfiguration {
 
-    public static ForgeConfigSpec.IntValue COMMAND_LEVEL_SIM_LEARN;
-    public static ForgeConfigSpec.IntValue COMMAND_LEVEL_SIM_DUMP;
-    public static ForgeConfigSpec.IntValue COMMAND_LEVEL_SIM_FLUSH;
-    public static ForgeConfigSpec.IntValue COMMAND_LEVEL_SIM_STATUS;
-    public static ForgeConfigSpec.IntValue COMMAND_LEVEL_SIM_ROLL_DROPS;
-    public static ForgeConfigSpec.IntValue COMMAND_LEVEL_GIVE;
+    public static ModConfigSpec.IntValue COMMAND_LEVEL_SIM_LEARN;
+    public static ModConfigSpec.IntValue COMMAND_LEVEL_SIM_DUMP;
+    public static ModConfigSpec.IntValue COMMAND_LEVEL_SIM_FLUSH;
+    public static ModConfigSpec.IntValue COMMAND_LEVEL_SIM_STATUS;
+    public static ModConfigSpec.IntValue COMMAND_LEVEL_SIM_ROLL_DROPS;
+    public static ModConfigSpec.IntValue COMMAND_LEVEL_GIVE;
 
-    public static void init(ForgeConfigSpec.Builder COMMON_BUILDER, ForgeConfigSpec.Builder CLIENT_BUILDER) {
+    public static void init(ModConfigSpec.Builder COMMON_BUILDER, ModConfigSpec.Builder CLIENT_BUILDER) {
 
         COMMON_BUILDER.comment("Settings for commands").push(ConfigPath.Commands.CATEGORY);
         CLIENT_BUILDER.comment("Settings for commands").push(ConfigPath.Commands.CATEGORY);

@@ -2,6 +2,7 @@ package ipsis.woot.util;
 
 
 import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -9,12 +10,16 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidType;
 import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
@@ -112,12 +117,28 @@ public abstract class WootContainerScreen<T extends AbstractContainerMenu> exten
         if (fluid == null)
             return;
 
-        Minecraft.getInstance().getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
-        int color = fluid.getFluid().getAttributes().getColor(fluid);
-        setGLColorFromInt(color);
-        ResourceLocation resourceLocation = fluid.getFluid().;
-        TextureAtlasSprite textureAtlasSprite = Minecraft.getInstance().getAtlasSpriteGetter(AtlasTexture.LOCATION_BLOCKS_TEXTURE).apply(resourceLocation);
-        drawTiledTexture(guiGraphics, x, y, textureAtlasSprite, width, height);
+        fluid.getFluid().defaultFluidState().ge
+
+        // Get sprite from texture atlas
+        TextureAtlas textureAtlas = Minecraft.getInstance().getModelManager().getAtlas(InventoryMenu.BLOCK_ATLAS);
+        TextureAtlasSprite sprite = textureAtlas.getSprite(stillTexture);
+
+        // Get fluid color
+        int color = fluidTypeProperties.getTi;
+
+        // Set color and render
+        RenderSystem.setShaderColor(
+                ((color >> 16) & 0xFF) / 255.0f,  // Red
+                ((color >> 8) & 0xFF) / 255.0f,   // Green
+                (color & 0xFF) / 255.0f,          // Blue
+                ((color >> 24) & 0xFF) / 255.0f   // Alpha
+        );
+
+        RenderSystem.setShaderTexture(0, InventoryMenu.BLOCK_ATLAS);
+        drawTiledTexture(guiGraphics, x, y, sprite, width, height);
+
+        // Reset color
+        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
     }
 
     private void setGLColorFromInt(int color) {

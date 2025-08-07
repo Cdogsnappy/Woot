@@ -1,10 +1,10 @@
 package ipsis.woot.modules.debug.items;
 
-import ipsis.woot.Woot;
-import ipsis.woot.setup.ModSetup;
 import ipsis.woot.util.WootDebug;
-import ipsis.woot.util.helper.PlayerHelper;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.ChatComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -13,7 +13,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,17 +23,17 @@ public class DebugItem extends Item {
     }
 
     @Override
-    public ItemInteractionResult onItemUseFirst(ItemStack stack, UseOnContext context) {
+    public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context) {
         if (!context.getLevel().isClientSide) {
             Block b =  context.getLevel().getBlockState(context.getClickedPos()).getBlock();
             if (b instanceof WootDebug) {
                 List<String> debug = new ArrayList<>();
                 ((WootDebug)b).getDebugText(debug, context);
                 for (String s : debug)
-                    context.getPlayer().sendSystemMessage(new ChatComponent(s), false);
+                    context.getPlayer().sendSystemMessage(Component.literal(s));
             }
         }
-        return ItemInteractionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
     public static List<String> getTileEntityDebug(List<String> debug, UseOnContext context) {

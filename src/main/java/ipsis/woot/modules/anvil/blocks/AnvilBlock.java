@@ -9,6 +9,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -62,11 +63,11 @@ public class AnvilBlock extends Block implements WootDebug, EntityBlock {
     @Nullable
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
-        return this.defaultBlockState().setValue(BlockStateProperties.HORIZONTAL_FACING, context.getPlacementHorizontalFacing().rotateY());
+        return this.defaultBlockState().setValue(BlockStateProperties.HORIZONTAL_FACING, context.getHorizontalDirection().getClockWise(Direction.Axis.Y));
     }
 
     @Override
-    protected void S(StateDefinition.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(BlockStateProperties.HORIZONTAL_FACING);
     }
 
@@ -133,19 +134,19 @@ public class AnvilBlock extends Block implements WootDebug, EntityBlock {
     }
 
     @OnlyIn(Dist.CLIENT)
-    public void animateTick(BlockState stateIn, Level worldIn, BlockPos pos, Random rand) {
-        super.animateTick(stateIn, worldIn, pos, rand);
-        if (AnvilConfiguration.ANVIL_PARTICILES.get() && rand.nextInt(10) == 0 && isAnvilHot(worldIn, pos))
-            worldIn.addParticle(ParticleTypes.LAVA, (double) ((float) pos.getX() + rand.nextFloat()), (double) ((float) pos.getY() + 1.1F), (double) ((float) pos.getZ() + rand.nextFloat()), 0.0D, 0.0D, 0.0D);
+    public void animateTick(BlockState stateIn, Level worldIn, BlockPos pos, RandomSource random) {
+        super.animateTick(stateIn, worldIn, pos, random);
+        if (AnvilConfiguration.ANVIL_PARTICILES.get() && random.nextInt(10) == 0 && isAnvilHot(worldIn, pos))
+            worldIn.addParticle(ParticleTypes.LAVA, (double) ((float) pos.getX() + random.nextFloat()), (double) ((float) pos.getY() + 1.1F), (double) ((float) pos.getZ() + random.nextFloat()), 0.0D, 0.0D, 0.0D);
     }
 
     @Override
-    public void onReplaced(BlockState blockState, Level world, BlockPos pos, BlockState newBlockState, boolean isMoving) {
+    public void onRemove(BlockState blockState, Level world, BlockPos pos, BlockState newBlockState, boolean isMoving) {
         if (blockState.getBlock() != newBlockState.getBlock()) {
-            TileEntity te = world.getTileEntity(pos);
+            BlockEntity te = world.getBlockEntity(pos);
             if (te instanceof AnvilBlockEntity)
                 ((AnvilBlockEntity) te).dropContents(world, pos);
-            super.onReplaced(blockState, world, pos, newBlockState, isMoving);
+            super.onRemove(blockState, world, pos, newBlockState, isMoving);
         }
     }
 

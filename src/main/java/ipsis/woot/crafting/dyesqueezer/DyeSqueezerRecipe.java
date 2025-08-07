@@ -69,7 +69,6 @@ public record DyeSqueezerRecipe(Ingredient input, int[] dyes, int energy) implem
         return arr;
     }
 
-    public static final RecipeType<DyeSqueezerRecipe> DYE_SQUEEZER_TYPE = RecipeType.register(Woot.MODID + ":dyesqueezer");
 
     /**
      * IRecipe
