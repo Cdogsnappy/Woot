@@ -15,10 +15,13 @@ import ipsis.woot.modules.factory.items.PerkItem;
 import ipsis.woot.modules.factory.items.XpShardBaseItem;
 import ipsis.woot.modules.factory.multiblock.MultiBlockBlockEntity;
 import ipsis.woot.modules.factory.perks.Perk;
+import ipsis.woot.util.WootBaseEntityBlock;
+import ipsis.woot.util.WootMachineBlockEntity;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.bus.api.IEventBus;
@@ -40,6 +43,13 @@ public class FactorySetup {
         BLOCKENTITIES.register(eventBus);
         CONTAINERS.register(eventBus);
     }
+
+    public static final DeferredHolder<Block, WootBaseEntityBlock> WOOT_BASE_BLOCK = BLOCKS.register(
+            "wootbaseblock", WootBaseEntityBlock::new);
+    )
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<WootMachineBlockEntity>> WOOT_MACHINE_ENTITY =
+            BLOCKENTITIES.register("wootmachineentity", () ->
+                    BlockEntityType.Builder.of(WootMachineBlockEntity::new, WOOT_BASE_BLOCK.get()).build(null));
 
     public static final String HEART_TAG = "heart";
     public static final DeferredHolder<Block, HeartBlock> HEART_BLOCK = BLOCKS.register(
@@ -158,7 +168,7 @@ public class FactorySetup {
 
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<?>> MULTIBLOCK_BLOCK_TILE = BLOCKENTITIES.register(
             "multiblock", () ->
-                    BlockEntityType.Builder.create(MultiBlockBlockEntity::new,
+                    BlockEntityType.Builder.of(MultiBlockBlockEntity::new,
                             IMPORT_BLOCK.get(),
                             EXPORT_BLOCK.get(),
                             FACTORY_A_BLOCK.get(),

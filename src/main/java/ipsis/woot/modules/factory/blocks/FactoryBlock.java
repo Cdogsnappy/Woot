@@ -1,12 +1,17 @@
 package ipsis.woot.modules.factory.blocks;
 
+import com.mojang.serialization.MapCodec;
 import ipsis.woot.modules.debug.items.DebugItem;
 import ipsis.woot.modules.factory.FactoryComponent;
 import ipsis.woot.modules.factory.FactoryComponentProvider;
+import ipsis.woot.modules.factory.FactorySetup;
 import ipsis.woot.modules.factory.multiblock.MultiBlockBlockEntity;
+import ipsis.woot.util.WootBaseEntityBlock;
 import ipsis.woot.util.WootDebug;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.SoundType;
@@ -14,12 +19,15 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class FactoryBlock extends Block implements FactoryComponentProvider, WootDebug, EntityBlock {
+public class FactoryBlock extends WootBaseEntityBlock implements FactoryComponentProvider, WootDebug {
 
     private final FactoryComponent component;
 
@@ -45,34 +53,23 @@ public class FactoryBlock extends Block implements FactoryComponentProvider, Woo
     }
 
     @Override
-    protected void createStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(BlockStateProperties.ATTACHED);
     }
 
     /**
      * Block display since we are less than a full block
      */
-    private final VoxelShape shape = Block.makeCuboidShape(1.0D, 1.0D, 1.0D, 15.0D, 15.0D, 15.0D);
+    private final VoxelShape shape = Block.box(1.0D, 1.0D, 1.0D, 15.0D, 15.0D, 15.0D);
     @Override
-    public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
+    public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         if (this.component == FactoryComponent.FACTORY_UPGRADE)
-            return super.getShape(state, worldIn, pos, context);
+            return super.getShape(state, level, pos, context);
         
-        if (state.get(BlockStateProperties.ATTACHED))
-            return VoxelShapes.fullCube();
+        if (state.getValue(BlockStateProperties.ATTACHED))
+            return Shapes.block();
         else
             return shape;
-    }
-
-    @Override
-    public boolean hasTileEntity(BlockState state) {
-        return true;
-    }
-
-    @Nullable
-    @Override
-    public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-        return new MultiBlockBlockEntity();
     }
 
     /**
@@ -93,6 +90,11 @@ public class FactoryBlock extends Block implements FactoryComponentProvider, Woo
 
     @Override
     public @org.jetbrains.annotations.Nullable BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {
+        return new MultiBlockBlockEntity(FactorySetup.MULTIBLOCK_BLOCK_TILE.get(), blockPos, blockState);
+    }
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
         return null;
     }
 }

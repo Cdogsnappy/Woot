@@ -2,6 +2,7 @@ package ipsis.woot.modules.infuser.blocks;
 
 import ipsis.woot.modules.debug.items.DebugItem;
 import ipsis.woot.modules.infuser.InfuserConfiguration;
+import ipsis.woot.util.WootBaseEntityBlock;
 import ipsis.woot.util.WootDebug;
 import ipsis.woot.util.helper.StringHelper;
 import net.minecraft.core.BlockPos;
@@ -38,7 +39,7 @@ import net.neoforged.neoforge.fluids.FluidUtil;
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class InfuserBlock extends Block implements WootDebug, EntityBlock {
+public class InfuserBlock extends WootBaseEntityBlock implements WootDebug {
 
     public InfuserBlock() {
         super(Properties.of().sound(SoundType.METAL).strength(3.5F));

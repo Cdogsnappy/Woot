@@ -1,7 +1,10 @@
 package ipsis.woot.modules.squeezer.blocks;
 
+import com.mojang.serialization.MapCodec;
 import ipsis.woot.modules.debug.items.DebugItem;
 import ipsis.woot.modules.squeezer.SqueezerConfiguration;
+import ipsis.woot.modules.squeezer.SqueezerSetup;
+import ipsis.woot.util.WootBaseEntityBlock;
 import ipsis.woot.util.WootDebug;
 import ipsis.woot.util.helper.StringHelper;
 import net.minecraft.core.BlockPos;
@@ -20,10 +23,13 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -37,9 +43,11 @@ import net.neoforged.neoforge.fluids.FluidUtil;
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class DyeSqueezerBlock extends Block implements WootDebug, EntityBlock {
+public class DyeSqueezerBlock extends WootBaseEntityBlock implements WootDebug, EntityBlock {
 
-    public DyeSqueezerBlock() {
+    public static final MapCodec<DyeSqueezerBlock> CODEC = simpleCodec(DyeSqueezerBlock::new);
+
+    public DyeSqueezerBlock(Properties prop) {
         super(Properties.of().sound(SoundType.METAL).strength(3.5F));
         registerDefaultState(getStateDefinition().any().setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH));
     }
@@ -148,5 +156,20 @@ public class DyeSqueezerBlock extends Block implements WootDebug, EntityBlock {
     @Override
     public @org.jetbrains.annotations.Nullable BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {
         return new DyeSqueezerBlockEntity(blockPos, blockState);
+    }
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
+    }
+    @Nullable
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
+        if(level.isClientSide()) {
+            return null;
+        }
+
+        return createTickerHelper(blockEntityType, SqueezerSetup.SQUEEZER_BLOCK_TILE.get(),
+                (level1, blockPos, blockState, blockEntity) -> blockEntity.tick(level));
     }
 }

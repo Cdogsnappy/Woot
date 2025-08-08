@@ -16,8 +16,11 @@ import ipsis.woot.util.FakeMob;
 import ipsis.woot.util.WootDebug;
 import ipsis.woot.util.helper.StorageHelper;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.Container;
+import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -44,9 +47,11 @@ import java.util.*;
  * The factory is formed manually by the user via the intern -> interrupt
  * When an attached block is removed or unloaded it should inform the heart -> interrupt
  */
-public class HeartBlockEntity extends BlockEntity implements TickingBlockEntity, MultiBlockMaster, WootDebug {
+public class HeartBlockEntity extends BlockEntity implements MultiBlockMaster, WootDebug, MenuProvider {
 
     static final Logger LOGGER = LogManager.getLogger();
+
+    static final int LAZY_TICK_RATE = 5;
 
     /**
      * Layout will not exist until after the first update call
@@ -57,6 +62,7 @@ public class HeartBlockEntity extends BlockEntity implements TickingBlockEntity,
     HeartRecipe recipe;
     TickTracker tickTracker = new TickTracker();
     boolean loadedFromNBT = false;
+    int tick = 0;
 
     public HeartBlockEntity(BlockPos pos, BlockState blockState) {
         super(FactorySetup.HEART_BLOCK_TILE.get(), pos, blockState);
@@ -64,8 +70,8 @@ public class HeartBlockEntity extends BlockEntity implements TickingBlockEntity,
     }
 
     @Override
-    public void remove() {
-        super.remove();
+    public void setRemoved() {
+        super.setRemoved();
         if (layout != null)
             layout.fullDisconnect();
     }
@@ -78,13 +84,16 @@ public class HeartBlockEntity extends BlockEntity implements TickingBlockEntity,
     }
 
     public boolean isRunning() {
-        return !level.isBlockPowered(pos);
+        return !level.hasNeighborSignal(getBlockPos());
     }
 
     public boolean isFormed() { return layout != null && layout.isFormed(); }
 
-    @Override
-    public void tick() {
+    public void tick(Level level) {
+        if(++tick <= LAZY_TICK_RATE){
+            return;
+        }
+        tick = 0;
         if (level == null)
             return;
 
@@ -93,7 +102,7 @@ public class HeartBlockEntity extends BlockEntity implements TickingBlockEntity,
 
        if (layout == null) {
            layout = new Layout();
-           layout.setLocation(level, getBlockPos(), level.getBlockState(getPos()).getValue(BlockStateProperties.HORIZONTAL_FACING));
+           layout.setLocation(level, getBlockPos(), level.getBlockState(getBlockPos()).getValue(BlockStateProperties.HORIZONTAL_FACING));
            layout.setDirty();
        }
 
@@ -104,7 +113,7 @@ public class HeartBlockEntity extends BlockEntity implements TickingBlockEntity,
        layout.tick(tickTracker, this);
        if (layout.isFormed()) {
            if (layout.hasChanged()) {
-               formedSetup = FormedSetup.createFromValidLayout(world, layout);
+               formedSetup = FormedSetup.createFromValidLayout(level, layout);
                LOGGER.debug("formedSetup: {}", formedSetup);
 
                formedSetup.getAllMobs().forEach(m -> MobSimulator.getInstance().learn(m));
@@ -151,21 +160,17 @@ public class HeartBlockEntity extends BlockEntity implements TickingBlockEntity,
        }
     }
 
-    @Override
-    public @NotNull BlockPos getPos() {
-        return this.worldPosition;
-    }
 
     private List<ItemStack> createItemIngredients(HeartRecipe recipe, FormedSetup formedSetup) {
         List<ItemStack> items = new ArrayList<>();
-        for (ItemStack itemStack : recipe.recipeItems)
+        for (ItemStack itemStack : recipe.recipeItems())
             items.add(itemStack.copy());
         return items;
     }
 
     private List<FluidStack> createFluidIngredients(HeartRecipe recipe, FormedSetup formedSetup) {
         List<FluidStack> fluids = new ArrayList<>();
-        for (FluidStack fluidStack : recipe.recipeFluids)
+        for (FluidStack fluidStack : recipe.recipeFluids())
             fluids.add(fluidStack.copy());
         return fluids;
     }
@@ -255,34 +260,26 @@ public class HeartBlockEntity extends BlockEntity implements TickingBlockEntity,
      * NBT
      */
 
-    @Override
-    public void deserializeNBT(CompoundNBT compound) {
-        super.deserializeNBT(compound);
-        readFromNBT(compound);
-    }
+
 
     @Override
-    public void read(BlockState blockState, CompoundNBT compoundNBT) {
-        super.read(blockState, compoundNBT);
-        readFromNBT(compoundNBT);
-    }
-
-    private void readFromNBT(CompoundNBT compound) {
-        if (compound.contains(ModNBT.Heart.PROGRESS_TAG)) {
+    public void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
+        if (tag.contains(ModNBT.Heart.PROGRESS_TAG)) {
             loadedFromNBT = true;
-            consumedUnits = compound.getInt(ModNBT.Heart.PROGRESS_TAG);
+            consumedUnits = tag.getInt(ModNBT.Heart.PROGRESS_TAG);
             LOGGER.debug("read: loading progress " + consumedUnits);
         }
     }
 
+
     @Override
-    public CompoundNBT write(CompoundNBT compound) {
-        super.write(compound);
+    public void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
         if (isFormed() && recipe != null) {
-            compound.putInt(ModNBT.Heart.PROGRESS_TAG, consumedUnits);
+            tag.putInt(ModNBT.Heart.PROGRESS_TAG, consumedUnits);
             LOGGER.debug("write: saving progress " + consumedUnits);
         }
-        return compound;
     }
 
     /**
@@ -323,6 +320,11 @@ public class HeartBlockEntity extends BlockEntity implements TickingBlockEntity,
         // Purely the passage of time
         consumedUnits++;
        setChanged();
+    }
+
+    @Override
+    public @org.jetbrains.annotations.Nullable AbstractContainerMenu createMenu(int i, Inventory inventory, Player player) {
+        return new HeartMenu(i, level, getBlockPos(), inventory, player);
     }
 
 

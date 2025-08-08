@@ -1,7 +1,6 @@
 package ipsis.woot.modules.factory.blocks;
 
 import ipsis.woot.Woot;
-import ipsis.woot.advancements.Advancements;
 import ipsis.woot.modules.factory.FactorySetup;
 import ipsis.woot.modules.factory.perks.Perk;
 import ipsis.woot.modules.factory.items.PerkItem;
@@ -40,8 +39,6 @@ public class UpgradeBlockEntity extends MultiBlockBlockEntity implements WootDeb
                 glue.onGoodbye();
                 MultiBlockTracker.get().addEntry(world, getBlockPos());
                 Woot.setup.getLogger().debug("tryAddUpgrade: added {}", type);
-                if (playerEntity instanceof ServerPlayer)
-                    Advancements.APPLY_PERK_TRIGGER.trigger((ServerPlayer) playerEntity, type);
                 return true;
             } else {
                 playerEntity.sendSystemMessage(Component.translatable("chat.woot.perk.fail.0"));
@@ -113,12 +110,8 @@ public class UpgradeBlockEntity extends MultiBlockBlockEntity implements WootDeb
     public List<String> getDebugText(List<String> debug, UseOnContext itemUseContext) {
         debug.add("====> UpgradeTileEntity");
         debug.add("      hasMaster: " + glue.hasMaster());
-        debug.add("      upgrade: " + world.getBlockState(pos).get(UpgradeBlock.UPGRADE));
+        debug.add("      upgrade: " + level.getBlockState(getBlockPos()).getValue(UpgradeBlock.UPGRADE));
         return debug;
     }
 
-    @Override
-    public List<String> getDebugText(List<String> debug, InteractionResult itemUseContext) {
-        return List.of();
-    }
 }

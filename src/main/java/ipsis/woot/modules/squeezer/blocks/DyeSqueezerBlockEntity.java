@@ -387,6 +387,6 @@ public class DyeSqueezerBlockEntity extends WootMachineBlockEntity implements Wo
 
     @Override
     public @org.jetbrains.annotations.Nullable AbstractContainerMenu createMenu(int i, Inventory inventory, Player player) {
-        return new DyeSqueezerContainer(i, level, getBlockPos(), inventory, player);
+        return new DyeSqueezerContainer(i, inventory, this);
     }
 }

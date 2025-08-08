@@ -5,6 +5,7 @@ import ipsis.woot.modules.factory.FactoryComponent;
 import ipsis.woot.modules.factory.FactoryComponentProvider;
 import ipsis.woot.modules.factory.FactoryConfiguration;
 import ipsis.woot.modules.factory.FactorySetup;
+import ipsis.woot.util.WootBaseEntityBlock;
 import ipsis.woot.util.WootDebug;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
@@ -35,7 +36,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class CellBlock extends Block implements WootDebug, FactoryComponentProvider, EntityBlock {
+public class CellBlock extends WootBaseEntityBlock implements WootDebug, FactoryComponentProvider{
 
     final Class<? extends CellBlockEntityBase> tileEntityClazz;
     public CellBlock(Class<? extends CellBlockEntityBase> clazz) {

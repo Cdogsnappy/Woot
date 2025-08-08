@@ -6,89 +6,90 @@ import com.mojang.brigadier.suggestion.SuggestionProvider;
 import ipsis.woot.modules.factory.blocks.ControllerBlockEntity;
 import ipsis.woot.simulator.spawning.SpawnController;
 import ipsis.woot.util.FakeMob;
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.Commands;
-import net.minecraft.command.ISuggestionProvider;
-import net.minecraft.command.arguments.EntityArgument;
-import net.minecraft.command.arguments.ResourceLocationArgument;
-import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.commands.CommandSource;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.commands.arguments.EntityArgument;
+import net.minecraft.commands.arguments.ResourceLocationArgument;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.ItemStack;
+
 
 public class GiveCommand {
 
-    static final SuggestionProvider<CommandSource> ENTITY_SUGGESTIONS = (ctx, builder) ->
-            ISuggestionProvider.func_212476_a(
-                    ForgeRegistries.ENTITIES.getKeys().stream(),
+    static final SuggestionProvider<CommandSourceStack> ENTITY_SUGGESTIONS = (ctx, builder) ->
+            SharedSuggestionProvider.suggestResource(
+                    BuiltInRegistries.ENTITY_TYPE.keySet().stream(),
                     builder);
 
-    static ArgumentBuilder<CommandSource, ?> register() {
+    static ArgumentBuilder<CommandSourceStack, ?> register() {
         return Commands.literal("give")
-                .requires(cs -> cs.hasPermissionLevel(CommandConfiguration.COMMAND_LEVEL_GIVE.get()))
+                .requires(cs -> cs.hasPermission(CommandConfiguration.COMMAND_LEVEL_GIVE.get()))
                 .then(
                         Commands.argument("target", EntityArgument.player())
                         .then(
-                                Commands.argument("entity", ResourceLocationArgument.resourceLocation()).suggests(ENTITY_SUGGESTIONS)
+                                Commands.argument("entity", ResourceLocationArgument.id()).suggests(ENTITY_SUGGESTIONS)
                                     .executes(ctx -> giveItem(
-                                        ctx.getSource(),
+                                        ctx.getSource().source,
                                         EntityArgument.getPlayer(ctx, "target"),
-                                        ResourceLocationArgument.getResourceLocation(ctx, "entity"), ""))
+                                        ResourceLocationArgument.getId(ctx, "entity"), ""))
                                 .then(
                                         Commands.argument("tag", StringArgumentType.string())
                                                 .executes(ctx -> giveItem(
-                                                        ctx.getSource(),
+                                                        ctx.getSource().source,
                                                         EntityArgument.getPlayer(ctx, "target"),
-                                                        ResourceLocationArgument.getResourceLocation(ctx, "entity"),
+                                                        ResourceLocationArgument.getId(ctx, "entity"),
                                                         StringArgumentType.getString(ctx, "tag")))
                                 )
                         )
                 );
     }
 
-    private static int giveItem(CommandSource source, ServerPlayerEntity target, ResourceLocation resourceLocation, String tag) {
+    private static int giveItem(CommandSource source, ServerPlayer target, ResourceLocation resourceLocation, String tag) {
 
         FakeMob fakeMob = new FakeMob();
         if (tag.equalsIgnoreCase(""))
             fakeMob = new FakeMob(resourceLocation.toString());
         else
             fakeMob = new FakeMob(resourceLocation.toString() + "," + tag);
-        if (fakeMob.isValid() && SpawnController.get().isLivingEntity(fakeMob, source.getWorld())) {
+        if (fakeMob.isValid() && SpawnController.get().isLivingEntity(fakeMob, target.level())) {
             ItemStack itemStack = ControllerBlockEntity.getItemStack(fakeMob);
 
             /**
              * Straight from vanilla GiveCommand
              */
-            boolean added = target.inventory.addItemStackToInventory(itemStack);
+            boolean added = target.getInventory().add(itemStack);
             if (added && itemStack.isEmpty()) {
                 itemStack.setCount(1);
-                ItemEntity itemEntity = target.dropItem(itemStack, false);
+                ItemEntity itemEntity = target.drop(itemStack, false);
                 if (itemEntity != null)
                     itemEntity.makeFakeItem();
 
-                target.world.playSound(null,
-                        target.getPosX(), target.getPosY(), target.getPosZ(),
-                        SoundEvents.ENTITY_ITEM_PICKUP,
-                        SoundCategory.PLAYERS,
+                target.level().playSound(null,
+                        target.getX(), target.getY(), target.getZ(),
+                        SoundEvents.ITEM_PICKUP,
+                        SoundSource.PLAYERS,
                         0.2F,
-                        ((target.getRNG().nextFloat() - target.getRNG().nextFloat()) * 0.7F + 1.0F) * 2.0F);
-                target.container.detectAndSendChanges();
+                        ((target.getRandom().nextFloat() - target.getRandom().nextFloat()) * 0.7F + 1.0F) * 2.0F);
+                target.containerMenu.broadcastChanges();
             } else {
-                ItemEntity itemEntity = target.dropItem(itemStack, false);
+                ItemEntity itemEntity = target.drop(itemStack, false);
                 if (itemEntity != null) {
-                    itemEntity.setNoPickupDelay();
-                    itemEntity.setOwnerId(target.getUniqueID());
+                    itemEntity.setNoPickUpDelay();
                 }
             }
-            source.sendFeedback(new TranslationTextComponent("commands.woot.give.ok",
-                    target.getDisplayName(), resourceLocation.toString()), true);
+            source.sendSystemMessage(Component.translatable("commands.woot.give.ok",
+                    target.getDisplayName(), resourceLocation.toString()));
         } else {
-            source.sendFeedback(new TranslationTextComponent("commands.woot.give.fail",
-                    resourceLocation.toString()), true);
+            source.sendSystemMessage(Component.translatable("commands.woot.give.fail",
+                    resourceLocation.toString()));
         }
 
         return 1;

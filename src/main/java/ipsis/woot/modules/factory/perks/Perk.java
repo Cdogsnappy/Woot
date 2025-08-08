@@ -2,6 +2,10 @@ package ipsis.woot.modules.factory.perks;
 
 
 
+import com.google.gson.JsonObject;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import ipsis.woot.util.ExtraWootCodecs;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -149,4 +153,5 @@ public enum Perk implements StringRepresentable {
     }
 
     public static final StreamCodec<RegistryFriendlyByteBuf, Perk> STREAM_CODEC = ExtraWootCodecs.enumStreamCodec(Perk.class);
+
 }

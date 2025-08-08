@@ -1,6 +1,8 @@
 package ipsis.woot.modules.factory.blocks;
 
+import com.mojang.serialization.MapCodec;
 import ipsis.woot.modules.debug.DebugSetup;
+import ipsis.woot.modules.factory.FactorySetup;
 import ipsis.woot.modules.layout.LayoutSetup;
 import ipsis.woot.modules.debug.items.DebugItem;
 import ipsis.woot.modules.factory.FactoryComponent;
@@ -16,10 +18,13 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -30,9 +35,11 @@ import org.jetbrains.annotations.NotNull;
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class HeartBlock extends Block implements FactoryComponentProvider, WootDebug {
+public class HeartBlock extends BaseEntityBlock implements FactoryComponentProvider, WootDebug {
 
-    public HeartBlock() {
+    public static final MapCodec<HeartBlock> CODEC = simpleCodec(HeartBlock::new);
+
+    public HeartBlock(Properties properties) {
         super(Properties.of().sound(SoundType.METAL).strength(3.5F));
         registerDefaultState(getStateDefinition().any().setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH));
     }
@@ -48,10 +55,6 @@ public class HeartBlock extends Block implements FactoryComponentProvider, WootD
         builder.add(BlockStateProperties.HORIZONTAL_FACING);
     }
 
-    @Override
-    public boolean hasTileEntity(BlockState state) {
-        return true;
-    }
 
 
     @Override
@@ -96,5 +99,27 @@ public class HeartBlock extends Block implements FactoryComponentProvider, WootD
         debug.add("====> HeartBlock");
         DebugItem.getTileEntityDebug(debug, itemUseContext);
         return debug;
+    }
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
+    }
+
+    @Override
+    public @org.jetbrains.annotations.Nullable BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {
+        return new HeartBlockEntity(blockPos, blockState);
+    }
+
+
+    @Nullable
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
+        if(level.isClientSide()) {
+            return null;
+        }
+
+        return createTickerHelper(blockEntityType, FactorySetup.HEART_BLOCK_TILE.get(),
+                (level1, blockPos, blockState, blockEntity) -> blockEntity.tick(level));
     }
 }

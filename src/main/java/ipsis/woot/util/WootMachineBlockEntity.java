@@ -1,5 +1,6 @@
 package ipsis.woot.util;
 
+import ipsis.woot.modules.factory.FactorySetup;
 import ipsis.woot.util.helper.WorldHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -7,6 +8,7 @@ import net.minecraft.world.Containers;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.apache.logging.log4j.LogManager;
@@ -23,7 +25,7 @@ import java.util.List;
  * This is HEAVILY based off the CoFH's TileMachineBase processing algorithm
  *
  */
-public abstract class WootMachineBlockEntity extends BlockEntity {
+public class WootMachineBlockEntity extends BlockEntity {
 
     protected enum Mode {
         NONE, INPUT, OUTPUT
@@ -32,8 +34,14 @@ public abstract class WootMachineBlockEntity extends BlockEntity {
 
     protected static final Logger LOGGER = LogManager.getLogger();
 
-    public WootMachineBlockEntity(BlockEntityType<?> blockEntityType, BlockPos pos, BlockState state) {
-        super(blockEntityType, pos, state);
+    public WootMachineBlockEntity(BlockPos pos, BlockState state) {
+        super(FactorySetup.WOOT_MACHINE_ENTITY.get(), pos, state);
+        for (Direction direction : Direction.values())
+            settings.put(direction, Mode.NONE);
+    }
+
+    public WootMachineBlockEntity(BlockEntityType<?> entityType, BlockPos pos, BlockState state) {
+        super(entityType, pos, state);
         for (Direction direction : Direction.values())
             settings.put(direction, Mode.NONE);
     }
@@ -87,24 +95,24 @@ public abstract class WootMachineBlockEntity extends BlockEntity {
      * Energy cell must not be empty
      * Must be space for all outputs
      */
-    protected abstract boolean canStart();
+    protected boolean canStart(){return false;}
 
     /**
      * Remove the inputs and generate the outputs
      */
-    protected abstract void processFinish();
+    protected void processFinish(){}
 
     /**
      * All inputs must be present to form a recipe
      * Energy and output space are not valid
      */
-    protected abstract boolean hasValidInput();
+    protected boolean hasValidInput(){return false;}
 
-    protected abstract boolean hasEnergy();
-    protected abstract int useEnergy();
-    protected abstract void clearRecipe();
-    protected abstract int getRecipeEnergy();
-    protected abstract boolean isDisabled();
+    protected boolean hasEnergy(){return false;}
+    protected int useEnergy(){return 0;}
+    protected void clearRecipe(){}
+    protected int getRecipeEnergy(){return 0;}
+    protected boolean isDisabled(){return false;}
 
     /**
      *
@@ -166,5 +174,7 @@ public abstract class WootMachineBlockEntity extends BlockEntity {
         setChanged();
         WorldHelper.updateClient(level, getBlockPos());
     }
+
+
 
 }

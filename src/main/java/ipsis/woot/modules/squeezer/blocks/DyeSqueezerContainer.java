@@ -8,6 +8,7 @@ import ipsis.woot.setup.NetworkChannel;
 import ipsis.woot.util.TankPacketHandler;
 import ipsis.woot.util.WootContainer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -16,6 +17,7 @@ import net.minecraft.world.inventory.DataSlot;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.fluids.FluidStack;
@@ -28,13 +30,17 @@ public class DyeSqueezerContainer extends WootContainer implements TankPacketHan
     public DyeSqueezerBlockEntity tileEntity;
     public Player player;
 
-    public DyeSqueezerContainer(int windowId, Level level, BlockPos pos, Inventory playerInventory, Player playerEntity) {
+    public DyeSqueezerContainer(int containerId, Inventory inv, FriendlyByteBuf extraData) {
+        this(containerId, inv, inv.player.level().getBlockEntity(extraData.readBlockPos()));
+    }
+
+    public DyeSqueezerContainer(int windowId, Inventory playerInventory, BlockEntity entity) {
         super(SqueezerSetup.SQUEEZER_BLOCK_CONTAINER.get(), windowId);
-        tileEntity = (DyeSqueezerBlockEntity)level.getBlockEntity(pos);
+        tileEntity = (DyeSqueezerBlockEntity)entity;
         addOwnSlots(tileEntity.getInventory());
         addPlayerSlots(playerInventory);
         addListeners();
-        this.player = playerEntity;
+        this.player = playerInventory.player;
     }
 
     private void addOwnSlots(IItemHandler inv) {

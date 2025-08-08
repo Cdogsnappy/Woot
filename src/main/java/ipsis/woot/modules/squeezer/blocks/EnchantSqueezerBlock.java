@@ -2,6 +2,7 @@ package ipsis.woot.modules.squeezer.blocks;
 
 import ipsis.woot.modules.debug.items.DebugItem;
 import ipsis.woot.modules.squeezer.SqueezerConfiguration;
+import ipsis.woot.util.WootBaseEntityBlock;
 import ipsis.woot.util.WootDebug;
 import ipsis.woot.util.helper.StringHelper;
 import net.minecraft.core.BlockPos;
@@ -37,7 +38,7 @@ import net.neoforged.neoforge.fluids.FluidUtil;
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class EnchantSqueezerBlock extends Block implements WootDebug, EntityBlock {
+public class EnchantSqueezerBlock extends WootBaseEntityBlock implements WootDebug, EntityBlock {
 
     public EnchantSqueezerBlock() {
         super(Block.Properties.of().sound(SoundType.METAL).strength(3.5F));

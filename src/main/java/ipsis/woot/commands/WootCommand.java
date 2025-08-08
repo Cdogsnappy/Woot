@@ -2,7 +2,8 @@ package ipsis.woot.commands;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import net.minecraft.command.CommandSource;
+import net.minecraft.commands.CommandSource;
+import net.minecraft.commands.CommandSourceStack;
 
 /**
  * The main command for the mod.
@@ -10,9 +11,9 @@ import net.minecraft.command.CommandSource;
  */
 public class WootCommand {
 
-    public WootCommand(CommandDispatcher<CommandSource> dispatcher) {
+    public WootCommand(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(
-                LiteralArgumentBuilder.<CommandSource>literal("woot")
+                LiteralArgumentBuilder.<CommandSourceStack>literal("woot")
                 .then(SimulationCommand.register())
                 .then(GiveCommand.register())
                 .then(ConfigCommand.register())

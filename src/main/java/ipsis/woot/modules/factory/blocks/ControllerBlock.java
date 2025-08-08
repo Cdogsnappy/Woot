@@ -1,5 +1,6 @@
 package ipsis.woot.modules.factory.blocks;
 
+import com.mojang.serialization.MapCodec;
 import ipsis.woot.modules.debug.items.DebugItem;
 import ipsis.woot.modules.factory.FactoryComponent;
 import ipsis.woot.modules.factory.FactoryComponentProvider;
@@ -14,6 +15,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -25,13 +27,17 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 
 import java.util.List;
 
-public class ControllerBlock extends Block implements FactoryComponentProvider, WootDebug {
+public class ControllerBlock extends BaseEntityBlock implements FactoryComponentProvider, WootDebug {
 
-    public ControllerBlock() {
+
+    public static final MapCodec<ControllerBlock> CODEC = simpleCodec(ControllerBlock::new);
+
+    public ControllerBlock(Properties prop) {
 
         super(Properties.of().sound(SoundType.METAL).strength(3.5F));
         registerDefaultState(getStateDefinition().any().setValue(BlockStateProperties.ATTACHED, false));
@@ -85,5 +91,15 @@ public class ControllerBlock extends Block implements FactoryComponentProvider, 
         debug.add("====> ControllerBlock");
         DebugItem.getTileEntityDebug(debug, itemUseContext);
         return debug;
+    }
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
+    }
+
+    @Override
+    public @Nullable BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {
+        return new ControllerBlockEntity(blockPos, blockState);
     }
 }

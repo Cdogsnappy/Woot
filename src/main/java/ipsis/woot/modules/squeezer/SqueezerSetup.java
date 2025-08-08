@@ -2,13 +2,16 @@ package ipsis.woot.modules.squeezer;
 
 import ipsis.woot.Woot;
 import ipsis.woot.modules.squeezer.blocks.*;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
@@ -30,7 +33,7 @@ public class SqueezerSetup {
 
     public static final String SQUEEZER_TAG = "squeezer";
     public static final DeferredHolder<Block, DyeSqueezerBlock> SQUEEZER_BLOCK = BLOCKS.register(
-            SQUEEZER_TAG, () -> new DyeSqueezerBlock());
+            SQUEEZER_TAG, () -> new DyeSqueezerBlock(BlockBehaviour.Properties.of()));
     public static final DeferredHolder<Item, BlockItem> SQUEEZER_BLOCK_ITEM = ITEMS.register(
             SQUEEZER_TAG, () ->
                     new BlockItem(SQUEEZER_BLOCK.get(), Woot.createStandardProperties()));
@@ -39,15 +42,7 @@ public class SqueezerSetup {
                     BlockEntityType.Builder.of(DyeSqueezerBlockEntity::new, SQUEEZER_BLOCK.get()).build(null));
 
     public static final DeferredHolder<MenuType<?>, MenuType<DyeSqueezerContainer>> SQUEEZER_BLOCK_CONTAINER = CONTAINERS.register(
-            SQUEEZER_TAG, () ->
-                    IForgeContainerType.create((windowId, inv, data) -> {
-                        return new DyeSqueezerContainer(
-                                windowId,
-                                Woot.proxy.getClientWorld(),
-                                data.readBlockPos(),
-                                inv,
-                                Woot.proxy.getClientPlayer());
-                    }));
+            SQUEEZER_TAG, () -> IMenuTypeExtension.create(DyeSqueezerContainer::new));
 
     public static final String ENCHANT_SQUEEZER_TAG = "enchsqueezer";
     public static final DeferredHolder<Block, EnchantSqueezerBlock> ENCHANT_SQUEEZER_BLOCK = BLOCKS.register(

@@ -37,13 +37,13 @@ public class HeartMenu extends WootContainer implements TankPacketHandler  {
     }
 
     public BlockPos getPos() {
-        return tileEntity.getPos();
+        return tileEntity.getBlockPos();
     }
 
 
     @Override
     public boolean stillValid(Player playerIn) {
-        return stillValid(ContainerLevelAccess.create(tileEntity.getLevel(), tileEntity.getPos()),
+        return stillValid(ContainerLevelAccess.create(tileEntity.getLevel(), tileEntity.getBlockPos()),
                 playerIn, FactorySetup.HEART_BLOCK.get());
     }
 
