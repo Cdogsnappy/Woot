@@ -1,9 +1,10 @@
 package ipsis.woot.modules.fluidconvertor;
 
 import ipsis.woot.crafting.fluidconvertor.FluidConvertorRecipe;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.item.crafting.RecipeManager;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeManager;
+
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -16,10 +17,10 @@ public class FluidConvertorRecipes {
 
         FluidConvertorRecipe.clearValidInputs();
         FluidConvertorRecipe.clearValidCatalysts();
-        for (IRecipe recipe : manager.getRecipes()) {
-            if (recipe instanceof FluidConvertorRecipe) {
-                FluidConvertorRecipe dRecipe = (FluidConvertorRecipe)recipe;
-                for (ItemStack itemStack : dRecipe.getCatalyst().getMatchingStacks())
+        for (RecipeHolder<?> recipe : manager.getRecipes()) {
+            if (recipe.value() instanceof FluidConvertorRecipe) {
+                FluidConvertorRecipe dRecipe = (FluidConvertorRecipe)recipe.value();
+                for (ItemStack itemStack : dRecipe.getCatalyst().getItems())
                     FluidConvertorRecipe.addValidCatalyst(itemStack);
 
                 FluidConvertorRecipe.addValidInput(dRecipe.getInputFluid());

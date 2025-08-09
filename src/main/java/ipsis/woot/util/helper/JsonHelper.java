@@ -1,7 +1,7 @@
 package ipsis.woot.util.helper;
 
 import com.google.gson.JsonObject;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 public class JsonHelper {
 
@@ -11,7 +11,7 @@ public class JsonHelper {
     public static JsonObject toJsonObject(ItemStack itemStack) {
 
         JsonObject json = new JsonObject();
-        json.addProperty("item", itemStack.getItem().getRegistryName().toString());
+        json.addProperty("item", itemStack.getItem().builtInRegistryHolder().toString());
         return json;
     }
 }

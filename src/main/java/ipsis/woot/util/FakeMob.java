@@ -15,6 +15,7 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ExtraCodecs;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.monster.MagmaCube;
@@ -72,24 +73,21 @@ public class FakeMob {
     public FakeMob(Mob mobEntity) {
         this();
 
-        if (mobEntity.toString() == null) {
-            setInfo(INVALID_ENTITY_KEY, EMPTY_TAG);
+        String entKey = EntityType.getKey(mobEntity.getType()).toString();
+        if (isSlime(mobEntity)) {
+            if (((Slime) mobEntity).getSize() == 1)
+                setInfo(entKey, SMALL_TAG);
+            else
+                setInfo(entKey, LARGE_TAG);
+        } else if (isMagmaCube(mobEntity)) {
+            if (((MagmaCube) mobEntity).getSize() == 1)
+                setInfo(entKey, SMALL_TAG);
+            else
+                setInfo(entKey, LARGE_TAG);
+        } else if (isChargedCreeper(mobEntity)) {
+            setInfo(entKey, CHARGED_TAG);
         } else {
-            if (isSlime(mobEntity)) {
-                if (((Slime) mobEntity).getSize() == 1)
-                    setInfo(mobEntity.toString(), SMALL_TAG);
-                else
-                    setInfo(mobEntity.toString(), LARGE_TAG);
-            } else if (isMagmaCube(mobEntity)) {
-                if (((MagmaCube) mobEntity).getSize() == 1)
-                    setInfo(mobEntity.toString(), SMALL_TAG);
-                else
-                    setInfo(mobEntity.toString(), LARGE_TAG);
-            } else if (isChargedCreeper(mobEntity)) {
-                setInfo(mobEntity.toString(), CHARGED_TAG);
-            } else {
-                setInfo(mobEntity.toString(), EMPTY_TAG);
-            }
+            setInfo(entKey, EMPTY_TAG);
         }
     }
 
@@ -112,7 +110,7 @@ public class FakeMob {
     public boolean hasTag() { return !this.tag.equalsIgnoreCase(EMPTY_TAG); }
 
     public @Nonnull
-    ResourceLocation getResourceLocation() { return  ResourceLocation.read(entityKey).getOrThrow(); }
+    ResourceLocation getResourceLocation() { return  ResourceLocation.parse(entityKey); }
 
     @Override
     public boolean equals(Object o) {

@@ -5,17 +5,22 @@ import ipsis.woot.modules.factory.Tier;
 import ipsis.woot.modules.factory.blocks.HeartBlock;
 import ipsis.woot.modules.factory.layout.FactoryHelper;
 import ipsis.woot.modules.factory.layout.PatternRepository;
+import ipsis.woot.util.helper.RandomHelper;
 import ipsis.woot.util.helper.StringHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
@@ -25,6 +30,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.HitResult;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import org.checkerframework.checker.units.qual.C;
 import org.jetbrains.annotations.NotNull;
 
 
@@ -75,6 +81,9 @@ public class InternItem extends Item {
 
     @Override
     public @NotNull InteractionResult useOn(UseOnContext context){
+        if(firstUse(context.getItemInHand())){
+            return useOnFirst(context);
+        }
         Player playerEntity = context.getPlayer();
         Level world = context.getLevel();
         ItemStack itemStack = context.getItemInHand();
@@ -104,23 +113,31 @@ public class InternItem extends Item {
         return InteractionResult.SUCCESS;
     }
 
+    private boolean firstUse(ItemStack stack){
+        CompoundTag tag = stack.get(DataComponents.CUSTOM_DATA).copyTag();
+        if(tag.contains("USEDONCE")){
+            return false;
+        }
+        tag.putInt("USEDONCE", 1);
+        stack.set(DataComponents.CUSTOM_DATA, CustomData.of(tag));
+        return true;
+    }
+
     /**
      * NBT
      */
     private static final String NBT_MODE = "mode";
     private static void setToolModeInStack(ItemStack itemStack, ToolMode toolMode) {
-        CompoundTag compound = itemStack.save();
-        if (compound == null)
-            compound = new CompoundNBT();
+        CompoundTag compound = itemStack.get(DataComponents.CUSTOM_DATA).copyTag();
 
         compound.putString(NBT_MODE, toolMode.name());
-        itemStack.setTag(compound);
+        itemStack.set(DataComponents.CUSTOM_DATA, CustomData.of(compound));
     }
 
     private static ToolMode getToolModeFromStack(ItemStack itemStack) {
         ToolMode mode = ToolMode.BUILD_1; // default
-        CompoundNBT compound = itemStack.getTag();
-        if (compound == null) {
+        CompoundTag compound = itemStack.get(DataComponents.CUSTOM_DATA).copyTag();
+        if (!compound.contains(NBT_MODE)) {
             setToolModeInStack(itemStack, mode);
         } else {
             try {
@@ -132,53 +149,52 @@ public class InternItem extends Item {
         return mode;
     }
 
-    @Override
-    public ActionResultType onItemUseFirst(ItemStack stack, UseOnContext context) {
+    public InteractionResult useOnFirst(UseOnContext context) {
 
-        ActionResultType result = ActionResultType.PASS;
-        ItemStack itemStack = context.getItem();
+        InteractionResult result = InteractionResult.PASS;
+        ItemStack itemStack = context.getItemInHand();
 
         if (!context.getPlayer().isCrouching() && !context.getLevel().isClientSide) {
-            Block b = context.getWorld().getBlockState(context.getPos()).getBlock();
+            Block b = context.getLevel().getBlockState(context.getClickedPos()).getBlock();
             if (b instanceof HeartBlock) {
                 BlockState blockState = context.getLevel().getBlockState(context.getClickedPos());
                 Direction facing = blockState.getValue(BlockStateProperties.HORIZONTAL_FACING);
                 ToolMode toolMode = getToolModeFromStack(itemStack);
-                if (toolMode.isBuildMode() && context.getPlayer().isAllowEdit()) {
-                    FactoryHelper.BuildResult buildResult = (FactoryHelper.tryBuild(context.getWorld(), context.getPos(), context.getPlayer(), facing, toolMode.getTier()));
+                if (toolMode.isBuildMode() && context.getPlayer().mayInteract(context.getLevel(), context.getClickedPos())) {
+                    FactoryHelper.BuildResult buildResult = (FactoryHelper.tryBuild(context.getLevel(), context.getClickedPos(), context.getPlayer(), facing, toolMode.getTier()));
                     if (buildResult == FactoryHelper.BuildResult.SUCCESS) {
-                        context.getWorld().playSound(
+                        context.getLevel().playSound(
                                 null,
-                                context.getPlayer().getPosX(),
-                                context.getPlayer().getPosY(),
-                                context.getPlayer().getPosZ(),
-                                SoundEvents.BLOCK_STONE_PLACE,
-                                SoundCategory.BLOCKS,
+                                context.getPlayer().getX(),
+                                context.getPlayer().getY(),
+                                context.getPlayer().getZ(),
+                                SoundEvents.AMETHYST_BLOCK_PLACE,
+                                SoundSource.BLOCKS,
                                 1.0F,
-                                0.5F * ((random.nextFloat() - random.nextFloat()) * 0.7F + 1.8F));
+                                0.5F * ((RandomHelper.RANDOM.nextFloat() - RandomHelper.RANDOM.nextFloat()) * 0.7F + 1.8F));
                     } else if (buildResult == FactoryHelper.BuildResult.ALL_BLOCKS_PLACED) {
-                        FactoryHelper.tryValidate(context.getWorld(), context.getPos(), context.getPlayer(), facing, toolMode.getTier());
+                        FactoryHelper.tryValidate(context.getLevel(), context.getClickedPos(), context.getPlayer(), facing, toolMode.getTier());
                     } else {
-                        context.getWorld().playSound(
+                        context.getLevel().playSound(
                                 null,
-                                context.getPlayer().getPosX(),
-                                context.getPlayer().getPosY(),
-                                context.getPlayer().getPosZ(),
-                                SoundEvents.BLOCK_ANVIL_DESTROY,
-                                SoundCategory.BLOCKS,
+                                context.getPlayer().getX(),
+                                context.getPlayer().getY(),
+                                context.getPlayer().getZ(),
+                                SoundEvents.ANVIL_DESTROY,
+                                SoundSource.BLOCKS,
                                 1.0F, 1.0F);
                     }
-                    result = ActionResultType.SUCCESS;
+                    result = InteractionResult.SUCCESS;
                 } else if (toolMode.isValidateMode()) {
                     if (!context.getLevel().isClientSide)
                         FactoryHelper.tryValidate(context.getLevel(), context.getClickedPos(), context.getPlayer(), facing, toolMode.getTier());
-                    result = ActionResultType.SUCCESS;
+                    result = InteractionResult.SUCCESS;
                 }
             }
         }
 
         // Returning SUCCESS will filter out the MAIN_HAND hand from onBlockActivated
-        return ActionResultType.PASS;
+        return InteractionResult.PASS;
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -187,15 +203,15 @@ public class InternItem extends Item {
         Block b = world.getBlockState(pos).getBlock();
 
         // Based off the BoneMealItem code
-        if (b.isAir(blockState, world, pos)) {
+        if (b.isEmpty(blockState)) {
             for(int i = 0; i < amount; ++i) {
-                double d0 = random.nextGaussian() * 0.02D;
-                double d1 = random.nextGaussian() * 0.02D;
-                double d2 = random.nextGaussian() * 0.02D;
+                double d0 = RandomHelper.RANDOM.nextGaussian() * 0.02D;
+                double d1 = RandomHelper.RANDOM.nextGaussian() * 0.02D;
+                double d2 = RandomHelper.RANDOM.nextGaussian() * 0.02D;
                 world.addParticle(ParticleTypes.HAPPY_VILLAGER,
-                        (double)((float)pos.getX() + random.nextFloat()),
-                        (double)((float)pos.getY() + random.nextFloat()),
-                        (double)((float)pos.getZ() + random.nextFloat()),
+                        (double)((float)pos.getX() + RandomHelper.RANDOM.nextFloat()),
+                        (double)((float)pos.getY() + RandomHelper.RANDOM.nextFloat()),
+                        (double)((float)pos.getZ() + RandomHelper.RANDOM.nextFloat()),
                         d0, d1, d2);
             }
         }

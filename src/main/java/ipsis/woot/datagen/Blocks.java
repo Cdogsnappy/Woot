@@ -12,9 +12,12 @@ import ipsis.woot.modules.oracle.OracleSetup;
 import ipsis.woot.modules.squeezer.SqueezerSetup;
 import ipsis.woot.util.oss.BaseBlockStateProvider;
 import net.minecraft.data.DataGenerator;
-import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraftforge.client.model.generators.*;
-import net.minecraftforge.common.data.ExistingFileHelper;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.neoforged.neoforge.client.model.generators.BlockModelBuilder;
+import net.neoforged.neoforge.client.model.generators.ModelFile;
+import net.neoforged.neoforge.client.model.generators.VariantBlockStateBuilder;
+import net.neoforged.neoforge.common.data.ExistingFileHelper;
+
 
 public class Blocks extends BaseBlockStateProvider {
 
@@ -240,252 +243,252 @@ public class Blocks extends BaseBlockStateProvider {
         ModelFile upgrade0 = models().cubeAll("factory_upgrade", modLoc("block/factory_upgrade"));
         builder = getVariantBuilder(FactorySetup.FACTORY_UPGRADE_BLOCK.get());
         builder.partialState().with(BlockStateProperties.ATTACHED, false)
-                .with(UpgradeBlock.UPGRADE, Perk.EMPTY)
+                .with(UpgradeBlock.UPGRADE, Perk.empty)
                 .modelForState().modelFile(upgrade0).addModel();
         builder.partialState().with(BlockStateProperties.ATTACHED, true)
-                .with(UpgradeBlock.UPGRADE, Perk.EMPTY)
+                .with(UpgradeBlock.UPGRADE, Perk.empty)
                 .modelForState().modelFile(upgrade0).addModel();
 
         ModelFile upgrade1 = models().cubeAll("factory_upgrade_efficiency_1", modLoc("item/efficiency_1"));
         ModelFile upgrade2 = models().cubeAll("factory_upgrade_efficiency_2", modLoc("item/efficiency_2"));
         ModelFile upgrade3 = models().cubeAll("factory_upgrade_efficiency_3", modLoc("item/efficiency_3"));
         builder.partialState().with(BlockStateProperties.ATTACHED, false)
-                .with(UpgradeBlock.UPGRADE, Perk.EFFICIENCY_1)
+                .with(UpgradeBlock.UPGRADE, Perk.efficiency_1)
                 .modelForState().modelFile(upgrade1).addModel();
         builder.partialState().with(BlockStateProperties.ATTACHED, true)
-                .with(UpgradeBlock.UPGRADE, Perk.EFFICIENCY_1)
+                .with(UpgradeBlock.UPGRADE, Perk.efficiency_1)
                 .modelForState().modelFile(upgrade1).addModel();
         builder.partialState().with(BlockStateProperties.ATTACHED, false)
-                .with(UpgradeBlock.UPGRADE, Perk.EFFICIENCY_2)
+                .with(UpgradeBlock.UPGRADE, Perk.efficiency_2)
                 .modelForState().modelFile(upgrade2).addModel();
         builder.partialState().with(BlockStateProperties.ATTACHED, true)
-                .with(UpgradeBlock.UPGRADE, Perk.EFFICIENCY_2)
+                .with(UpgradeBlock.UPGRADE, Perk.efficiency_2)
                 .modelForState().modelFile(upgrade2).addModel();
         builder.partialState().with(BlockStateProperties.ATTACHED, false)
-                .with(UpgradeBlock.UPGRADE, Perk.EFFICIENCY_3)
+                .with(UpgradeBlock.UPGRADE, Perk.efficiency_3)
                 .modelForState().modelFile(upgrade3).addModel();
         builder.partialState().with(BlockStateProperties.ATTACHED, true)
-                .with(UpgradeBlock.UPGRADE, Perk.EFFICIENCY_3)
+                .with(UpgradeBlock.UPGRADE, Perk.efficiency_3)
                 .modelForState().modelFile(upgrade3).addModel();
 
         upgrade1 = models().cubeAll("factory_upgrade_looting_1", modLoc("item/looting_1"));
         upgrade2 = models().cubeAll("factory_upgrade_looting_2", modLoc("item/looting_2"));
         upgrade3 = models().cubeAll("factory_upgrade_looting_3", modLoc("item/looting_3"));
         builder.partialState().with(BlockStateProperties.ATTACHED, false)
-                .with(UpgradeBlock.UPGRADE, Perk.LOOTING_1)
+                .with(UpgradeBlock.UPGRADE, Perk.looting_1)
                 .modelForState().modelFile(upgrade1).addModel();
         builder.partialState().with(BlockStateProperties.ATTACHED, true)
-                .with(UpgradeBlock.UPGRADE, Perk.LOOTING_1)
+                .with(UpgradeBlock.UPGRADE, Perk.looting_1)
                 .modelForState().modelFile(upgrade1).addModel();
         builder.partialState().with(BlockStateProperties.ATTACHED, false)
-                .with(UpgradeBlock.UPGRADE, Perk.LOOTING_2)
+                .with(UpgradeBlock.UPGRADE, Perk.looting_2)
                 .modelForState().modelFile(upgrade2).addModel();
         builder.partialState().with(BlockStateProperties.ATTACHED, true)
-                .with(UpgradeBlock.UPGRADE, Perk.LOOTING_2)
+                .with(UpgradeBlock.UPGRADE, Perk.looting_2)
                 .modelForState().modelFile(upgrade2).addModel();
         builder.partialState().with(BlockStateProperties.ATTACHED, false)
-                .with(UpgradeBlock.UPGRADE, Perk.LOOTING_3)
+                .with(UpgradeBlock.UPGRADE, Perk.looting_3)
                 .modelForState().modelFile(upgrade3).addModel();
         builder.partialState().with(BlockStateProperties.ATTACHED, true)
-                .with(UpgradeBlock.UPGRADE, Perk.LOOTING_3)
+                .with(UpgradeBlock.UPGRADE, Perk.looting_3)
                 .modelForState().modelFile(upgrade3).addModel();
 
         upgrade1 = models().cubeAll("factory_upgrade_mass_1", modLoc("item/mass_1"));
         upgrade2 = models().cubeAll("factory_upgrade_mass_2", modLoc("item/mass_2"));
         upgrade3 = models().cubeAll("factory_upgrade_mass_3", modLoc("item/mass_3"));
         builder.partialState().with(BlockStateProperties.ATTACHED, false)
-                .with(UpgradeBlock.UPGRADE, Perk.MASS_1)
+                .with(UpgradeBlock.UPGRADE, Perk.mass_1)
                 .modelForState().modelFile(upgrade1).addModel();
         builder.partialState().with(BlockStateProperties.ATTACHED, true)
-                .with(UpgradeBlock.UPGRADE, Perk.MASS_1)
+                .with(UpgradeBlock.UPGRADE, Perk.mass_1)
                 .modelForState().modelFile(upgrade1).addModel();
         builder.partialState().with(BlockStateProperties.ATTACHED, false)
-                .with(UpgradeBlock.UPGRADE, Perk.MASS_2)
+                .with(UpgradeBlock.UPGRADE, Perk.mass_2)
                 .modelForState().modelFile(upgrade2).addModel();
         builder.partialState().with(BlockStateProperties.ATTACHED, true)
-                .with(UpgradeBlock.UPGRADE, Perk.MASS_2)
+                .with(UpgradeBlock.UPGRADE, Perk.mass_2)
                 .modelForState().modelFile(upgrade2).addModel();
         builder.partialState().with(BlockStateProperties.ATTACHED, false)
-                .with(UpgradeBlock.UPGRADE, Perk.MASS_3)
+                .with(UpgradeBlock.UPGRADE, Perk.mass_3)
                 .modelForState().modelFile(upgrade3).addModel();
         builder.partialState().with(BlockStateProperties.ATTACHED, true)
-                .with(UpgradeBlock.UPGRADE, Perk.MASS_3)
+                .with(UpgradeBlock.UPGRADE, Perk.mass_3)
                 .modelForState().modelFile(upgrade3).addModel();
 
         upgrade1 = models().cubeAll("factory_upgrade_rate_1", modLoc("item/rate_1"));
         upgrade2 = models().cubeAll("factory_upgrade_rate_2", modLoc("item/rate_2"));
         upgrade3 = models().cubeAll("factory_upgrade_rate_3", modLoc("item/rate_3"));
         builder.partialState().with(BlockStateProperties.ATTACHED, false)
-                .with(UpgradeBlock.UPGRADE, Perk.RATE_1)
+                .with(UpgradeBlock.UPGRADE, Perk.rate_1)
                 .modelForState().modelFile(upgrade1).addModel();
         builder.partialState().with(BlockStateProperties.ATTACHED, true)
-                .with(UpgradeBlock.UPGRADE, Perk.RATE_1)
+                .with(UpgradeBlock.UPGRADE, Perk.rate_1)
                 .modelForState().modelFile(upgrade1).addModel();
         builder.partialState().with(BlockStateProperties.ATTACHED, false)
-                .with(UpgradeBlock.UPGRADE, Perk.RATE_2)
+                .with(UpgradeBlock.UPGRADE, Perk.rate_2)
                 .modelForState().modelFile(upgrade2).addModel();
         builder.partialState().with(BlockStateProperties.ATTACHED, true)
-                .with(UpgradeBlock.UPGRADE, Perk.RATE_2)
+                .with(UpgradeBlock.UPGRADE, Perk.rate_2)
                 .modelForState().modelFile(upgrade2).addModel();
         builder.partialState().with(BlockStateProperties.ATTACHED, false)
-                .with(UpgradeBlock.UPGRADE, Perk.RATE_3)
+                .with(UpgradeBlock.UPGRADE, Perk.rate_3)
                 .modelForState().modelFile(upgrade3).addModel();
         builder.partialState().with(BlockStateProperties.ATTACHED, true)
-                .with(UpgradeBlock.UPGRADE, Perk.RATE_3)
+                .with(UpgradeBlock.UPGRADE, Perk.rate_3)
                 .modelForState().modelFile(upgrade3).addModel();
 
         upgrade1 = models().cubeAll("factory_upgrade_tier_shard_1", modLoc("item/tier_shard_1"));
         upgrade2 = models().cubeAll("factory_upgrade_tier_shard_2", modLoc("item/tier_shard_2"));
         upgrade3 = models().cubeAll("factory_upgrade_tier_shard_3", modLoc("item/tier_shard_3"));
         builder.partialState().with(BlockStateProperties.ATTACHED, false)
-                .with(UpgradeBlock.UPGRADE, Perk.TIER_SHARD_1)
+                .with(UpgradeBlock.UPGRADE, Perk.tier_shard_1)
                 .modelForState().modelFile(upgrade1).addModel();
         builder.partialState().with(BlockStateProperties.ATTACHED, true)
-                .with(UpgradeBlock.UPGRADE, Perk.TIER_SHARD_1)
+                .with(UpgradeBlock.UPGRADE, Perk.tier_shard_1)
                 .modelForState().modelFile(upgrade1).addModel();
         builder.partialState().with(BlockStateProperties.ATTACHED, false)
-                .with(UpgradeBlock.UPGRADE, Perk.TIER_SHARD_2)
+                .with(UpgradeBlock.UPGRADE, Perk.tier_shard_2)
                 .modelForState().modelFile(upgrade2).addModel();
         builder.partialState().with(BlockStateProperties.ATTACHED, true)
-                .with(UpgradeBlock.UPGRADE, Perk.TIER_SHARD_2)
+                .with(UpgradeBlock.UPGRADE, Perk.tier_shard_2)
                 .modelForState().modelFile(upgrade2).addModel();
         builder.partialState().with(BlockStateProperties.ATTACHED, false)
-                .with(UpgradeBlock.UPGRADE, Perk.TIER_SHARD_3)
+                .with(UpgradeBlock.UPGRADE, Perk.tier_shard_3)
                 .modelForState().modelFile(upgrade3).addModel();
         builder.partialState().with(BlockStateProperties.ATTACHED, true)
-                .with(UpgradeBlock.UPGRADE, Perk.TIER_SHARD_3)
+                .with(UpgradeBlock.UPGRADE, Perk.tier_shard_3)
                 .modelForState().modelFile(upgrade3).addModel();
 
         upgrade1 = models().cubeAll("factory_upgrade_xp_1", modLoc("item/xp_1"));
         upgrade2 = models().cubeAll("factory_upgrade_xp_2", modLoc("item/xp_2"));
         upgrade3 = models().cubeAll("factory_upgrade_xp_3", modLoc("item/xp_3"));
         builder.partialState().with(BlockStateProperties.ATTACHED, false)
-                .with(UpgradeBlock.UPGRADE, Perk.XP_1)
+                .with(UpgradeBlock.UPGRADE, Perk.xp_1)
                 .modelForState().modelFile(upgrade1).addModel();
         builder.partialState().with(BlockStateProperties.ATTACHED, true)
-                .with(UpgradeBlock.UPGRADE, Perk.XP_1)
+                .with(UpgradeBlock.UPGRADE, Perk.xp_1)
                 .modelForState().modelFile(upgrade1).addModel();
         builder.partialState().with(BlockStateProperties.ATTACHED, false)
-                .with(UpgradeBlock.UPGRADE, Perk.XP_2)
+                .with(UpgradeBlock.UPGRADE, Perk.xp_2)
                 .modelForState().modelFile(upgrade2).addModel();
         builder.partialState().with(BlockStateProperties.ATTACHED, true)
-                .with(UpgradeBlock.UPGRADE, Perk.XP_2)
+                .with(UpgradeBlock.UPGRADE, Perk.xp_2)
                 .modelForState().modelFile(upgrade2).addModel();
         builder.partialState().with(BlockStateProperties.ATTACHED, false)
-                .with(UpgradeBlock.UPGRADE, Perk.XP_3)
+                .with(UpgradeBlock.UPGRADE, Perk.xp_3)
                 .modelForState().modelFile(upgrade3).addModel();
         builder.partialState().with(BlockStateProperties.ATTACHED, true)
-                .with(UpgradeBlock.UPGRADE, Perk.XP_3)
+                .with(UpgradeBlock.UPGRADE, Perk.xp_3)
                 .modelForState().modelFile(upgrade3).addModel();
 
         upgrade1 = models().cubeAll("factory_upgrade_headless_1", modLoc("item/headless_1"));
         upgrade2 = models().cubeAll("factory_upgrade_headless_2", modLoc("item/headless_2"));
         upgrade3 = models().cubeAll("factory_upgrade_headless_3", modLoc("item/headless_3"));
         builder.partialState().with(BlockStateProperties.ATTACHED, false)
-                .with(UpgradeBlock.UPGRADE, Perk.HEADLESS_1)
+                .with(UpgradeBlock.UPGRADE, Perk.headless_1)
                 .modelForState().modelFile(upgrade1).addModel();
         builder.partialState().with(BlockStateProperties.ATTACHED, true)
-                .with(UpgradeBlock.UPGRADE, Perk.HEADLESS_1)
+                .with(UpgradeBlock.UPGRADE, Perk.headless_1)
                 .modelForState().modelFile(upgrade1).addModel();
         builder.partialState().with(BlockStateProperties.ATTACHED, false)
-                .with(UpgradeBlock.UPGRADE, Perk.HEADLESS_2)
+                .with(UpgradeBlock.UPGRADE, Perk.headless_2)
                 .modelForState().modelFile(upgrade2).addModel();
         builder.partialState().with(BlockStateProperties.ATTACHED, true)
-                .with(UpgradeBlock.UPGRADE, Perk.HEADLESS_2)
+                .with(UpgradeBlock.UPGRADE, Perk.headless_2)
                 .modelForState().modelFile(upgrade2).addModel();
         builder.partialState().with(BlockStateProperties.ATTACHED, false)
-                .with(UpgradeBlock.UPGRADE, Perk.HEADLESS_3)
+                .with(UpgradeBlock.UPGRADE, Perk.headless_3)
                 .modelForState().modelFile(upgrade3).addModel();
         builder.partialState().with(BlockStateProperties.ATTACHED, true)
-                .with(UpgradeBlock.UPGRADE, Perk.HEADLESS_3)
+                .with(UpgradeBlock.UPGRADE, Perk.headless_3)
                 .modelForState().modelFile(upgrade3).addModel();
 
         upgrade1 = models().cubeAll("factory_upgrade_slaughter_1", modLoc("item/slaughter_1"));
         upgrade2 = models().cubeAll("factory_upgrade_slaughter_2", modLoc("item/slaughter_2"));
         upgrade3 = models().cubeAll("factory_upgrade_slaughter_3", modLoc("item/slaughter_3"));
         builder.partialState().with(BlockStateProperties.ATTACHED, false)
-                .with(UpgradeBlock.UPGRADE, Perk.SLAUGHTER_1)
+                .with(UpgradeBlock.UPGRADE, Perk.slaughter_1)
                 .modelForState().modelFile(upgrade1).addModel();
         builder.partialState().with(BlockStateProperties.ATTACHED, true)
-                .with(UpgradeBlock.UPGRADE, Perk.SLAUGHTER_1)
+                .with(UpgradeBlock.UPGRADE, Perk.slaughter_1)
                 .modelForState().modelFile(upgrade1).addModel();
         builder.partialState().with(BlockStateProperties.ATTACHED, false)
-                .with(UpgradeBlock.UPGRADE, Perk.SLAUGHTER_2)
+                .with(UpgradeBlock.UPGRADE, Perk.slaughter_2)
                 .modelForState().modelFile(upgrade2).addModel();
         builder.partialState().with(BlockStateProperties.ATTACHED, true)
-                .with(UpgradeBlock.UPGRADE, Perk.SLAUGHTER_2)
+                .with(UpgradeBlock.UPGRADE, Perk.slaughter_2)
                 .modelForState().modelFile(upgrade2).addModel();
         builder.partialState().with(BlockStateProperties.ATTACHED, false)
-                .with(UpgradeBlock.UPGRADE, Perk.SLAUGHTER_3)
+                .with(UpgradeBlock.UPGRADE, Perk.slaughter_3)
                 .modelForState().modelFile(upgrade3).addModel();
         builder.partialState().with(BlockStateProperties.ATTACHED, true)
-                .with(UpgradeBlock.UPGRADE, Perk.SLAUGHTER_3)
+                .with(UpgradeBlock.UPGRADE, Perk.slaughter_3)
                 .modelForState().modelFile(upgrade3).addModel();
 
         upgrade1 = models().cubeAll("factory_upgrade_crusher_1", modLoc("item/crusher_1"));
         upgrade2 = models().cubeAll("factory_upgrade_crusher_2", modLoc("item/crusher_2"));
         upgrade3 = models().cubeAll("factory_upgrade_crusher_3", modLoc("item/crusher_3"));
         builder.partialState().with(BlockStateProperties.ATTACHED, false)
-                .with(UpgradeBlock.UPGRADE, Perk.CRUSHER_1)
+                .with(UpgradeBlock.UPGRADE, Perk.crusher_1)
                 .modelForState().modelFile(upgrade1).addModel();
         builder.partialState().with(BlockStateProperties.ATTACHED, true)
-                .with(UpgradeBlock.UPGRADE, Perk.CRUSHER_1)
+                .with(UpgradeBlock.UPGRADE, Perk.crusher_1)
                 .modelForState().modelFile(upgrade1).addModel();
         builder.partialState().with(BlockStateProperties.ATTACHED, false)
-                .with(UpgradeBlock.UPGRADE, Perk.CRUSHER_2)
+                .with(UpgradeBlock.UPGRADE, Perk.crusher_2)
                 .modelForState().modelFile(upgrade2).addModel();
         builder.partialState().with(BlockStateProperties.ATTACHED, true)
-                .with(UpgradeBlock.UPGRADE, Perk.CRUSHER_2)
+                .with(UpgradeBlock.UPGRADE, Perk.crusher_2)
                 .modelForState().modelFile(upgrade2).addModel();
         builder.partialState().with(BlockStateProperties.ATTACHED, false)
-                .with(UpgradeBlock.UPGRADE, Perk.CRUSHER_3)
+                .with(UpgradeBlock.UPGRADE, Perk.crusher_3)
                 .modelForState().modelFile(upgrade3).addModel();
         builder.partialState().with(BlockStateProperties.ATTACHED, true)
-                .with(UpgradeBlock.UPGRADE, Perk.CRUSHER_3)
+                .with(UpgradeBlock.UPGRADE, Perk.crusher_3)
                 .modelForState().modelFile(upgrade3).addModel();
 
         upgrade1 = models().cubeAll("factory_upgrade_laser_1", modLoc("item/laser_1"));
         upgrade2 = models().cubeAll("factory_upgrade_laser_2", modLoc("item/laser_2"));
         upgrade3 = models().cubeAll("factory_upgrade_laser_3", modLoc("item/laser_3"));
         builder.partialState().with(BlockStateProperties.ATTACHED, false)
-                .with(UpgradeBlock.UPGRADE, Perk.LASER_1)
+                .with(UpgradeBlock.UPGRADE, Perk.laser_1)
                 .modelForState().modelFile(upgrade1).addModel();
         builder.partialState().with(BlockStateProperties.ATTACHED, true)
-                .with(UpgradeBlock.UPGRADE, Perk.LASER_1)
+                .with(UpgradeBlock.UPGRADE, Perk.laser_1)
                 .modelForState().modelFile(upgrade1).addModel();
         builder.partialState().with(BlockStateProperties.ATTACHED, false)
-                .with(UpgradeBlock.UPGRADE, Perk.LASER_2)
+                .with(UpgradeBlock.UPGRADE, Perk.laser_2)
                 .modelForState().modelFile(upgrade2).addModel();
         builder.partialState().with(BlockStateProperties.ATTACHED, true)
-                .with(UpgradeBlock.UPGRADE, Perk.LASER_2)
+                .with(UpgradeBlock.UPGRADE, Perk.laser_2)
                 .modelForState().modelFile(upgrade2).addModel();
         builder.partialState().with(BlockStateProperties.ATTACHED, false)
-                .with(UpgradeBlock.UPGRADE, Perk.LASER_3)
+                .with(UpgradeBlock.UPGRADE, Perk.laser_3)
                 .modelForState().modelFile(upgrade3).addModel();
         builder.partialState().with(BlockStateProperties.ATTACHED, true)
-                .with(UpgradeBlock.UPGRADE, Perk.LASER_3)
+                .with(UpgradeBlock.UPGRADE, Perk.laser_3)
                 .modelForState().modelFile(upgrade3).addModel();
 
         upgrade1 = models().cubeAll("factory_upgrade_flayed_1", modLoc("item/flayed_1"));
         upgrade2 = models().cubeAll("factory_upgrade_flayed_2", modLoc("item/flayed_2"));
         upgrade3 = models().cubeAll("factory_upgrade_flayed_3", modLoc("item/flayed_3"));
         builder.partialState().with(BlockStateProperties.ATTACHED, false)
-                .with(UpgradeBlock.UPGRADE, Perk.FLAYED_1)
+                .with(UpgradeBlock.UPGRADE, Perk.flayed_1)
                 .modelForState().modelFile(upgrade1).addModel();
         builder.partialState().with(BlockStateProperties.ATTACHED, true)
-                .with(UpgradeBlock.UPGRADE, Perk.FLAYED_1)
+                .with(UpgradeBlock.UPGRADE, Perk.flayed_1)
                 .modelForState().modelFile(upgrade1).addModel();
         builder.partialState().with(BlockStateProperties.ATTACHED, false)
-                .with(UpgradeBlock.UPGRADE, Perk.FLAYED_2)
+                .with(UpgradeBlock.UPGRADE, Perk.flayed_2)
                 .modelForState().modelFile(upgrade2).addModel();
         builder.partialState().with(BlockStateProperties.ATTACHED, true)
-                .with(UpgradeBlock.UPGRADE, Perk.FLAYED_2)
+                .with(UpgradeBlock.UPGRADE, Perk.flayed_2)
                 .modelForState().modelFile(upgrade2).addModel();
         builder.partialState().with(BlockStateProperties.ATTACHED, false)
-                .with(UpgradeBlock.UPGRADE, Perk.FLAYED_3)
+                .with(UpgradeBlock.UPGRADE, Perk.flayed_3)
                 .modelForState().modelFile(upgrade3).addModel();
         builder.partialState().with(BlockStateProperties.ATTACHED, true)
-                .with(UpgradeBlock.UPGRADE, Perk.FLAYED_3)
+                .with(UpgradeBlock.UPGRADE, Perk.flayed_3)
                 .modelForState().modelFile(upgrade3).addModel();
 
         machineBlock(FactorySetup.HEART_BLOCK.get(), "heart", "block/heart");

@@ -18,17 +18,6 @@ import java.util.function.Supplier;
 
 public class ExtraWootCodecs {
 
-    public static void writeFluidStack(ByteBuf dataOut, FluidStack fluidStack) {
-        PacketBuffer buf = new PacketBuffer(dataOut);
-        fluidStack.writeToPacket(buf);
-    }
-
-    public static FluidStack readFluidStack(ByteBuf dataIn) {
-        PacketBuffer buf = new PacketBuffer(dataIn);
-        FluidStack fluidStack = FluidStack.readFromPacket(buf);
-        return fluidStack;
-    }
-
 
     public static final StreamCodec<RegistryFriendlyByteBuf, List<ItemStack>> ITEM_LIST_CODEC = ByteBufCodecs.collection(
             ArrayList::new, ItemStack.STREAM_CODEC);

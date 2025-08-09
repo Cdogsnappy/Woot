@@ -268,7 +268,7 @@ public class InfuserBlockEntity extends WootMachineBlockEntity implements WootDe
             // stack size determines the enchant level, so save it off and reset to single item generated
             int level = itemStack.getCount();
             itemStack = new ItemStack(Items.BOOK, 1);
-            itemStack = EnchantingHelper.addRandomBookEnchant(itemStack, level);
+            itemStack = EnchantingHelper.addRandomBookEnchant(itemStack, level, getLevel().registryAccess());
         }
 
         outputSlot.insertItem(OUTPUT_SLOT, itemStack, false);
@@ -396,6 +396,6 @@ public class InfuserBlockEntity extends WootMachineBlockEntity implements WootDe
 
     @Override
     public @org.jetbrains.annotations.Nullable AbstractContainerMenu createMenu(int i, Inventory inventory, Player player) {
-        return new InfuserMenu(i, level, getBlockPos(), inventory, player);
+        return new InfuserMenu(i, inventory, this);
     }
 }

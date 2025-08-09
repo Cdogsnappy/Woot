@@ -18,6 +18,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.material.Fluid;
+import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
 import org.lwjgl.opengl.GL11;
@@ -117,14 +118,13 @@ public abstract class WootContainerScreen<T extends AbstractContainerMenu> exten
         if (fluid == null)
             return;
 
-        fluid.getFluid().defaultFluidState().ge
-
+        ResourceLocation stillTexture = IClientFluidTypeExtensions.of(fluid.getFluid()).getStillTexture();
         // Get sprite from texture atlas
         TextureAtlas textureAtlas = Minecraft.getInstance().getModelManager().getAtlas(InventoryMenu.BLOCK_ATLAS);
         TextureAtlasSprite sprite = textureAtlas.getSprite(stillTexture);
 
         // Get fluid color
-        int color = fluidTypeProperties.getTi;
+        int color = IClientFluidTypeExtensions.of(fluid.getFluid()).getTintColor();
 
         // Set color and render
         RenderSystem.setShaderColor(

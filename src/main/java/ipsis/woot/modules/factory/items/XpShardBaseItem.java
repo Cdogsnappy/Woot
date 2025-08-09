@@ -2,9 +2,23 @@ package ipsis.woot.modules.factory.items;
 
 import ipsis.woot.Woot;
 import ipsis.woot.modules.factory.FactorySetup;
+import ipsis.woot.util.helper.RandomHelper;
 import net.minecraft.advancements.CriteriaTriggers;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.ExperienceOrb;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.neoforge.common.util.FakePlayer;
 
 
 import javax.annotation.Nullable;
@@ -12,10 +26,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * XP shards are created by the factory when killing mobs and the appropriate upgrade is present.
- * Each XP shard is equal to one experience.
- * 9 Shards can be combined into XP orbs/blocks with
- * The factory will create XP orbs/blocks and give XP shards as change
+ * xp shards are created by the factory when killing mobs and the appropriate upgrade is present.
+ * Each xp shard is equal to one experience.
+ * 9 Shards can be combined into xp orbs/blocks with
+ * The factory will create xp orbs/blocks and give xp shards as change
  */
 public class XpShardBaseItem extends Item {
 
@@ -87,61 +101,64 @@ public class XpShardBaseItem extends Item {
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand handIn) {
+    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
 
-        if (worldIn.isRemote)
-            return ActionResult.resultPass(playerIn.getHeldItem(handIn));
+        ItemStack itemStack = player.getItemInHand(hand);
 
-        ItemStack itemStack = playerIn.getHeldItem(handIn);
+        if (!level.isClientSide)
+            return InteractionResultHolder.pass(itemStack);
+
         if (itemStack.isEmpty())
-            return ActionResult.resultPass(playerIn.getHeldItem(handIn));
+            return InteractionResultHolder.pass(itemStack);
 
         ItemStack advancementStack = itemStack.copy();
 
-        worldIn.playSound(
+        level.playSound(
                 null,
-                playerIn.getPosX(),
-                playerIn.getPosY(),
-                playerIn.getPosZ(),
-                SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP,
-                SoundCategory.PLAYERS,
+                player.getX(),
+                player.getY(),
+                player.getZ(),
+                SoundEvents.EXPERIENCE_ORB_PICKUP,
+                SoundSource.PLAYERS,
                 0.2F,
-                0.5F * ((random.nextFloat() - random.nextFloat()) * 0.7F + 1.8F));
+                0.5F * ((RandomHelper.RANDOM.nextFloat() - RandomHelper.RANDOM.nextFloat()) * 0.7F + 1.8F));
 
-        if (playerIn instanceof FakePlayer) {
+        if (player instanceof FakePlayer) {
             // Fake player can only use one at a time
-            worldIn.addEntity(new ExperienceOrbEntity(
-                            worldIn,
-                            playerIn.getPosX(), playerIn.getPosY(), playerIn.getPosZ(),
+            level.addFreshEntity(new ExperienceOrb(
+                            level,
+                    player.getX(),
+                    player.getY(),
+                    player.getZ(),
                             1));
             itemStack.shrink(1);
         } else {
             int xp = 0;
-            if (playerIn.isSneaking()) {
+            if (player.isCrouching()) {
                 // Consume the whole stack
                 xp = getXp(itemStack) * itemStack.getCount();
-                if (!playerIn.isCreative())
+                if (!player.isCreative())
                     itemStack.setCount(0);
             } else {
                 xp = getXp(itemStack);
-                if (!playerIn.isCreative())
+                if (!player.isCreative())
                     itemStack.shrink(1);
             }
             if (xp > 0) {
-                playerIn.giveExperiencePoints(xp);
-                if (playerIn instanceof ServerPlayerEntity)
-                    CriteriaTriggers.CONSUME_ITEM.trigger((ServerPlayerEntity) playerIn, advancementStack);
+                player.giveExperiencePoints(xp);
+                if (player instanceof ServerPlayer)
+                    CriteriaTriggers.CONSUME_ITEM.trigger((ServerPlayer) player, advancementStack);
             }
         }
-        return ActionResult.resultSuccess(itemStack);
+        return InteractionResultHolder.success(itemStack);
     }
 
     @OnlyIn(Dist.CLIENT)
     @Override
-    public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-        super.addInformation(stack, worldIn, tooltip, flagIn);
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flagIn) {
+        super.appendHoverText(stack, context, tooltip, flagIn);
 
-        tooltip.add(new TranslationTextComponent("info.woot.shard.0"));
-        tooltip.add(new TranslationTextComponent("info.woot.shard.1"));
+        tooltip.add(Component.translatable("info.woot.shard.0"));
+        tooltip.add(Component.translatable("info.woot.shard.1"));
     }
 }

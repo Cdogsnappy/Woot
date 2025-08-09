@@ -15,20 +15,19 @@ public class CustomDropsLoader {
 
     public static void load(RecipeManager recipeManager) {
 
-        for (RecipeHolder recipeHolder : recipeManager.getRecipes()) {
-            if (recipeHolder.value() instanceof FactoryRecipe) {
-                FactoryRecipe factoryRecipe = (FactoryRecipe) recipeHolder.value();
+        for (RecipeHolder<?> recipeHolder : recipeManager.getRecipes()) {
+            if (recipeHolder.value() instanceof FactoryRecipe factoryRecipe) {
                 if (factoryRecipe.getFakeMob().isValid()) {
-                    for (FactoryRecipe.Drop drop : factoryRecipe.getDrops()) {
-                        ItemStack itemStack = drop.itemStack;
+                    for (FactoryRecipe.Drop drop : factoryRecipe.drops()) {
+                        ItemStack itemStack = drop.itemStack();
                         for (int i = 0; i < 4; i++) {
                             itemStack.setCount(1);
                             HashMap<Integer, Integer> stackSizes = new HashMap<>();
-                            stackSizes.put(drop.stackSizes[i], 1);
+                            stackSizes.put(drop.stackSizes().get(i), 1);
                             MobSimulator.getInstance().learnCustomDrop(
                                     new FakeMobKey(factoryRecipe.getFakeMob(), i),
                                     itemStack,
-                                    drop.dropChance[i], stackSizes);
+                                    drop.dropChance().get(i), stackSizes);
                         }
                     }
                 }

@@ -3,6 +3,9 @@ package ipsis.woot;
 import ipsis.woot.config.Config;
 import ipsis.woot.setup.*;
 import net.minecraft.world.item.Item;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.Logging;
+import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
@@ -17,20 +20,16 @@ public class Woot {
     public static final String MODID = "woot";
     public static ModSetup setup = new ModSetup();
 
-    public Woot() {
+    public Woot(IEventBus modEventBus, ModContainer modContainer) {
 
-        ModLoadingContext.get().(ModConfig.Type.CLIENT, Config.CLIENT_CONFIG);
-        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.COMMON_CONFIG);
+        ModSetup.registrySetup(modEventBus);
 
-        setup.registrySetup(NeoForge.EVENT_BUS);
 
-        NeoForge.EVENT_BUS.register(new Registration());
+        modEventBus.addListener((FMLCommonSetupEvent e) -> setup.commonSetup(e));
+        modEventBus.addListener((FMLClientSetupEvent e) -> setup.clientSetup(e));
 
-        NeoForge.EVENT_BUS.addListener((FMLCommonSetupEvent e) -> setup.commonSetup(e));
-        NeoForge.EVENT_BUS.addListener((FMLClientSetupEvent e) -> setup.clientSetup(e));
-
-        Config.loadConfig(Config.CLIENT_CONFIG, FMLPaths.CONFIGDIR.get().resolve("woot-client.toml"));
-        Config.loadConfig(Config.COMMON_CONFIG, FMLPaths.CONFIGDIR.get().resolve("woot-common.toml"));
+        modContainer.registerConfig(ModConfig.Type.COMMON, Config.COMMON_CONFIG);
+        modContainer.registerConfig(ModConfig.Type.CLIENT, Config.CLIENT_CONFIG);
     }
 
     public static Item.Properties createStandardProperties() {

@@ -9,8 +9,10 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -34,7 +36,7 @@ public class OracleSetup {
 
     public static final String ORACLE_TAG = "oracle";
     public static final DeferredHolder<Block, OracleBlock> ORACLE_BLOCK = BLOCKS.register(
-            ORACLE_TAG, OracleBlock::new);
+            ORACLE_TAG, () -> new OracleBlock(BlockBehaviour.Properties.of()));
     public static final DeferredHolder<Item, Item> ORACLE_BLOCK_ITEM = ITEMS.register(
             ORACLE_TAG, () ->
                     new BlockItem(ORACLE_BLOCK.get(), Woot.createStandardProperties()));
@@ -43,13 +45,5 @@ public class OracleSetup {
                     BlockEntityType.Builder.of(OracleTileEntity::new, ORACLE_BLOCK.get()).build(null));
 
     public static final DeferredHolder<MenuType<?>, MenuType<OracleContainer>> ORACLE_BLOCK_CONTAINER = CONTAINERS.register(
-            ORACLE_TAG, () ->
-                    IMenuTypeExtension.create((windowId, inv, data) -> {
-                        return new OracleContainer(
-                                windowId,
-                                Minecraft.getInstance().level,
-                                data.readBlockPos(),
-                                inv,
-                                Minecraft.getInstance().player);
-                    }));
+            ORACLE_TAG, () -> IMenuTypeExtension.create(OracleContainer::new));
 }

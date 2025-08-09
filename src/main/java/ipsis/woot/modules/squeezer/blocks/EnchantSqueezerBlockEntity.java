@@ -332,6 +332,6 @@ public class EnchantSqueezerBlockEntity extends WootMachineBlockEntity implement
 
     @Override
     public @org.jetbrains.annotations.Nullable AbstractContainerMenu createMenu(int i, Inventory inventory, Player player) {
-        return new EnchantSqueezerMenu(i, level, getBlockPos(), inventory, player);
+        return new EnchantSqueezerMenu(i, inventory, this);
     }
 }

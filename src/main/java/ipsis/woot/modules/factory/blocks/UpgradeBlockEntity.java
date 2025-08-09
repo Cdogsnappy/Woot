@@ -26,12 +26,12 @@ import java.util.List;
 public class UpgradeBlockEntity extends MultiBlockBlockEntity implements WootDebug {
 
     public UpgradeBlockEntity(BlockPos pos, BlockState state) {
-        super(FactorySetup.FACTORY_UPGRADE_BLOCK_TILE.get(), pos, state);
+        super(pos, state);
     }
 
     public boolean tryAddUpgrade(Level world, Player playerEntity, BlockState state, Perk type) {
 
-        if (state.getValue(UpgradeBlock.UPGRADE) == Perk.EMPTY) {
+        if (state.getValue(UpgradeBlock.UPGRADE) == Perk.empty) {
             // Add to empty must be level 1
             if (Perk.LEVEL_1_PERKS.contains(type)) {
                 world.setBlock(getBlockPos(),
@@ -82,7 +82,7 @@ public class UpgradeBlockEntity extends MultiBlockBlockEntity implements WootDeb
 
     public void dropItems(BlockState state, Level world, BlockPos pos) {
         Perk upgrade = state.getValue(UpgradeBlock.UPGRADE);
-        if (upgrade == Perk.EMPTY)
+        if (upgrade == Perk.empty)
             return;
 
         int currLevel = Perk.getLevel(upgrade);

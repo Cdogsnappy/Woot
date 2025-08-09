@@ -8,6 +8,7 @@ import ipsis.woot.setup.NetworkChannel;
 import ipsis.woot.util.TankPacketHandler;
 import ipsis.woot.util.WootContainer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -15,6 +16,7 @@ import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.DataSlot;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.fluids.FluidStack;
@@ -28,10 +30,14 @@ public class FluidConvertorMenu extends WootContainer implements TankPacketHandl
     public FluidConvertorBlockEntity tileEntity;
     Player player;
 
-    public FluidConvertorMenu(int windowId, Inventory playerInventory, Player playerEntity, FluidConvertorBlockEntity entity) {
+    public FluidConvertorMenu(int containerId, Inventory inv, FriendlyByteBuf extraData) {
+        this(containerId, inv, inv.player.level().getBlockEntity(extraData.readBlockPos()));
+    }
+
+    public FluidConvertorMenu(int windowId, Inventory playerInventory, BlockEntity entity) {
         super(FluidConvertorSetup.FLUID_CONVERTOR_BLOCK_CONTATAINER.get(), windowId);
-        tileEntity = entity;
-        this.player = playerEntity;
+        tileEntity = (FluidConvertorBlockEntity) entity;
+        this.player = playerInventory.player;
 
         addOwnSlots(tileEntity.inventory);
         addPlayerSlots(playerInventory);

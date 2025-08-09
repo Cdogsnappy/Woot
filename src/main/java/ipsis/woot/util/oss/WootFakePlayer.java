@@ -3,6 +3,8 @@ package ipsis.woot.util.oss;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.client.renderer.EffectInstance;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.neoforged.neoforge.common.util.FakePlayer;
 
 
@@ -20,7 +22,7 @@ public class WootFakePlayer extends FakePlayer {
     }
 
     @Override
-    public boolean isPotionApplicable(EffectInstance potioneffectIn) {
+    public boolean canBeAffected(MobEffectInstance effectInstance) {
         return false;
     }
 }

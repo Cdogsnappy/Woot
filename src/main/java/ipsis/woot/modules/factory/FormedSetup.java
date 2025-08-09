@@ -4,7 +4,6 @@ import ipsis.woot.Woot;
 import ipsis.woot.config.Config;
 import ipsis.woot.config.ConfigOverride;
 import ipsis.woot.modules.factory.blocks.*;
-import ipsis.woot.modules.factory.client.ClientFactorySetup;
 import ipsis.woot.modules.factory.layout.Layout;
 import ipsis.woot.modules.factory.layout.PatternBlock;
 import ipsis.woot.modules.factory.perks.Perk;
@@ -94,7 +93,7 @@ public class FormedSetup {
         }
         return 0;
     }
-    public int getLootingLevel() { return MathHelper.clampLooting(perks.getOrDefault(Perk.Group.LOOTING, 0)); }
+    public int getLootingLevel() { return MathHelper.clampLooting(perks.getOrDefault(Perk.Group.looting, 0)); }
 
     public List<Optional<IItemHandler>> getImportHandlers() {
         List<Optional<IItemHandler>> handlers = new ArrayList<>();
@@ -192,43 +191,43 @@ public class FormedSetup {
             }
 
             // Efficiency
-            if (perks.containsKey(Perk.Group.EFFICIENCY)) {
-                int perkLevel = perks.getOrDefault(Perk.Group.EFFICIENCY, 0);
+            if (perks.containsKey(Perk.Group.effieciency)) {
+                int perkLevel = perks.getOrDefault(Perk.Group.effieciency, 0);
                 if (perkLevel > 0)
                     param.setPerkEfficiencyValue(Config.OVERRIDE.getIntegerOrDefault(fakeMob,
-                            Config.OVERRIDE.getKeyByPerk(Perk.Group.EFFICIENCY, perkLevel)));
+                            Config.OVERRIDE.getKeyByPerk(Perk.Group.effieciency, perkLevel)));
             }
 
             // Mass
-            if (perks.containsKey(Perk.Group.MASS)) {
-                int perkLevel = perks.getOrDefault(Perk.Group.MASS, 0);
+            if (perks.containsKey(Perk.Group.mass)) {
+                int perkLevel = perks.getOrDefault(Perk.Group.mass, 0);
                 if (perkLevel > 0)
                     param.setPerkMassValue(Config.OVERRIDE.getIntegerOrDefault(fakeMob,
-                            Config.OVERRIDE.getKeyByPerk(Perk.Group.MASS, perkLevel)));
+                            Config.OVERRIDE.getKeyByPerk(Perk.Group.mass, perkLevel)));
             }
 
             // Rate
-            if (perks.containsKey(Perk.Group.RATE)) {
-                int perkLevel = perks.getOrDefault(Perk.Group.RATE, 0);
+            if (perks.containsKey(Perk.Group.rate)) {
+                int perkLevel = perks.getOrDefault(Perk.Group.rate, 0);
                 if (perkLevel > 0)
                     param.setPerkRateValue(Config.OVERRIDE.getIntegerOrDefault(fakeMob,
-                            Config.OVERRIDE.getKeyByPerk(Perk.Group.RATE, perkLevel)));
+                            Config.OVERRIDE.getKeyByPerk(Perk.Group.rate, perkLevel)));
             }
 
             // Xp
-            if (perks.containsKey(Perk.Group.XP)) {
-                int perkLevel = perks.getOrDefault(Perk.Group.XP, 0);
+            if (perks.containsKey(Perk.Group.xp)) {
+                int perkLevel = perks.getOrDefault(Perk.Group.xp, 0);
                 if (perkLevel > 0)
                     param.setPerkXpValue(Config.OVERRIDE.getIntegerOrDefault(fakeMob,
-                            Config.OVERRIDE.getKeyByPerk(Perk.Group.XP, perkLevel)));
+                            Config.OVERRIDE.getKeyByPerk(Perk.Group.xp, perkLevel)));
             }
 
             // Headless
-            if (perks.containsKey(Perk.Group.HEADLESS)) {
-                int perkLevel = perks.getOrDefault(Perk.Group.HEADLESS, 0);
+            if (perks.containsKey(Perk.Group.headless)) {
+                int perkLevel = perks.getOrDefault(Perk.Group.headless, 0);
                 if (perkLevel > 0)
                     param.setPerkHeadlessValue(Config.OVERRIDE.getIntegerOrDefault(fakeMob,
-                            Config.OVERRIDE.getKeyByPerk(Perk.Group.HEADLESS, perkLevel)));
+                            Config.OVERRIDE.getKeyByPerk(Perk.Group.headless, perkLevel)));
             }
 
             mobParams.put(fakeMob, param);
@@ -262,7 +261,7 @@ public class FormedSetup {
                 BlockEntity te = world.getBlockEntity(pb.getBlockPos());
                 if (te instanceof UpgradeBlockEntity) {
                     Perk perk = ((UpgradeBlockEntity) te).getUpgrade(world.getBlockState(pb.getBlockPos()));
-                    if (perk != Perk.EMPTY) {
+                    if (perk != Perk.empty) {
                         Perk.Group group = Perk.getGroup(perk);
                         int perkLevel = Perk.getLevel(perk);
                         /**
@@ -282,7 +281,7 @@ public class FormedSetup {
                         Woot.setup.getLogger().debug("createFromValidLayout: adding perk {}/{}", group, perkLevel);
                         formedSetup.perks.put(group, perkLevel);
 
-                        if (group == Perk.Group.TIER_SHARD) {
+                        if (group == Perk.Group.tier_shard) {
                             if (perkLevel == 1)
                                 formedSetup.perkTierShardValue = FactoryConfiguration.TIER_SHARD_1.get();
                             else if (perkLevel == 2)

@@ -1,11 +1,12 @@
 package ipsis.woot.util.oss;
 
 import ipsis.woot.Woot;
-import net.minecraft.block.Block;
 import net.minecraft.data.DataGenerator;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.model.generators.*;
-import net.minecraftforge.common.data.ExistingFileHelper;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.Block;
+import net.neoforged.neoforge.client.model.generators.BlockStateProvider;
+import net.neoforged.neoforge.client.model.generators.ModelFile;
+import net.neoforged.neoforge.common.data.ExistingFileHelper;
 
 /**
  * A subset of McJty's BaseBlockStateProvider from McJtyLib
@@ -13,35 +14,35 @@ import net.minecraftforge.common.data.ExistingFileHelper;
 public abstract class BaseBlockStateProvider extends BlockStateProvider {
 
     public BaseBlockStateProvider(DataGenerator gen, String modid, ExistingFileHelper exFileHelper) {
-        super(gen, modid, exFileHelper);
+        super(gen.getPackOutput(), modid, exFileHelper);
     }
 
     private ModelFile frontBasedModel(String modelName, ResourceLocation texture) {
         return models().orientable(
                 modelName,
-                new ResourceLocation(Woot.MODID, "block/factory"),
+                ResourceLocation.fromNamespaceAndPath(Woot.MODID, "block/factory"),
                 texture,
-                new ResourceLocation(Woot.MODID, "block/factory"));
+                ResourceLocation.fromNamespaceAndPath(Woot.MODID, "block/factory"));
     }
 
     private ModelFile sideOnlyBasedModel(String modelName, ResourceLocation texture) {
         return models().cubeBottomTop(modelName,
                 texture,
-                new ResourceLocation(Woot.MODID, "block/factory"),
-                new ResourceLocation(Woot.MODID, "block/factory"));
+                ResourceLocation.fromNamespaceAndPath(Woot.MODID, "block/factory"),
+                ResourceLocation.fromNamespaceAndPath(Woot.MODID, "block/factory"));
     }
 
     public void singleTextureBlock(Block block, String modelName, String textureName) {
-        ModelFile modelFile = models().cubeAll(modelName, modLoc(textureName));
-        simpleBlock(block, modelFile);
+        ModelFile model = models().cubeAll(modelName, modLoc(textureName));
+        simpleBlock(block, model);
     }
 
     public void machineBlock(Block block, String modelName, String textureName) {
         ModelFile modelFile = frontBasedModel(modelName, modLoc(textureName));
         horizontalBlock(block,
-                new ResourceLocation(Woot.MODID, "block/factory"),
+                ResourceLocation.fromNamespaceAndPath(Woot.MODID, "block/factory"),
                 modLoc(textureName),
-                new ResourceLocation(Woot.MODID, "block/factory"));
+                ResourceLocation.fromNamespaceAndPath(Woot.MODID, "block/factory"));
     }
 
     public void sideOnlyBlock(Block block, String modelName, String textureName) {

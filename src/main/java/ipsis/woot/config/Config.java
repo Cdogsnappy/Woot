@@ -11,13 +11,14 @@ import ipsis.woot.modules.layout.LayoutConfiguration;
 import ipsis.woot.simulator.MobSimulatorConfiguration;
 import ipsis.woot.modules.squeezer.SqueezerConfiguration;
 import ipsis.woot.policy.PolicyConfiguration;
+import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.fml.event.config.ModConfigEvent;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
 
 import java.nio.file.Path;
 
-@EventBusSubscriber
 public class Config {
 
     public static ConfigOverride OVERRIDE = new ConfigOverride();
@@ -42,6 +43,7 @@ public class Config {
 
         COMMON_CONFIG = COMMON_BUILDER.build();
         CLIENT_CONFIG = CLIENT_BUILDER.build();
+
     }
 
     private static void setupGeneralConfig() {
@@ -53,7 +55,7 @@ public class Config {
         COMMON_BUILDER.pop();
     }
 
-    public static void loadConfig(ModConfigSpec spec, Path path) {
+    public static void register(ModConfigSpec spec, Path path) {
         final CommentedFileConfig configData = CommentedFileConfig.builder(path)
                 .sync()
                 .autosave()
@@ -61,6 +63,8 @@ public class Config {
                 .build();
 
         configData.load();;
-        spec.setConfig(configData);
+        spec.correct(configData);
     }
+
+
 }

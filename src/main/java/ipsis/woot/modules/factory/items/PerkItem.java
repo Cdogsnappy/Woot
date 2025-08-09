@@ -1,6 +1,5 @@
 package ipsis.woot.modules.factory.items;
 
-import ipsis.woot.Woot;
 import ipsis.woot.modules.factory.*;
 import ipsis.woot.modules.factory.perks.Helper;
 import ipsis.woot.modules.factory.perks.Perk;
@@ -9,10 +8,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.level.Level;
 
 
-import javax.annotation.Nullable;
 import java.util.List;
 
 public class PerkItem extends Item {
@@ -62,71 +59,71 @@ public class PerkItem extends Item {
 
     public static ItemStack getItemStack(Perk perk) {
 
-        if (perk == Perk.EFFICIENCY_1)
+        if (perk == Perk.efficiency_1)
             return new ItemStack(FactorySetup.EFFICIENCY_1_ITEM.get());
-        else if (perk == Perk.EFFICIENCY_2)
+        else if (perk == Perk.efficiency_2)
             return new ItemStack(FactorySetup.EFFICIENCY_2_ITEM.get());
-        else if (perk == Perk.EFFICIENCY_3)
+        else if (perk == Perk.efficiency_3)
             return new ItemStack(FactorySetup.EFFICIENCY_3_ITEM.get());
-        else if (perk == Perk.LOOTING_1)
+        else if (perk == Perk.looting_1)
             return new ItemStack(FactorySetup.LOOTING_1_ITEM.get());
-        else if (perk == Perk.LOOTING_2)
+        else if (perk == Perk.looting_2)
             return new ItemStack(FactorySetup.LOOTING_2_ITEM.get());
-        else if (perk == Perk.LOOTING_3)
+        else if (perk == Perk.looting_3)
             return new ItemStack(FactorySetup.LOOTING_3_ITEM.get());
-        else if (perk == Perk.MASS_1)
+        else if (perk == Perk.mass_1)
             return new ItemStack(FactorySetup.MASS_1_ITEM.get());
-        else if (perk == Perk.MASS_2)
+        else if (perk == Perk.mass_2)
             return new ItemStack(FactorySetup.MASS_2_ITEM.get());
-        else if (perk == Perk.MASS_3)
+        else if (perk == Perk.mass_3)
             return new ItemStack(FactorySetup.MASS_3_ITEM.get());
-        else if (perk == Perk.RATE_1)
+        else if (perk == Perk.rate_1)
             return new ItemStack(FactorySetup.RATE_1_ITEM.get());
-        else if (perk == Perk.RATE_2)
+        else if (perk == Perk.rate_2)
             return new ItemStack(FactorySetup.RATE_2_ITEM.get());
-        else if (perk == Perk.RATE_3)
+        else if (perk == Perk.rate_3)
             return new ItemStack(FactorySetup.RATE_3_ITEM.get());
-        else if (perk == Perk.TIER_SHARD_1)
+        else if (perk == Perk.tier_shard_1)
             return new ItemStack(FactorySetup.TIER_SHARD_1_ITEM.get());
-        else if (perk == Perk.TIER_SHARD_2)
+        else if (perk == Perk.tier_shard_2)
             return new ItemStack(FactorySetup.TIER_SHARD_2_ITEM.get());
-        else if (perk == Perk.TIER_SHARD_3)
+        else if (perk == Perk.tier_shard_3)
             return new ItemStack(FactorySetup.TIER_SHARD_3_ITEM.get());
-        else if (perk == Perk.XP_1)
+        else if (perk == Perk.xp_1)
             return new ItemStack(FactorySetup.XP_1_ITEM.get());
-        else if (perk == Perk.XP_2)
+        else if (perk == Perk.xp_2)
             return new ItemStack(FactorySetup.XP_2_ITEM.get());
-        else if (perk == Perk.XP_3)
+        else if (perk == Perk.xp_3)
             return new ItemStack(FactorySetup.XP_3_ITEM.get());
-        else if (perk == Perk.HEADLESS_1)
+        else if (perk == Perk.headless_1)
             return new ItemStack(FactorySetup.HEADLESS_1_ITEM.get());
-        else if (perk == Perk.HEADLESS_2)
+        else if (perk == Perk.headless_2)
             return new ItemStack(FactorySetup.HEADLESS_2_ITEM.get());
-        else if (perk == Perk.HEADLESS_3)
+        else if (perk == Perk.headless_3)
             return new ItemStack(FactorySetup.HEADLESS_3_ITEM.get());
-        else if (perk == Perk.SLAUGHTER_1)
+        else if (perk == Perk.slaughter_1)
             return new ItemStack(FactorySetup.SLAUGHTER_1_ITEM.get());
-        else if (perk == Perk.SLAUGHTER_2)
+        else if (perk == Perk.slaughter_2)
             return new ItemStack(FactorySetup.SLAUGHTER_2_ITEM.get());
-        else if (perk == Perk.SLAUGHTER_3)
+        else if (perk == Perk.slaughter_3)
             return new ItemStack(FactorySetup.SLAUGHTER_3_ITEM.get());
-        else if (perk == Perk.CRUSHER_1)
+        else if (perk == Perk.crusher_1)
             return new ItemStack(FactorySetup.CRUSHER_1_ITEM.get());
-        else if (perk == Perk.CRUSHER_2)
+        else if (perk == Perk.crusher_2)
             return new ItemStack(FactorySetup.CRUSHER_2_ITEM.get());
-        else if (perk == Perk.CRUSHER_3)
+        else if (perk == Perk.crusher_3)
             return new ItemStack(FactorySetup.CRUSHER_3_ITEM.get());
-        else if (perk == Perk.LASER_1)
+        else if (perk == Perk.laser_1)
             return new ItemStack(FactorySetup.LASER_1_ITEM.get());
-        else if (perk == Perk.LASER_2)
+        else if (perk == Perk.laser_2)
             return new ItemStack(FactorySetup.LASER_2_ITEM.get());
-        else if (perk == Perk.LASER_3)
+        else if (perk == Perk.laser_3)
             return new ItemStack(FactorySetup.LASER_3_ITEM.get());
-        else if (perk == Perk.FLAYED_1)
+        else if (perk == Perk.flayed_1)
             return new ItemStack(FactorySetup.FLAYED_1_ITEM.get());
-        else if (perk == Perk.FLAYED_2)
+        else if (perk == Perk.flayed_2)
             return new ItemStack(FactorySetup.FLAYED_2_ITEM.get());
-        else if (perk == Perk.FLAYED_3)
+        else if (perk == Perk.flayed_3)
             return new ItemStack(FactorySetup.FLAYED_3_ITEM.get());
 
         return ItemStack.EMPTY;

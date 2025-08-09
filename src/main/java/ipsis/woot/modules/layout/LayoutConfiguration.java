@@ -2,15 +2,16 @@ package ipsis.woot.modules.layout;
 
 import ipsis.woot.config.ConfigDefaults;
 import ipsis.woot.config.ConfigPath;
-import net.minecraftforge.common.ForgeConfigSpec;
+import net.neoforged.neoforge.common.ModConfigSpec;
+
 
 public class LayoutConfiguration {
 
-    public static ForgeConfigSpec.BooleanValue SIMPLE_LAYOUT;
-    public static ForgeConfigSpec.DoubleValue RENDER_OPACITY;
-    public static ForgeConfigSpec.DoubleValue RENDER_SIZE;
+    public static ModConfigSpec.BooleanValue SIMPLE_LAYOUT;
+    public static ModConfigSpec.DoubleValue RENDER_OPACITY;
+    public static ModConfigSpec.DoubleValue RENDER_SIZE;
 
-    public static void init(ForgeConfigSpec.Builder COMMON_BUILDER, ForgeConfigSpec.Builder CLIENT_BUILDER) {
+    public static void init(ModConfigSpec.Builder COMMON_BUILDER, ModConfigSpec.Builder CLIENT_BUILDER) {
 
         COMMON_BUILDER.comment("Settings for the layout guide").push(ConfigPath.Layout.CATEGORY);
         CLIENT_BUILDER.comment("Settings for the layout guide").push(ConfigPath.Layout.CATEGORY);

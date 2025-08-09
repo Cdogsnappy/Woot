@@ -22,10 +22,10 @@ import java.util.Optional;
 public abstract class CellBlockEntityBase extends MultiBlockBlockEntity implements WootDebug {
 
     protected FluidTank tank = new FluidTank(FluidType.BUCKET_VOLUME);
-    private final Optional<IFluidHandler> holder = Optional.of(() -> tank);
+    private final Optional<IFluidHandler> holder = Optional.of(tank);
 
     public CellBlockEntityBase(BlockEntityType<?> blockEntityType, BlockPos pos, BlockState state) {
-        super(blockEntityType, pos, state);
+        super(pos, state);
         tank.setCapacity(getCapacity());
         tank.setValidator(e -> e.getFluid() == FluidSetup.CONATUS_FLUID.get().getSource());
     }

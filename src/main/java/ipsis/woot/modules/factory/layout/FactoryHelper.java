@@ -1,6 +1,5 @@
 package ipsis.woot.modules.factory.layout;
 
-import ipsis.woot.advancements.Advancements;
 import ipsis.woot.modules.factory.FactoryComponent;
 import ipsis.woot.modules.factory.Tier;
 import ipsis.woot.modules.factory.multiblock.MultiBlockGlueProvider;
@@ -17,7 +16,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.common.util.BlockSnapshot;
+import net.neoforged.neoforge.event.level.BlockEvent;
 
 
 import java.util.ArrayList;
@@ -88,17 +89,19 @@ public class FactoryHelper {
             if (!PlayerHelper.playerHasFactoryComponent(playerEntity, correctItemStacks)) {
                 playerEntity.sendSystemMessage(
                         Component.translatable("chat.woot.intern.missingblock",
-                                StringHelper.translate(pb.getFactoryComponent().getTranslationKey())), false);
+                                StringHelper.translate(pb.getFactoryComponent().getTranslationKey())));
                 return BuildResult.NO_BLOCK_IN_INV;
             }
-            if (world.isModifiable(playerEntity, pb.getBlockPos()) && (world.isAirBlock(pb.getBlockPos()) || currState.getMaterial().isReplaceable())) {
+            if (world.mayInteract(playerEntity, pb.getBlockPos()) && (world.isEmptyBlock(pb.getBlockPos()) || currState.canBeReplaced())) {
                 ItemStack takenStack = PlayerHelper.takeFactoryComponent(playerEntity, correctItemStacks);
                 if (!takenStack.isEmpty()) {
 
                     BlockSnapshot blockSnapshot = BlockSnapshot.create(world.dimension(), world, pos);
                     world.setBlock(pb.getBlockPos(), placeBlock.defaultBlockState(), 11);
-                    if (ForgeEventFactory.onBlockPlace(playerEntity, blockSnapshot, Direction.UP)) {
-                        blockSnapshot.restore(true, false);
+                    BlockEvent.EntityPlaceEvent event = new BlockEvent.EntityPlaceEvent(blockSnapshot, currState, playerEntity);
+                    event = NeoForge.EVENT_BUS.post(event);
+                    if(event.getBlockSnapshot().getFlags() != 11){
+                        blockSnapshot.restore(11);
                         return BuildResult.ERROR;
                     }
                 }
@@ -106,9 +109,9 @@ public class FactoryHelper {
             } else {
                 // cannot replace block
                 playerEntity.sendSystemMessage(
-                        new TranslationTextComponent("chat.woot.intern.noreplace",
+                        Component.translatable("chat.woot.intern.noreplace",
                                 StringHelper.translate(pb.getFactoryComponent().getTranslationKey()),
-                                pb.getBlockPos().getX(), pb.getBlockPos().getY(), pb.getBlockPos().getZ()), false);
+                                pb.getBlockPos().getX(), pb.getBlockPos().getY(), pb.getBlockPos().getZ()));
                 return BuildResult.ERROR;
             }
         }
@@ -118,10 +121,9 @@ public class FactoryHelper {
     public static void tryValidate(Level world, BlockPos pos, Player playerEntity, Direction facing, Tier tier) {
 
         playerEntity.sendSystemMessage(
-                new TranslationTextComponent(
+                Component.translatable(
                 "chat.woot.intern.validate.start",
-                        StringHelper.translate(tier.getTranslationKey())),
-                true);
+                        StringHelper.translate(tier.getTranslationKey())));
 
         List<String> feedback = new ArrayList<>();
         AbsolutePattern absolutePattern = AbsolutePattern.create(world, tier, pos, facing);
@@ -137,8 +139,7 @@ public class FactoryHelper {
             playerEntity.sendSystemMessage(
                     Component.translatable(
                     "chat.woot.intern.validate.valid", StringHelper.translate(tier.getTranslationKey())));
-            if (playerEntity instanceof ServerPlayer)
-                Advancements.TIER_VALIDATE_TRIGGER.trigger((ServerPlayer)playerEntity, tier);
+
         }
     }
 }

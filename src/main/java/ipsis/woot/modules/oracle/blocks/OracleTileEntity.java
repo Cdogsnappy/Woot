@@ -29,6 +29,6 @@ public class OracleTileEntity extends BlockEntity implements MenuProvider {
 
     @Override
     public @org.jetbrains.annotations.Nullable AbstractContainerMenu createMenu(int i, Inventory inventory, Player player) {
-        return new OracleContainer(i, this.level, this.worldPosition, inventory, player);
+        return new OracleContainer(i, inventory,this);
     }
 }

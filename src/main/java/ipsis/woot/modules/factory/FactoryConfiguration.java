@@ -1,7 +1,5 @@
 package ipsis.woot.modules.factory;
 
-import ipsis.woot.config.ConfigDefaults;
-import ipsis.woot.config.ConfigOverride;
 import ipsis.woot.config.ConfigPath;
 import ipsis.woot.modules.factory.perks.Perk;
 
@@ -82,36 +80,36 @@ public class FactoryConfiguration {
     public static ModConfigSpec.ConfigValue<List<Integer>> T5_FARM_DROP_SHARD_WEIGHTS;
 
     public static ModConfigSpec.IntValue getPerkIntValue(Perk.Group group, int level) {
-        if (group == Perk.Group.EFFICIENCY && level == 1) return EFFICIENCY_1;
-        if (group == Perk.Group.EFFICIENCY && level == 2) return EFFICIENCY_2;
-        if (group == Perk.Group.EFFICIENCY && level == 3) return EFFICIENCY_3;
-        if (group == Perk.Group.MASS && level == 1) return MASS_COUNT_1;
-        if (group == Perk.Group.MASS && level == 2) return MASS_COUNT_2;
-        if (group == Perk.Group.MASS && level == 3) return MASS_COUNT_3;
-        if (group == Perk.Group.RATE && level == 1) return RATE_1;
-        if (group == Perk.Group.RATE && level == 2) return RATE_2;
-        if (group == Perk.Group.RATE && level == 3) return RATE_3;
-        if (group == Perk.Group.TIER_SHARD && level == 1) return TIER_SHARD_1;
-        if (group == Perk.Group.TIER_SHARD && level == 2) return TIER_SHARD_2;
-        if (group == Perk.Group.TIER_SHARD && level == 3) return TIER_SHARD_3;
-        if (group == Perk.Group.XP && level == 1) return XP_1;
-        if (group == Perk.Group.XP && level == 1) return XP_2;
-        if (group == Perk.Group.XP && level == 1) return XP_3;
-        if (group == Perk.Group.HEADLESS && level == 1) return HEADLESS_1;
-        if (group == Perk.Group.HEADLESS && level == 2) return HEADLESS_2;
-        if (group == Perk.Group.HEADLESS && level == 3) return HEADLESS_3;
-        if (group == Perk.Group.SLAUGHTER && level == 1) return SLAUGHTER_1;
-        if (group == Perk.Group.SLAUGHTER && level == 2) return SLAUGHTER_2;
-        if (group == Perk.Group.SLAUGHTER && level == 3) return SLAUGHTER_3;
-        if (group == Perk.Group.CRUSHER && level == 1) return CRUSHER_1;
-        if (group == Perk.Group.CRUSHER && level == 2) return CRUSHER_2;
-        if (group == Perk.Group.CRUSHER && level == 3) return CRUSHER_3;
-        if (group == Perk.Group.LASER && level == 1) return LASER_1;
-        if (group == Perk.Group.LASER && level == 2) return LASER_2;
-        if (group == Perk.Group.LASER && level == 3) return LASER_3;
-        if (group == Perk.Group.FLAYED && level == 1) return FLAYED_1;
-        if (group == Perk.Group.FLAYED && level == 2) return FLAYED_2;
-        if (group == Perk.Group.FLAYED && level == 3) return FLAYED_3;
+        if (group == Perk.Group.effieciency && level == 1) return EFFICIENCY_1;
+        if (group == Perk.Group.effieciency && level == 2) return EFFICIENCY_2;
+        if (group == Perk.Group.effieciency && level == 3) return EFFICIENCY_3;
+        if (group == Perk.Group.mass && level == 1) return MASS_COUNT_1;
+        if (group == Perk.Group.mass && level == 2) return MASS_COUNT_2;
+        if (group == Perk.Group.mass && level == 3) return MASS_COUNT_3;
+        if (group == Perk.Group.rate && level == 1) return RATE_1;
+        if (group == Perk.Group.rate && level == 2) return RATE_2;
+        if (group == Perk.Group.rate && level == 3) return RATE_3;
+        if (group == Perk.Group.tier_shard && level == 1) return TIER_SHARD_1;
+        if (group == Perk.Group.tier_shard && level == 2) return TIER_SHARD_2;
+        if (group == Perk.Group.tier_shard && level == 3) return TIER_SHARD_3;
+        if (group == Perk.Group.xp && level == 1) return XP_1;
+        if (group == Perk.Group.xp && level == 1) return XP_2;
+        if (group == Perk.Group.xp && level == 1) return XP_3;
+        if (group == Perk.Group.headless && level == 1) return HEADLESS_1;
+        if (group == Perk.Group.headless && level == 2) return HEADLESS_2;
+        if (group == Perk.Group.headless && level == 3) return HEADLESS_3;
+        if (group == Perk.Group.slaughter && level == 1) return SLAUGHTER_1;
+        if (group == Perk.Group.slaughter && level == 2) return SLAUGHTER_2;
+        if (group == Perk.Group.slaughter && level == 3) return SLAUGHTER_3;
+        if (group == Perk.Group.crusher && level == 1) return CRUSHER_1;
+        if (group == Perk.Group.crusher && level == 2) return CRUSHER_2;
+        if (group == Perk.Group.crusher && level == 3) return CRUSHER_3;
+        if (group == Perk.Group.laser && level == 1) return LASER_1;
+        if (group == Perk.Group.laser && level == 2) return LASER_2;
+        if (group == Perk.Group.laser && level == 3) return LASER_3;
+        if (group == Perk.Group.flayed && level == 1) return FLAYED_1;
+        if (group == Perk.Group.flayed && level == 2) return FLAYED_2;
+        if (group == Perk.Group.flayed && level == 3) return FLAYED_3;
         return null; // Some don't have config values
     }
 
@@ -459,15 +457,15 @@ public class FactoryConfiguration {
                 COMMON_BUILDER.push(ConfigPath.Factory.CATEGORY_XP);
                 {
                     XP_1 = COMMON_BUILDER
-                            .comment("Percentage generate of XP for xp 1 perks")
+                            .comment("Percentage generate of xp for xp 1 perks")
                             .defineInRange(ConfigPath.Factory.XP_1_TAG,
                                     Factory.XP_1_DEF, 0, 1000);
                     XP_2 = COMMON_BUILDER
-                            .comment("Percentage generate of XP for xp 2 perks")
+                            .comment("Percentage generate of xp for xp 2 perks")
                             .defineInRange(ConfigPath.Factory.XP_2_TAG,
                                     Factory.XP_2_DEF, 0, 1000);
                     XP_3 = COMMON_BUILDER
-                            .comment("Percentage generate of XP for xp 3 perks")
+                            .comment("Percentage generate of xp for xp 3 perks")
                             .defineInRange(ConfigPath.Factory.XP_3_TAG,
                                     Factory.XP_3_DEF, 0, 1000);
                 }

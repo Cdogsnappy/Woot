@@ -21,8 +21,13 @@ public class MultiBlockBlockEntity extends BlockEntity implements MultiBlockGlue
 
     protected MultiBlockGlue glue;
 
-    public MultiBlockBlockEntity(BlockEntityType type, BlockPos pos, BlockState state) {
+    public MultiBlockBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
+        glue = new Glue(this, this);
+    }
+
+    public MultiBlockBlockEntity(BlockPos pos, BlockState state) {
+        super(FactorySetup.MULTIBLOCK_BLOCK_TILE.get(), pos, state);
         glue = new Glue(this, this);
     }
 

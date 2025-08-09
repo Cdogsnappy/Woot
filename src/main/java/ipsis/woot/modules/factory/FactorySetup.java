@@ -21,12 +21,16 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 public class FactorySetup {
@@ -45,15 +49,16 @@ public class FactorySetup {
     }
 
     public static final DeferredHolder<Block, WootBaseEntityBlock> WOOT_BASE_BLOCK = BLOCKS.register(
-            "wootbaseblock", WootBaseEntityBlock::new);
-    )
+            "wootbaseblock", () -> new WootBaseEntityBlock(BlockBehaviour.Properties.of()));
+
+
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<WootMachineBlockEntity>> WOOT_MACHINE_ENTITY =
             BLOCKENTITIES.register("wootmachineentity", () ->
                     BlockEntityType.Builder.of(WootMachineBlockEntity::new, WOOT_BASE_BLOCK.get()).build(null));
 
     public static final String HEART_TAG = "heart";
     public static final DeferredHolder<Block, HeartBlock> HEART_BLOCK = BLOCKS.register(
-            HEART_TAG, HeartBlock::new);
+            HEART_TAG, () -> new HeartBlock(BlockBehaviour.Properties.of()));
     public static final DeferredHolder<Item, Item> HEART_BLOCK_ITEM = ITEMS.register(
             HEART_TAG, () ->
                     new BlockItem(HEART_BLOCK.get(), Woot.createStandardProperties()));
@@ -61,20 +66,12 @@ public class FactorySetup {
             HEART_TAG, () ->
                     BlockEntityType.Builder.of(HeartBlockEntity::new, HEART_BLOCK.get()).build(null));
 
-    public static final DeferredHolder<MenuType<HeartMenu>> HEART_BLOCK_CONTAINER = CONTAINERS.register(
-            HEART_TAG, () ->
-                    IForgeContainerType.create((windowId, inv, data) -> {
-                        return new HeartMenu(
-                                windowId,
-                                Woot.proxy.getClientWorld(),
-                                data.readBlockPos(),
-                                inv,
-                                Woot.proxy.getClientPlayer());
-                    }));
+    public static final DeferredHolder<MenuType<?>, MenuType<HeartMenu>> HEART_BLOCK_CONTAINER = CONTAINERS.register(
+            HEART_TAG, () -> IMenuTypeExtension.create(HeartMenu::new));
 
     public static final String CONTROLLER_TAG = "controller";
     public static final DeferredHolder<Block, ControllerBlock> CONTROLLER_BLOCK = BLOCKS.register(
-            CONTROLLER_TAG, ControllerBlock::new);
+            CONTROLLER_TAG, () -> new ControllerBlock(BlockBehaviour.Properties.of()));
     public static final DeferredHolder<Item, Item> CONTROLLER_BLOCK_ITEM = ITEMS.register(
             CONTROLLER_TAG, () ->
                     new ControllerBlockItem(CONTROLLER_BLOCK.get(), Woot.createStandardProperties()));
@@ -191,9 +188,6 @@ public class FactorySetup {
     public static final DeferredHolder<Item, Item> FACTORY_UPGRADE_BLOCK_ITEM = ITEMS.register(
             FACTORY_UPGRADE_TAG, () ->
                     new BlockItem(FACTORY_UPGRADE_BLOCK.get(), Woot.createStandardProperties()));
-    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<UpgradeBlockEntity>> FACTORY_UPGRADE_BLOCK_TILE = BLOCKENTITIES.register(
-            FACTORY_UPGRADE_TAG, () ->
-                    BlockEntityType.Builder.of(UpgradeBlockEntity::new, FACTORY_UPGRADE_BLOCK.get()).build(null));
 
     public static final String CELL_1_TAG = "cell_1";
     public static final DeferredHolder<Block, CellBlock> CELL_1_BLOCK = BLOCKS.register(
@@ -261,81 +255,81 @@ public class FactorySetup {
             Exotic.EXOTIC_E.getName(), () -> new BlockItem(EXOTIC_E_BLOCK.get(), Woot.createStandardProperties()));
 
     public static final DeferredHolder<Item, PerkItem> EFFICIENCY_1_ITEM = ITEMS.register(
-            PerkItem.EFFICIENCY_1_REGNAME, () -> new PerkItem(Perk.EFFICIENCY_1));
+            PerkItem.EFFICIENCY_1_REGNAME, () -> new PerkItem(Perk.efficiency_1));
     public static final DeferredHolder<Item, PerkItem> EFFICIENCY_2_ITEM = ITEMS.register(
-            PerkItem.EFFICIENCY_2_REGNAME, () -> new PerkItem(Perk.EFFICIENCY_2));
+            PerkItem.EFFICIENCY_2_REGNAME, () -> new PerkItem(Perk.efficiency_2));
     public static final DeferredHolder<Item, PerkItem> EFFICIENCY_3_ITEM = ITEMS.register(
-            PerkItem.EFFICIENCY_3_REGNAME, () -> new PerkItem(Perk.EFFICIENCY_3));
+            PerkItem.EFFICIENCY_3_REGNAME, () -> new PerkItem(Perk.efficiency_3));
 
     public static final DeferredHolder<Item, PerkItem> LOOTING_1_ITEM = ITEMS.register(
-            PerkItem.LOOTING_1_REGNAME, () -> new PerkItem(Perk.LOOTING_1));
+            PerkItem.LOOTING_1_REGNAME, () -> new PerkItem(Perk.looting_1));
     public static final DeferredHolder<Item, PerkItem> LOOTING_2_ITEM = ITEMS.register(
-            PerkItem.LOOTING_2_REGNAME, () -> new PerkItem(Perk.LOOTING_2));
+            PerkItem.LOOTING_2_REGNAME, () -> new PerkItem(Perk.looting_2));
     public static final DeferredHolder<Item, PerkItem> LOOTING_3_ITEM = ITEMS.register(
-            PerkItem.LOOTING_3_REGNAME, () -> new PerkItem(Perk.LOOTING_3));
+            PerkItem.LOOTING_3_REGNAME, () -> new PerkItem(Perk.looting_3));
 
     public static final DeferredHolder<Item, PerkItem> MASS_1_ITEM = ITEMS.register(
-            PerkItem.MASS_1_REGNAME, () -> new PerkItem(Perk.MASS_1));
+            PerkItem.MASS_1_REGNAME, () -> new PerkItem(Perk.mass_1));
     public static final DeferredHolder<Item, PerkItem> MASS_2_ITEM = ITEMS.register(
-            PerkItem.MASS_2_REGNAME, () -> new PerkItem(Perk.MASS_2));
+            PerkItem.MASS_2_REGNAME, () -> new PerkItem(Perk.mass_2));
     public static final DeferredHolder<Item, PerkItem> MASS_3_ITEM = ITEMS.register(
-            PerkItem.MASS_3_REGNAME, () -> new PerkItem(Perk.MASS_3));
+            PerkItem.MASS_3_REGNAME, () -> new PerkItem(Perk.mass_3));
 
     public static final DeferredHolder<Item, PerkItem> RATE_1_ITEM = ITEMS.register(
-            PerkItem.RATE_1_REGNAME, () -> new PerkItem(Perk.RATE_1));
+            PerkItem.RATE_1_REGNAME, () -> new PerkItem(Perk.rate_1));
     public static final DeferredHolder<Item, PerkItem> RATE_2_ITEM = ITEMS.register(
-            PerkItem.RATE_2_REGNAME, () -> new PerkItem(Perk.RATE_2));
+            PerkItem.RATE_2_REGNAME, () -> new PerkItem(Perk.rate_2));
     public static final DeferredHolder<Item, PerkItem> RATE_3_ITEM = ITEMS.register(
-            PerkItem.RATE_3_REGNAME, () -> new PerkItem(Perk.RATE_3));
+            PerkItem.RATE_3_REGNAME, () -> new PerkItem(Perk.rate_3));
 
     public static final DeferredHolder<Item, PerkItem> TIER_SHARD_1_ITEM = ITEMS.register(
-            PerkItem.TIER_SHARD_1_REGNAME, () -> new PerkItem(Perk.TIER_SHARD_1));
+            PerkItem.TIER_SHARD_1_REGNAME, () -> new PerkItem(Perk.tier_shard_1));
     public static final DeferredHolder<Item, PerkItem> TIER_SHARD_2_ITEM = ITEMS.register(
-            PerkItem.TIER_SHARD_2_REGNAME, () -> new PerkItem(Perk.TIER_SHARD_2));
+            PerkItem.TIER_SHARD_2_REGNAME, () -> new PerkItem(Perk.tier_shard_2));
     public static final DeferredHolder<Item, PerkItem> TIER_SHARD_3_ITEM = ITEMS.register(
-            PerkItem.TIER_SHARD_3_REGNAME, () -> new PerkItem(Perk.TIER_SHARD_3));
+            PerkItem.TIER_SHARD_3_REGNAME, () -> new PerkItem(Perk.tier_shard_3));
 
     public static final DeferredHolder<Item, PerkItem> XP_1_ITEM = ITEMS.register(
-            PerkItem.XP_1_REGNAME, () -> new PerkItem(Perk.XP_1));
+            PerkItem.XP_1_REGNAME, () -> new PerkItem(Perk.xp_1));
     public static final DeferredHolder<Item, PerkItem> XP_2_ITEM = ITEMS.register(
-            PerkItem.XP_2_REGNAME, () -> new PerkItem(Perk.XP_2));
+            PerkItem.XP_2_REGNAME, () -> new PerkItem(Perk.xp_2));
     public static final DeferredHolder<Item, PerkItem> XP_3_ITEM = ITEMS.register(
-            PerkItem.XP_3_REGNAME, () -> new PerkItem(Perk.XP_3));
+            PerkItem.XP_3_REGNAME, () -> new PerkItem(Perk.xp_3));
 
     public static final DeferredHolder<Item, PerkItem> HEADLESS_1_ITEM = ITEMS.register(
-            PerkItem.HEADLESS_1_REGNAME, () -> new PerkItem(Perk.HEADLESS_1));
+            PerkItem.HEADLESS_1_REGNAME, () -> new PerkItem(Perk.headless_1));
     public static final DeferredHolder<Item, PerkItem> HEADLESS_2_ITEM = ITEMS.register(
-            PerkItem.HEADLESS_2_REGNAME, () -> new PerkItem(Perk.HEADLESS_2));
+            PerkItem.HEADLESS_2_REGNAME, () -> new PerkItem(Perk.headless_2));
     public static final DeferredHolder<Item, PerkItem> HEADLESS_3_ITEM = ITEMS.register(
-            PerkItem.HEADLESS_3_REGNAME, () -> new PerkItem(Perk.HEADLESS_3));
+            PerkItem.HEADLESS_3_REGNAME, () -> new PerkItem(Perk.headless_3));
 
     public static final DeferredHolder<Item, PerkItem> SLAUGHTER_1_ITEM = ITEMS.register(
-            PerkItem.SLAUGHTER_1_REGNAME, () -> new PerkItem(Perk.SLAUGHTER_1));
+            PerkItem.SLAUGHTER_1_REGNAME, () -> new PerkItem(Perk.slaughter_1));
     public static final DeferredHolder<Item, PerkItem> SLAUGHTER_2_ITEM = ITEMS.register(
-            PerkItem.SLAUGHTER_2_REGNAME, () -> new PerkItem(Perk.SLAUGHTER_2));
+            PerkItem.SLAUGHTER_2_REGNAME, () -> new PerkItem(Perk.slaughter_2));
     public static final DeferredHolder<Item, PerkItem> SLAUGHTER_3_ITEM = ITEMS.register(
-            PerkItem.SLAUGHTER_3_REGNAME, () -> new PerkItem(Perk.SLAUGHTER_3));
+            PerkItem.SLAUGHTER_3_REGNAME, () -> new PerkItem(Perk.slaughter_3));
 
     public static final DeferredHolder<Item, PerkItem> CRUSHER_1_ITEM = ITEMS.register(
-            PerkItem.CRUSHER_1_REGNAME, () -> new PerkItem(Perk.CRUSHER_1));
+            PerkItem.CRUSHER_1_REGNAME, () -> new PerkItem(Perk.crusher_1));
     public static final DeferredHolder<Item, PerkItem> CRUSHER_2_ITEM = ITEMS.register(
-            PerkItem.CRUSHER_2_REGNAME, () -> new PerkItem(Perk.CRUSHER_2));
+            PerkItem.CRUSHER_2_REGNAME, () -> new PerkItem(Perk.crusher_2));
     public static final DeferredHolder<Item, PerkItem> CRUSHER_3_ITEM = ITEMS.register(
-            PerkItem.CRUSHER_3_REGNAME, () -> new PerkItem(Perk.CRUSHER_3));
+            PerkItem.CRUSHER_3_REGNAME, () -> new PerkItem(Perk.crusher_3));
 
     public static final DeferredHolder<Item, PerkItem> LASER_1_ITEM = ITEMS.register(
-            PerkItem.LASER_1_REGNAME, () -> new PerkItem(Perk.LASER_1));
+            PerkItem.LASER_1_REGNAME, () -> new PerkItem(Perk.laser_1));
     public static final DeferredHolder<Item, PerkItem> LASER_2_ITEM = ITEMS.register(
-            PerkItem.LASER_2_REGNAME, () -> new PerkItem(Perk.LASER_2));
+            PerkItem.LASER_2_REGNAME, () -> new PerkItem(Perk.laser_2));
     public static final DeferredHolder<Item, PerkItem> LASER_3_ITEM = ITEMS.register(
-            PerkItem.LASER_3_REGNAME, () -> new PerkItem(Perk.LASER_3));
+            PerkItem.LASER_3_REGNAME, () -> new PerkItem(Perk.laser_3));
 
     public static final DeferredHolder<Item, PerkItem> FLAYED_1_ITEM = ITEMS.register(
-            PerkItem.FLAYED_1_REGNAME, () -> new PerkItem(Perk.FLAYED_1));
+            PerkItem.FLAYED_1_REGNAME, () -> new PerkItem(Perk.flayed_1));
     public static final DeferredHolder<Item, PerkItem> FLAYED_2_ITEM = ITEMS.register(
-            PerkItem.FLAYED_2_REGNAME, () -> new PerkItem(Perk.FLAYED_2));
+            PerkItem.FLAYED_2_REGNAME, () -> new PerkItem(Perk.flayed_2));
     public static final DeferredHolder<Item, PerkItem> FLAYED_3_ITEM = ITEMS.register(
-            PerkItem.FLAYED_3_REGNAME, () -> new PerkItem(Perk.FLAYED_3));
+            PerkItem.FLAYED_3_REGNAME, () -> new PerkItem(Perk.flayed_3));
 
     public static final DeferredHolder<Item, MobShardItem> MOB_SHARD_ITEM = ITEMS.register(
             "mobshard", MobShardItem::new);
@@ -344,4 +338,12 @@ public class FactorySetup {
             XpShardBaseItem.SHARD_REGNAME, () -> new XpShardBaseItem(XpShardBaseItem.Variant.SHARD));
     public static final DeferredHolder<Item, XpShardBaseItem> XP_SPLINTER_ITEM = ITEMS.register(
             XpShardBaseItem.SPLINTER_REGNAME, () -> new XpShardBaseItem(XpShardBaseItem.Variant.SPLINTER));
+
+   // public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<UpgradeBlockEntity>> FACTORY_UPGRADE_BLOCK_ENTITY = BLOCKENTITIES.register(
+           // FACTORY_UPGRADE_TAG, () ->
+                  //  BlockEntityType.Builder.of(UpgradeBlockEntity::new, FACTORY_UPGRADE_BLOCK.get()).build(null));
+
+    public static List<Item> getItems(){
+        return ITEMS.getEntries().stream().map(i -> i.get()).collect(Collectors.toUnmodifiableList());
+    }
 }

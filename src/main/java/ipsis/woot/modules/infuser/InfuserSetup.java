@@ -14,6 +14,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
@@ -42,15 +43,7 @@ public class InfuserSetup {
             INFUSER_TAG, () ->
                     BlockEntityType.Builder.of(InfuserBlockEntity::new, INFUSER_BLOCK.get()).build(null));
     public static final DeferredHolder<MenuType<?>, MenuType<InfuserMenu>> INFUSER_BLOCK_CONTAINER = CONTAINERS.register(
-            INFUSER_TAG, () ->
-                    IForgeMenuType.create((windowId, inv, data) -> {
-                        return new InfuserMenu(
-                                windowId,
-                                Woot.proxy.getClientWorld(),
-                                data.readBlockPos(),
-                                inv,
-                                Woot.proxy.getClientPlayer());
-                    }));
+            INFUSER_TAG, () -> IMenuTypeExtension.create(InfuserMenu::new));
 
     /**
      * Dye Shards

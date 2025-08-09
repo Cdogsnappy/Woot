@@ -8,6 +8,7 @@ import ipsis.woot.util.TankPacketHandler;
 import ipsis.woot.util.WootContainer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.ContainerListener;
 import net.minecraft.world.entity.player.Inventory;
@@ -17,6 +18,7 @@ import net.minecraft.world.inventory.DataSlot;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.capabilities.Capabilities;
@@ -33,9 +35,13 @@ public class InfuserMenu extends WootContainer implements TankPacketHandler {
     public InfuserBlockEntity blockEntity;
     public Inventory playerInventory;
 
-    public InfuserMenu(int windowId, Level world, BlockPos pos, Inventory playerInventory, Player playerEntity) {
+    public InfuserMenu(int containerId, Inventory inv, FriendlyByteBuf extraData) {
+        this(containerId, inv, inv.player.level().getBlockEntity(extraData.readBlockPos()));
+    }
+
+    public InfuserMenu(int windowId, Inventory playerInventory, BlockEntity entity) {
         super(InfuserSetup.INFUSER_BLOCK_CONTAINER.get(), windowId);
-        blockEntity = (InfuserBlockEntity) world.getBlockEntity(pos);
+        blockEntity = (InfuserBlockEntity) entity;
         this.playerInventory = playerInventory;
 
         addOwnSlots();

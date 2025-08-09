@@ -99,27 +99,27 @@ public class OracleScreen extends AbstractContainerScreen<OracleContainer> {
         // This is called twice ?
         super.init(); // This sets leftPos/topPos
 
-        this.nextMobButton = this.addButton(new Button(
-                this.leftPos + 9 + (8 * 18),
-                this.topPos + 18, 18, 18, new Component(">"),
+        this.nextMobButton = this.addRenderableWidget(Button.builder(
+                 Component.literal(">"),
                 h -> {
                     if (!menu.simulatedMobs.isEmpty()) {
                         mobIndex = (mobIndex + 1);
-                        mobIndex = MathHelper.clamp(mobIndex, 0, menu.simulatedMobs.size() - 1);
+                        mobIndex = Math.clamp(mobIndex, 0, menu.simulatedMobs.size() - 1);
                         menu.refreshDrops(mobIndex);
                     }
-                }));
+                }).bounds(this.leftPos + 9 + (8 * 18),
+                this.topPos + 18, 18, 18).build());
 
-        this.prevMobButton = this.addButton(new Button(
-                this.leftPos + 9,
-                this.topPos + 18, 18, 18, new StringTextComponent("<"),
+        this.prevMobButton = this.addRenderableWidget(Button.builder(
+                 Component.literal("<"),
                 h -> {
                     if (!menu.simulatedMobs.isEmpty()) {
                         mobIndex = (mobIndex - 1);
-                        mobIndex = MathHelper.clamp(mobIndex, 0, menu.simulatedMobs.size() - 1);
+                        mobIndex = Math.clamp(mobIndex, 0, menu.simulatedMobs.size() - 1);
                         menu.refreshDrops(mobIndex);
                     }
-                }));
+                }).bounds(this.leftPos + 9,
+                this.topPos + 18, 18, 18).build());
 
         menu.refreshMobs();
     }

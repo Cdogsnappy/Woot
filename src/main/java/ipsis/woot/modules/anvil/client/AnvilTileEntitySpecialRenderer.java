@@ -4,10 +4,12 @@ package ipsis.woot.modules.anvil.client;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import ipsis.woot.modules.anvil.blocks.AnvilBlockEntity;
+import ipsis.woot.modules.layout.client.LayoutTileEntitySpecialRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
@@ -49,5 +51,15 @@ public class AnvilTileEntitySpecialRenderer implements BlockEntityRenderer<Anvil
         if (!ingredients[3].isEmpty())
             renderStack(ingredients[3],  poseStack, multiBufferSource, 0.5F, 1.05F, 0.5F + 0.4F, combinedLight, combinedOverlay);
 
+    }
+
+    public static final Dispatcher DISPATCHER = new Dispatcher();
+
+    public static class Dispatcher implements BlockEntityRendererProvider<AnvilBlockEntity> {
+
+        @Override
+        public BlockEntityRenderer<AnvilBlockEntity> create(Context context) {
+            return new AnvilTileEntitySpecialRenderer();
+        }
     }
 }

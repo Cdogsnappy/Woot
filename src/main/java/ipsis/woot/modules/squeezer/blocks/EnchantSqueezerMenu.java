@@ -7,6 +7,7 @@ import ipsis.woot.util.TankPacketHandler;
 import ipsis.woot.util.WootContainer;
 import ipsis.woot.util.helper.EnchantmentHelper;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -15,6 +16,7 @@ import net.minecraft.world.inventory.DataSlot;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.fluids.FluidStack;
@@ -28,10 +30,14 @@ public class EnchantSqueezerMenu extends WootContainer implements TankPacketHand
     public EnchantSqueezerBlockEntity tileEntity;
     private Player player;
 
-    public EnchantSqueezerMenu(int windowId, Level world, BlockPos pos, Inventory playerInventory, Player playerEntity) {
+    public EnchantSqueezerMenu(int containerId, Inventory inv, FriendlyByteBuf extraData) {
+        this(containerId, inv, inv.player.level().getBlockEntity(extraData.readBlockPos()));
+    }
+
+    public EnchantSqueezerMenu(int windowId, Inventory playerInventory, BlockEntity entity) {
         super(SqueezerSetup.ENCHANT_SQUEEZER_BLOCK_CONTAINER.get(), windowId);
-        tileEntity = (EnchantSqueezerBlockEntity)world.getBlockEntity(pos);
-        this.player = playerEntity;
+        tileEntity = (EnchantSqueezerBlockEntity)entity;
+        this.player = playerInventory.player;
         addOwnSlots(tileEntity.getInventory());
         addPlayerSlots(playerInventory);
         addListeners();

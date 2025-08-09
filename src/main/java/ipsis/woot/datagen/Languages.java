@@ -178,7 +178,7 @@ public class Languages extends LanguageProvider {
         add("commands.woot.simulation.status.waiting", "Waiting for cell {0}");
         add("commands.woot.simulation.dump.drop", "Drops {0}");
         add("commands.woot.simulation.roll", "{0} Looting {1} dropped {2}");
-        add("commands.woot.mob.info.summary", "{0} Health {1} XP {2} Tier {3}");
+        add("commands.woot.mob.info.summary", "{0} Health {1} xp {2} Tier {3}");
 
         // Fluids
         add("fluid.woot.conatus_fluid", "Conatus Fluid");
@@ -434,8 +434,8 @@ public class Languages extends LanguageProvider {
                 new AdvText("factory_d_block", "Heaven sent", "Craft a Cerulean Block"),
                 new AdvText("factory_e_block", "Not Tyrian", "Craft a Byzantium Block"),
                 new AdvText("xp_perk_1", "Madman's knowledge", "Craft a Wisdom I Perk"),
-                new AdvText("xp_shard", "A bit of experience", "Consume an XP Shard"),
-                new AdvText("xp_splinter", "A tiny bit of experience", "Consume an XP Splinter"),
+                new AdvText("xp_shard", "A bit of experience", "Consume an xp Shard"),
+                new AdvText("xp_splinter", "A tiny bit of experience", "Consume an xp Splinter"),
 
                 new AdvText("capture_mob", "All mobs were harmed", "Create a Mob Shard, capture a sheep and fully program it"),
                 new AdvText("controller", "I have the power", "Craft a Mob Controller"),

@@ -39,7 +39,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static ipsis.woot.crafting.fluidconvertor.FluidConvertorRecipe.FLUID_CONV_TYPE;
 
 public class FluidConvertorBlockEntity extends WootMachineBlockEntity implements WootDebug, MenuProvider {
 
@@ -402,7 +401,7 @@ public class FluidConvertorBlockEntity extends WootMachineBlockEntity implements
 
     @Override
     public @org.jetbrains.annotations.Nullable AbstractContainerMenu createMenu(int i, Inventory inventory, Player player) {
-        return new FluidConvertorMenu(i, inventory, player, this);
+        return new FluidConvertorMenu(i, inventory, this);
     }
 
 }

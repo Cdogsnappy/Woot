@@ -5,8 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import ipsis.woot.Woot;
 //import ipsis.woot.compat.top.WootTopPlugin;
-import ipsis.woot.advancements.Advancements;
-import ipsis.woot.compat.top.WootTopPlugin;
+
 import ipsis.woot.config.OverrideLoader;
 import ipsis.woot.fluilds.FluidSetup;
 import ipsis.woot.modules.anvil.AnvilSetup;
@@ -26,6 +25,7 @@ import ipsis.woot.mod.ModFiles;
 import ipsis.woot.simulator.MobSimulator;
 import ipsis.woot.simulator.MobSimulatorSetup;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.IEventBus;
@@ -53,11 +53,10 @@ public class ModSetup {
         };
     }
 
-    public void registrySetup(IEventBus eventBus) {
+    public static void registrySetup(IEventBus eventBus) {
         InfuserSetup.register(eventBus);
         SqueezerSetup.register(eventBus);
         OracleSetup.register(eventBus);
-        FactorySetup.register(eventBus);
         LayoutSetup.register(eventBus);
         AnvilSetup.register(eventBus);
         FluidSetup.register(eventBus);
@@ -65,40 +64,33 @@ public class ModSetup {
         DebugSetup.register(eventBus);
         GenericSetup.register(eventBus);
         FluidConvertorSetup.register(eventBus);
+        FactorySetup.register(eventBus);
+        WootCreativeModeTab.register(eventBus);
     }
 
     public void commonSetup(FMLCommonSetupEvent e) {
 
-        NeoForge.EVENT_BUS.register(new ForgeEventHandlers());
-
-        Advancements.init();
         PolicyRegistry.get().loadFromConfig();
         ModFiles.INSTANCE.init();
-        NetworkChannel.init();
         PatternRepository.get().load();
         OverrideLoader.loadFromConfig();
         PolicyRegistry.get().loadFromConfig();
-        MobSimulatorSetup.init();
         LootGeneration.get().loadFromConfig();
 
         File dropFile = ModFiles.INSTANCE.getLootFile();
         Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
         try {
-            JsonObject jsonObject = JSONUtils.fromJson(GSON, new FileReader(dropFile), JsonObject.class);
+            JsonObject jsonObject = GsonHelper.fromJson(GSON, new FileReader(dropFile), JsonObject.class);
             MobSimulator.getInstance().fromJson(jsonObject);
         } catch (Exception exception) {
             Woot.setup.getLogger().warn("Failed to load loot file {}", dropFile.getAbsolutePath());
         }
-        setupPlugins();
     }
 
     public void clientSetup(FMLClientSetupEvent e) {
 
     }
 
-    public void setupPlugins() {
-        WootTopPlugin.init();
-    }
 
     public Logger getLogger() { return logger; }
     public CreativeModeTab getCreativeTab() { return creativeTab; }

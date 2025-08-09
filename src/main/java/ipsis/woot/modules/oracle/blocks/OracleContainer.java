@@ -9,6 +9,7 @@ import ipsis.woot.setup.ServerDataRequest;
 import ipsis.woot.simulator.SimulatedMobDropSummary;
 import ipsis.woot.util.FakeMob;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -26,9 +27,13 @@ public class OracleContainer extends AbstractContainerMenu {
 
     public BlockEntity tileEntity;
 
-    public OracleContainer(int windowId, Level world, BlockPos pos, Inventory playerInventory, Player playerEntity) {
+    public OracleContainer(int containerId, Inventory inv, FriendlyByteBuf extraData) {
+        this(containerId, inv, inv.player.level().getBlockEntity(extraData.readBlockPos()));
+    }
+
+    public OracleContainer(int windowId, Inventory playerInventory, BlockEntity entity) {
         super(OracleSetup.ORACLE_BLOCK_CONTAINER.get(), windowId);
-        tileEntity = world.getBlockEntity(pos);
+        tileEntity = entity;
 
         /**
          * There is no player inventory as it is display only

@@ -7,13 +7,11 @@ import com.google.gson.JsonSyntaxException;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;
 import ipsis.woot.Woot;
-import ipsis.woot.simulator.DropStackData;
-import ipsis.woot.simulator.MobSimulator;
 import ipsis.woot.simulator.SimulatedMobDropSummary;
-import ipsis.woot.util.helper.JsonHelper;
 import ipsis.woot.util.helper.MathHelper;
 import ipsis.woot.util.helper.RandomHelper;
 import net.minecraft.util.GsonHelper;
+import net.minecraft.util.random.WeightedEntry;
 import net.minecraft.util.random.WeightedRandom;
 import net.minecraft.world.item.ItemStack;
 
@@ -84,14 +82,14 @@ public class SimulatedMobDrop {
 
 
         if (!stackWeights.isEmpty()) {
-            List<DropStackData> dropstacks = new ArrayList<>();
+            List<WeightedEntry.Wrapper<Integer>> dropstacks = new ArrayList<>();
             //Woot.setup.getLogger().debug("calculateDropSize: {}", stackWeights);
             for (Map.Entry<Integer, Integer> entry : stackWeights.entrySet())
-                dropstacks.add(new DropStackData(entry.getKey(), entry.getValue()));
+                dropstacks.add(WeightedEntry.wrap(entry.getKey(), entry.getValue()));
 
             if (WeightedRandom.getTotalWeight(dropstacks) > 0) {
-                DropStackData chosen = WeightedRandom.getRandomItem(RandomHelper.RANDOM, dropstacks);
-                stackSize = chosen.stackSize;
+                stackSize = WeightedRandom.getRandomItem(RandomHelper.RANDOM, dropstacks).get().data();
+
             }
             //Woot.setup.getLogger().debug("calculateDropSize: custom:{} {} chosen {}",
             //        hasCustom, dropstacks, stackSize);

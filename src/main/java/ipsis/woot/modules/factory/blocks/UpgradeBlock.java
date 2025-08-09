@@ -19,18 +19,17 @@ import net.minecraft.world.phys.BlockHitResult;
 
 
 import javax.annotation.Nullable;
+import java.util.regex.Pattern;
 
 public class UpgradeBlock extends FactoryBlock {
 
     public UpgradeBlock(FactoryComponent component) {
         super(component);
-        this.registerDefaultState(this.getStateDefinition().any().setValue(UPGRADE, Perk.EMPTY).setValue(BlockStateProperties.ATTACHED, false));
+        this.registerDefaultState(this.getStateDefinition().any().setValue(UPGRADE, Perk.empty).setValue(BlockStateProperties.ATTACHED, false));
     }
 
-    public static final EnumProperty<Perk> UPGRADE_TYPE;
-    static { UPGRADE_TYPE = EnumProperty.create("upgrade", Perk.class); }
+    public static final EnumProperty<Perk> UPGRADE = EnumProperty.create("upgrade", Perk.class, Perk.values());
 
-    public static final EnumProperty<Perk> UPGRADE = UPGRADE_TYPE;
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {

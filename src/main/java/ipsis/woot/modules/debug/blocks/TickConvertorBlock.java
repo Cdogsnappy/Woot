@@ -17,10 +17,6 @@ public class TickConvertorBlock extends Block implements EntityBlock {
         super(Block.Properties.of().sound(SoundType.METAL));
     }
 
-    @Override
-    public boolean hasTileEntity(BlockState state) {
-        return true;
-    }
 
     @Nullable
     @Override

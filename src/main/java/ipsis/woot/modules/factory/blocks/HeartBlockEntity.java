@@ -19,7 +19,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.Container;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -28,7 +27,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.TickingBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.neoforged.api.distmarker.Dist;
@@ -38,7 +36,6 @@ import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.items.IItemHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -299,7 +296,7 @@ public class HeartBlockEntity extends BlockEntity implements MultiBlockMaster, W
     public boolean hasFlayedPerk() {
         if (!isFormed())
             return false;
-        return formedSetup.getAllPerks().containsKey(Perk.Group.FLAYED);
+        return formedSetup.getAllPerks().containsKey(Perk.Group.flayed);
     }
 
     /**
@@ -324,7 +321,7 @@ public class HeartBlockEntity extends BlockEntity implements MultiBlockMaster, W
 
     @Override
     public @org.jetbrains.annotations.Nullable AbstractContainerMenu createMenu(int i, Inventory inventory, Player player) {
-        return new HeartMenu(i, level, getBlockPos(), inventory, player);
+        return new HeartMenu(i, inventory, this);
     }
 
 

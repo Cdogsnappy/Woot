@@ -3,7 +3,6 @@ package ipsis.woot.datagen.modules;
 import ipsis.woot.Woot;
 import ipsis.woot.crafting.factory.FactoryRecipe;
 import ipsis.woot.crafting.factory.FactoryRecipeBuilder;
-import ipsis.woot.datagen.ItemTagsGen;
 import ipsis.woot.mod.ModTags;
 import ipsis.woot.modules.factory.FactorySetup;
 import ipsis.woot.modules.factory.items.PerkItem;
@@ -15,6 +14,7 @@ import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -23,9 +23,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.registries.DeferredHolder;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.function.Consumer;
 
 public class Factory {
 
@@ -296,7 +294,7 @@ public class Factory {
                 .pattern("scs")
                 .pattern(" s ")
                 .define('c', GenericSetup.MACHINE_CASING_ITEM.get())
-                .define('s', ItemTagsGen.SKULLS)
+                .define('s', ItemTags.SKULLS)
                 .group(Woot.MODID)
                 .unlockedBy("cobblestone", InventoryChangeTrigger.TriggerInstance.hasItems(Blocks.COBBLESTONE))
                 .save(recipeOutput);

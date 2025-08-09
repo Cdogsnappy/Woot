@@ -13,7 +13,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
 public class WootBaseEntityBlock extends BaseEntityBlock {
-    protected WootBaseEntityBlock(Properties properties) {
+    public WootBaseEntityBlock(Properties properties) {
         super(properties);
     }
 

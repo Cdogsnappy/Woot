@@ -17,6 +17,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -88,7 +89,8 @@ public class CellBlock extends WootBaseEntityBlock implements WootDebug, Factory
         }
 
         int contents = 0;
-        CompoundTag compoundNBT = stack.get(DataComponents.BLOCK_ENTITY_DATA).copyTag();
+        CustomData data = stack.get(DataComponents.BLOCK_ENTITY_DATA);
+        CompoundTag compoundNBT = data == null ? new CompoundTag() : data.copyTag();
         if (compoundNBT.contains("Tank")) {
             FluidStack fluidStack = FluidStack.parse(context.registries(), compoundNBT.getCompound("Tank")).get();
             contents = fluidStack.getAmount();
@@ -117,10 +119,6 @@ public class CellBlock extends WootBaseEntityBlock implements WootDebug, Factory
 
     @Override
     public @org.jetbrains.annotations.Nullable BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {
-        try {
-            return tileEntityClazz.newInstance();
-        } catch (InstantiationException | IllegalAccessException e) {
-            throw new RuntimeException();
-        }
+        return new Cell1BlockEntity(blockPos, blockState);
     }
 }

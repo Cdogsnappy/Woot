@@ -7,6 +7,7 @@ import ipsis.woot.setup.NetworkChannel;
 import ipsis.woot.util.TankPacketHandler;
 import ipsis.woot.util.WootContainer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.ContainerListener;
 import net.minecraft.world.entity.player.Inventory;
@@ -14,6 +15,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.DataSlot;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.fluids.FluidStack;
@@ -25,9 +27,13 @@ public class HeartMenu extends WootContainer implements TankPacketHandler  {
     private HeartBlockEntity tileEntity;
     private Inventory pInventory;
 
-    public HeartMenu(int windowId, Level world, BlockPos pos, Inventory playerInventory, Player playerEntity) {
+    public HeartMenu(int containerId, Inventory inv, FriendlyByteBuf extraData) {
+        this(containerId, inv, inv.player.level().getBlockEntity(extraData.readBlockPos()));
+    }
+
+    public HeartMenu(int windowId, Inventory playerInventory, BlockEntity entity) {
         super(FactorySetup.HEART_BLOCK_CONTAINER.get(), windowId);
-        tileEntity = (HeartBlockEntity)world.getBlockEntity(pos);
+        tileEntity = (HeartBlockEntity)entity;
         this.pInventory = playerInventory;
         addListeners();
 

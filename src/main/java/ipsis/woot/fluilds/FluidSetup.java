@@ -135,7 +135,7 @@ public class FluidSetup {
     public static final ResourceLocation MOB_ESSENCE_STILL =ResourceLocation.parse("woot:block/mob_essence_still");
     public static final ResourceLocation MOB_ESSENCE_FLOWING = ResourceLocation.parse("woot:block/mob_essence_flow");
 
-    public static DeferredHolder<FluidType, FluidType> MOB_ESSENCE_FLUID_TYPE = FLUID_TYPES.register("puredye_fluid_type",
+    public static DeferredHolder<FluidType, FluidType> MOB_ESSENCE_FLUID_TYPE = FLUID_TYPES.register("mobessence_fluid_type",
             () -> new FluidType(FluidType.Properties.create()
                     .descriptionId("fluid.woot.mobessence")
                     .canSwim(false)

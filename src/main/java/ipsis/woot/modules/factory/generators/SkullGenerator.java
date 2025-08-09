@@ -3,12 +3,14 @@ package ipsis.woot.modules.factory.generators;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSyntaxException;
+import com.mojang.serialization.JsonOps;
 import ipsis.woot.Woot;
 import ipsis.woot.simulator.MobSimulator;
 import ipsis.woot.util.FakeMob;
 import ipsis.woot.util.helper.RandomHelper;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
 
 
 import java.util.HashMap;
@@ -32,9 +34,15 @@ public class SkullGenerator {
                     Woot.setup.getLogger().error(s + " == INVALID (mob {})", parts[0]);
                 } else {
                     try {
-                        JsonObject jsonObject = GsonHelper.fromJson(parts[1]);
+                        JsonObject jsonObject = GsonHelper.parse(parts[1]);
                         if (jsonObject.isJsonObject()) {
-                            ItemStack itemStack = ShapedRecipe.deserializeItem(jsonObject);
+                            ItemStack itemStack;
+                            try {
+                                itemStack = ItemStack.CODEC.parse(JsonOps.INSTANCE, jsonObject).getOrThrow();
+                            }
+                            catch(Exception e){
+                                itemStack = ItemStack.EMPTY;
+                            }
                             if (!itemStack.isEmpty()) {
                                 Woot.setup.getLogger().info("SkullGenerator: {} -> {}", fakeMob, itemStack);
                                 skulls.put(fakeMob, itemStack);

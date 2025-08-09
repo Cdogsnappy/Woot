@@ -1,5 +1,7 @@
 package ipsis.woot.modules.layout.client;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import ipsis.woot.modules.factory.FactoryComponent;
 import ipsis.woot.modules.factory.FactorySetup;
 import ipsis.woot.modules.layout.LayoutSetup;
@@ -10,59 +12,49 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.*;
 
 
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.neoforge.client.model.EmptyModel;
+import net.neoforged.neoforge.client.model.data.ModelData;
 
 @OnlyIn(Dist.CLIENT)
-public class LayoutTileEntitySpecialRenderer extends TileEntityRenderer<LayoutBlockEntity> {
+public class LayoutTileEntitySpecialRenderer implements BlockEntityRenderer<LayoutBlockEntity> {
 
-    public LayoutTileEntitySpecialRenderer(TileEntityRendererDispatcher dispatcher) {
-        super(dispatcher);
-    }
 
-    @Override
-    public boolean isGlobalRenderer(LayoutBlockEntity te) {
-        // Force the render even when the chunk is out of view
-        return true;
-    }
 
-    @Override
-    public void render(LayoutBlockEntity layoutBlockEntity, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int combinedLightIn, int combinedOverlayIn) {
 
-        World world = layoutBlockEntity.getWorld();
-        if (world != null) {
-            if (layoutBlockEntity.getAbsolutePattern() == null)
-                layoutBlockEntity.refresh();
+    void textureRender(LayoutBlockEntity tileEntityIn, float partialTicks, PoseStack matrixStack, MultiBufferSource bufferIn, int combinedLightIn, int combinedOverlayIn) {
 
-            textureRender(layoutBlockEntity, partialTicks, matrixStackIn, bufferIn, combinedLightIn, combinedOverlayIn);
-        }
-    }
-
-    void textureRender(LayoutBlockEntity tileEntityIn, float partialTicks, MatrixStack matrixStack, IRenderTypeBuffer bufferIn, int combinedLightIn, int combinedOverlayIn) {
-
-        boolean showAll = tileEntityIn.getLevel() == -1;
+        //boolean showAll = tileEntityIn.getLevel().get == -1;
+        boolean showAll = true;
         int validY = showAll ? 0 : tileEntityIn.getYForLevel();
-        BlockPos origin = tileEntityIn.getPos();
+        BlockPos origin = tileEntityIn.getBlockPos();
         Direction facing = Direction.SOUTH;
 
         // Watch for this being called after the block is broken
         // Ensure that we still have a Layout Block at the position to extract the facing from
-        Block layoutBlock = tileEntityIn.getWorld().getBlockState(origin).getBlock();
+        Block layoutBlock = tileEntityIn.getLevel().getBlockState(origin).getBlock();
         if (layoutBlock == LayoutSetup.LAYOUT_BLOCK.get())
-            facing = tileEntityIn.getWorld().getBlockState(origin).get(BlockStateProperties.HORIZONTAL_FACING);
+            facing = tileEntityIn.getLevel().getBlockState(origin).getValue(BlockStateProperties.HORIZONTAL_FACING);
 
         float minX = 0.0F, minY = 0.0F, minZ = 0.0F;
         float maxX = 0.0F, maxY = 0.0F, maxZ = 0.0F;
-        matrixStack.push();
+        matrixStack.pushPose();
         {
             matrixStack.translate(0.0F, 0.0F, 0.0F);
             for (PatternBlock block : tileEntityIn.getAbsolutePattern().getBlocks()) {
                 if (!showAll && block.getBlockPos().getY() != validY)
                     continue;
 
-                matrixStack.push();
+                matrixStack.pushPose();
                 {
                     float x = (origin.getX() - block.getBlockPos().getX()) * -1.0F;
                     float y = (origin.getY() - block.getBlockPos().getY()) * -1.0F;
@@ -77,26 +69,47 @@ public class LayoutTileEntitySpecialRenderer extends TileEntityRenderer<LayoutBl
 
                     BlockState blockState = block.getFactoryComponent().getDefaultBlockState();
                     if (block.getFactoryComponent() == FactoryComponent.HEART)
-                        blockState = FactorySetup.HEART_BLOCK.get().getDefaultState().with(BlockStateProperties.HORIZONTAL_FACING, facing);
+                        blockState = FactorySetup.HEART_BLOCK.get().defaultBlockState().setValue(BlockStateProperties.HORIZONTAL_FACING, facing);
 
-                    Minecraft.getInstance().getBlockRendererDispatcher().renderBlock(blockState,
-                            matrixStack, bufferIn, 0x00f000f0, combinedOverlayIn, EmptyModelData.INSTANCE);
+                    Minecraft.getInstance().getBlockRenderer().renderSingleBlock(blockState,
+                            matrixStack, bufferIn, 0x00f000f0, combinedOverlayIn, ModelData.EMPTY, RenderType.LINES);
                 }
-                matrixStack.pop();;
+                matrixStack.popPose();;
             }
         }
-        matrixStack.pop();
-        matrixStack.push();
+        matrixStack.popPose();
+        matrixStack.pushPose();
         {
             maxX += 1.0F;
             maxY += 1.0F;
             maxZ += 1.0F;
             matrixStack.translate(0.0F, 0.0F, 0.0F);
-            IVertexBuilder iVertexBuilder = bufferIn.getBuffer(RenderType.LINES);
-            WorldRenderer.drawBoundingBox(matrixStack, iVertexBuilder,
+            VertexConsumer iVertexBuilder = bufferIn.getBuffer(RenderType.LINES);
+            LevelRenderer.renderLineBox(matrixStack, iVertexBuilder,
                 minX, minY, minZ, maxX, maxY, maxZ,
                0.9F, 0.9F, 0.9F, 1.0F, 0.5F, 0.5F, 0.5F);
         }
-        matrixStack.pop();
+        matrixStack.popPose();
+    }
+
+    @Override
+    public void render(LayoutBlockEntity layoutBlockEntity, float v, PoseStack poseStack, MultiBufferSource multiBufferSource, int i, int i1) {
+        Level world = layoutBlockEntity.getLevel();
+        if (world != null) {
+            if (layoutBlockEntity.getAbsolutePattern() == null)
+                layoutBlockEntity.refresh();
+
+            textureRender(layoutBlockEntity, v, poseStack, multiBufferSource, i, i1);
+        }
+    }
+
+    public static final Dispatcher DISPATCHER = new Dispatcher();
+
+    public static class Dispatcher implements BlockEntityRendererProvider<LayoutBlockEntity>{
+
+        @Override
+        public BlockEntityRenderer<LayoutBlockEntity> create(Context context) {
+            return new LayoutTileEntitySpecialRenderer();
+        }
     }
 }

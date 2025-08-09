@@ -129,7 +129,7 @@ public class FactoryScanner {
 
             if (p.getFactoryComponent() == FactoryComponent.FACTORY_UPGRADE) {
                 BlockState blockState = world.getBlockState(p.getBlockPos());
-                if (blockState.getValue(UpgradeBlock.UPGRADE) != Perk.EMPTY)
+                if (blockState.getValue(UpgradeBlock.UPGRADE) != Perk.empty)
                     absolutePattern.addPerk(blockState.getValue(UpgradeBlock.UPGRADE));
             }
 

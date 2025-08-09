@@ -11,6 +11,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
@@ -41,13 +42,5 @@ public class FluidConvertorSetup {
                     BlockEntityType.Builder.of(FluidConvertorBlockEntity::new,
                             FLUID_CONVERTOR_BLOCK.get()).build((null)));
     public static final DeferredHolder<MenuType<?>, MenuType<FluidConvertorMenu>> FLUID_CONVERTOR_BLOCK_CONTATAINER = CONTAINERS.register(
-            FLUID_CONVERTOR_TAG, () ->
-                    IForgeContainerType.create((windowId, inv, data) -> {
-                        return new FluidConvertorMenu(
-                                windowId,
-                                Woot.proxy.getClientWorld(),
-                                data.readBlockPos(),
-                                inv,
-                                Woot.proxy.getClientPlayer());
-                    }));
+            FLUID_CONVERTOR_TAG, () -> IMenuTypeExtension.create(FluidConvertorMenu::new));
 }

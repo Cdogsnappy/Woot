@@ -2,8 +2,10 @@ package ipsis.woot.modules.debug.blocks;
 
 import ipsis.woot.modules.debug.DebugSetup;
 import ipsis.woot.modules.factory.blocks.CellBlockEntityBase;
+import ipsis.woot.util.WootMachineBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -12,14 +14,14 @@ import net.minecraft.world.level.block.state.BlockState;
  * full, essentially turning a factory into a free mob farm,
  * with the spawn time being the only limiting factor.
  */
-public class TickConvertorBlockEntity extends BlockEntity {
+public class TickConvertorBlockEntity extends WootMachineBlockEntity {
 
     public TickConvertorBlockEntity(BlockPos pos, BlockState state) {
         super(DebugSetup.CREATIVE_CONATUS_BLOCK_TILE.get(), pos, state);
     }
 
     @Override
-    public void tick() {
+    public void tick(Level level) {
         for (Direction facing : Direction.values()) {
             BlockEntity te = level.getBlockEntity(getBlockPos().offset(facing.getNormal()));
             if (!(te instanceof CellBlockEntityBase))

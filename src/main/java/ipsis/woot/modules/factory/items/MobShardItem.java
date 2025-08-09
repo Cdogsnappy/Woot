@@ -1,7 +1,6 @@
 package ipsis.woot.modules.factory.items;
 
 import ipsis.woot.Woot;
-import ipsis.woot.advancements.Advancements;
 import ipsis.woot.config.Config;
 import ipsis.woot.config.ConfigOverride;
 import ipsis.woot.modules.factory.FactorySetup;
@@ -24,6 +23,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.CustomData;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import org.checkerframework.checker.units.qual.C;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -39,7 +39,7 @@ public class MobShardItem extends Item {
 
     @Override
     public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
-
+        Woot.setup.getLogger().debug(target.getName());
         if (attacker.level().isClientSide || !(attacker instanceof Player))
             return false;
 
@@ -88,7 +88,8 @@ public class MobShardItem extends Item {
 
     public static FakeMob getProgrammedMob(ItemStack itemStack) {
         FakeMob fakeMob = new FakeMob();
-        CompoundTag tag = itemStack.get(DataComponents.CUSTOM_DATA).copyTag();
+        CustomData data =  itemStack.get(DataComponents.CUSTOM_DATA);
+        CompoundTag tag = data == null ? new CompoundTag() : data.copyTag();
         if (tag.contains(NBT_MOB))
             fakeMob = new FakeMob(tag.getCompound(NBT_MOB));
 
@@ -98,10 +99,11 @@ public class MobShardItem extends Item {
     private void setProgrammedMob(ItemStack itemStack, FakeMob fakeMob) {
         CompoundTag mobNbt = new CompoundTag();
         FakeMob.writeToNBT(fakeMob, mobNbt);
-        itemStack.get(DataComponents.CUSTOM_DATA).update(data -> {
-            data.put(NBT_MOB, mobNbt);
-            data.putInt(NBT_KILLS, 0);
-        });
+        CustomData data = itemStack.get(DataComponents.CUSTOM_DATA);
+        CompoundTag tag = data == null ? new CompoundTag() : data.copyTag();
+        tag.put(NBT_MOB, mobNbt);
+        tag.putInt(NBT_KILLS, 0);
+        itemStack.set(DataComponents.CUSTOM_DATA, CustomData.of(tag));
     }
 
     private static boolean isMatchingMob(ItemStack itemStack, FakeMob fakeMob) {
@@ -133,8 +135,6 @@ public class MobShardItem extends Item {
 
         if (!foundStack.isEmpty()) {
             incrementKills(foundStack, 1);
-            if (isFullyProgrammed(foundStack) && playerEntity instanceof ServerPlayer)
-                Advancements.MOB_CAPTURE_TRIGGER.trigger((ServerPlayer) playerEntity, fakeMob);
         }
     }
 
@@ -150,13 +150,10 @@ public class MobShardItem extends Item {
         if (!PolicyRegistry.get().canCaptureEntity(fakeMob.getResourceLocation()) || !canShardCaptureMob(fakeMob.getResourceLocation()))
             return;
 
-        itemStack.get(DataComponents.CUSTOM_DATA).update(data -> {
-            int killCount = data.getInt(NBT_KILLS);
-            if (!isFull(itemStack)) {
-                killCount += v;
-                data.putInt(NBT_KILLS, killCount);
-            }
-        });
+        CustomData data = itemStack.get(DataComponents.CUSTOM_DATA);
+        CompoundTag tag = data == null ? new CompoundTag() : data.copyTag();
+        tag.putInt(NBT_KILLS, tag.getInt(NBT_KILLS) + v);
+        itemStack.set(DataComponents.CUSTOM_DATA, CustomData.of(tag));
 
         if (isFull(itemStack) && isProgrammed(itemStack)){
             itemStack.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true);

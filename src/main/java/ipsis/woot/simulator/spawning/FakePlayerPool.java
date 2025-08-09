@@ -6,7 +6,10 @@ import ipsis.woot.util.helper.MathHelper;
 import ipsis.woot.util.oss.WootFakePlayer;
 import ipsis.woot.util.oss.WootFakePlayerFactory;
 import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
@@ -14,6 +17,7 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.neoforged.neoforge.common.util.FakePlayer;
 
 
@@ -45,21 +49,23 @@ public class FakePlayerPool {
         fakePlayerMap.put(looting, fakePlayer);
     }
 
-    private static void init(@Nonnull ServerLevel world) {
+    private static void init(@Nonnull ServerLevel level) {
         fakePlayerMap = new HashMap<>();
-        Enchantment enchantment = BuiltInRegistries.ENCHANTMENT_EFFECT_COMPONENT_TYPE.get(ResourceLocation.fromNamespaceAndPath("minecraft", "looting"));
+        RegistryAccess registryAccess = level.registryAccess(); // or player.level().registryAccess()
+        Registry<Enchantment> enchantmentRegistry = registryAccess.registryOrThrow(Registries.ENCHANTMENT);
+        Enchantment enchantment = enchantmentRegistry.get(Enchantments.LOOTING);
         if (enchantment == null)
             Woot.setup.getLogger().warn("FakePlayerPool failed to find looting enchantment");
 
-        addFakePlayer(WootFakePlayerFactory.get(world, GP_LOOT_0), 0, enchantment);
-        addFakePlayer(WootFakePlayerFactory.get(world, GP_LOOT_1), 1, enchantment);
-        addFakePlayer(WootFakePlayerFactory.get(world, GP_LOOT_2), 2, enchantment);
-        addFakePlayer(WootFakePlayerFactory.get(world, GP_LOOT_3), 3, enchantment);
+        addFakePlayer(WootFakePlayerFactory.get(level, GP_LOOT_0), 0, enchantment);
+        addFakePlayer(WootFakePlayerFactory.get(level, GP_LOOT_1), 1, enchantment);
+        addFakePlayer(WootFakePlayerFactory.get(level, GP_LOOT_2), 2, enchantment);
+        addFakePlayer(WootFakePlayerFactory.get(level, GP_LOOT_3), 3, enchantment);
     }
 
-    public static @Nullable FakePlayer getFakePlayer(@Nonnull ServerLevel world, int looting) {
+    public static @Nullable FakePlayer getFakePlayer(@Nonnull ServerLevel level, int looting) {
         if (fakePlayerMap == null)
-            init(world);
+            init(level);
 
         return fakePlayerMap.get(MathHelper.clampLooting(looting));
     }

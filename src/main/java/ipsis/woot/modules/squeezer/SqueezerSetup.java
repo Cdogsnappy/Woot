@@ -55,13 +55,5 @@ public class SqueezerSetup {
                     BlockEntityType.Builder.of(EnchantSqueezerBlockEntity::new, ENCHANT_SQUEEZER_BLOCK.get()).build(null));
 
     public static final DeferredHolder<MenuType<?>, MenuType<EnchantSqueezerMenu>> ENCHANT_SQUEEZER_BLOCK_CONTAINER = CONTAINERS.register(
-            ENCHANT_SQUEEZER_TAG, () ->
-                    IForgeContainerType.create((windowId, inv, data) -> {
-                        return new EnchantSqueezerMenu(
-                                windowId,
-                                Woot.proxy.getClientWorld(),
-                                data.readBlockPos(),
-                                inv,
-                                Woot.proxy.getClientPlayer());
-                    }));
+            ENCHANT_SQUEEZER_TAG, () -> IMenuTypeExtension.create(EnchantSqueezerMenu::new));
 }

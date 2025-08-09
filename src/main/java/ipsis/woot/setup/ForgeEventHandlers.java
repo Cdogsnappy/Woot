@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import ipsis.woot.Woot;
-import ipsis.woot.advancements.Advancements;
 import ipsis.woot.commands.ModCommands;
 import ipsis.woot.mod.ModFiles;
 import ipsis.woot.modules.anvil.AnvilRecipes;
@@ -23,18 +22,30 @@ import ipsis.woot.util.FakeMobKey;
 import ipsis.woot.util.helper.ItemEntityHelper;
 import ipsis.woot.util.helper.SerializationHelper;
 import ipsis.woot.util.oss.WootFakePlayer;
+import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.RecipesUpdatedEvent;
 import net.neoforged.neoforge.common.util.FakePlayer;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
+import net.neoforged.neoforge.event.entity.living.LivingExperienceDropEvent;
+import net.neoforged.neoforge.event.server.ServerStartingEvent;
+import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
@@ -42,10 +53,11 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+@EventBusSubscriber(modid=Woot.MODID)
 public class ForgeEventHandlers {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
-    public void onLivingDropsEvent(LivingDropsEvent event) {
+    public static void onLivingDropsEvent(LivingDropsEvent event) {
 
         /**
          * Entity->LivingEntity->Mob
@@ -65,35 +77,34 @@ public class ForgeEventHandlers {
         // Cancel our fake spawns
         event.setCanceled(true);
 
+        Registry<Enchantment> enchantmentRegistry = damageSource.getEntity().level().registryAccess().registryOrThrow(Registries.ENCHANTMENT);
+        Holder<Enchantment> lootingHolder = enchantmentRegistry.getHolderOrThrow(Enchantments.LOOTING);
+
         List<ItemStack> drops = ItemEntityHelper.convertToItemStacks(event.getDrops());
-        FakeMobKey fakeMobKey = new FakeMobKey(new FakeMob(mob), event.getLootingLevel());
+        FakeMobKey fakeMobKey = new FakeMobKey(new FakeMob(mob), event.getSource().getWeaponItem().getEnchantmentLevel(lootingHolder));
         if (fakeMobKey.getMob().isValid()) {
             ipsis.woot.simulator.MobSimulator.getInstance().learnSimulatedDrops(fakeMobKey, drops);
         }
     }
 
     @SubscribeEvent(priority = EventPriority.NORMAL)
-    public void onLivingDeathEvent(LivingDeathEvent event) {
+    public static void onLivingDeathEvent(LivingDeathEvent event) {
 
         // Only player kills
         if (!(event.getSource().getEntity() instanceof Player))
             return;
 
-        Player killer = (Player)event.getSource().getTrueSource();
+        Player killer = (Player)event.getSource().getDirectEntity();
         LivingEntity victim = event.getEntity();
 
         if (ignoreDeathEvent(event.getEntity())) {
             Woot.setup.getLogger().debug("onLivingDeathEvent: duplicate {} {}",
-                    event.getEntity(), event.getEntity().getCachedUniqueIdString());
+                    event.getEntity(), event.getEntity().getStringUUID());
             return;
         }
 
         // Ignore fakeplayer
         if (killer instanceof FakePlayer)
-            return;
-
-        // Ignore player killing player
-        if (victim instanceof Player)
             return;
 
         if (!(victim instanceof Mob))
@@ -125,7 +136,7 @@ public class ForgeEventHandlers {
     }
     private static List<TickTrack> tickTracks = new ArrayList<>();
     @SubscribeEvent
-    public void onWorldTick(LevelTickEvent event) {
+    public static void onWorldTick(LevelTickEvent.Post event) {
 
         TickTrack currTick = null;
         for (TickTrack tickTrack : tickTracks) {
@@ -140,21 +151,17 @@ public class ForgeEventHandlers {
             tickTracks.add(currTick);
         }
 
-        if (event.getLevel().getDimensionKey().equals(MobSimulatorSetup.TARTARUS)) {
+        if (event.getLevel().dimension().equals(MobSimulatorSetup.TARTARUS_LEVEL_KEY)) {
             MobSimulator.getInstance().tick(event.getLevel());
         } else {
             if (currTick.tick(event.getLevel().getGameTime()))
-                MultiBlockTracker.get().run(event.level);
+                MultiBlockTracker.get().run(event.getLevel());
         }
     }
 
-    @SubscribeEvent
-    public static void onFileChange(final ModConfig.Reloading configEvent) {
-        Woot.setup.getLogger().info("onFileChange");
-    }
 
     @SubscribeEvent
-    public void onServerStarting(final FMLServerStartingEvent event) {
+    public static void onServerStarting(final ServerStartingEvent event) {
         Woot.setup.getLogger().info("onServerStarting");
         SqueezerRecipes.load(event.getServer().getRecipeManager());
         AnvilRecipes.load(event.getServer().getRecipeManager());
@@ -162,28 +169,28 @@ public class ForgeEventHandlers {
         FluidConvertorRecipes.load(event.getServer().getRecipeManager());
         CustomDropsLoader.load(event.getServer().getRecipeManager());
 
-        for (ServerWorld world : event.getServer().getWorlds())
-            Woot.setup.getLogger().debug("onServerStarting: world {}", world.getDimensionKey());
+        for (ServerLevel world : event.getServer().getAllLevels())
+            Woot.setup.getLogger().debug("onServerStarting: world {}", world.dimension());
 
-        ServerWorld serverWorld = event.getServer().getWorld(MobSimulatorSetup.TARTARUS);
+        ServerLevel serverWorld = event.getServer().getLevel(MobSimulatorSetup.TARTARUS_LEVEL_KEY);
         if (serverWorld == null) {
             Woot.setup.getLogger().error("onServerStarting: tartarus not found");
         } else {
             Woot.setup.getLogger().info("onServerStarting: force load Tartarus Cells");
-            serverWorld.forceChunk(TartarusChunkGenerator.WORK_CHUNK_X, TartarusChunkGenerator.WORK_CHUNK_Z, true);
+            serverWorld.setChunkForced(TartarusChunkGenerator.WORK_CHUNK_X, TartarusChunkGenerator.WORK_CHUNK_Z, true);
         }
     }
 
     @SubscribeEvent
-    public void onLivingExperienceDrop(final LivingExperienceDropEvent event) {
+    public static void onLivingExperienceDrop(final LivingExperienceDropEvent event) {
         if (event.getAttackingPlayer() instanceof WootFakePlayer) {
-            // This is not a real kill, so dont spawn the XP
+            // This is not a real kill, so dont spawn the xp
             event.setCanceled(true);
         }
     }
 
     @SubscribeEvent
-    public void onRecipesUpdatedEvent(final RecipesUpdatedEvent event) {
+    public static void onRecipesUpdatedEvent(final RecipesUpdatedEvent event) {
         Woot.setup.getLogger().info("onRecipesUpdatedEvent");
         SqueezerRecipes.load(event.getRecipeManager());
         AnvilRecipes.load(event.getRecipeManager());
@@ -192,13 +199,13 @@ public class ForgeEventHandlers {
     }
 
     @SubscribeEvent
-    public void onRegisterCommandsEvent(final RegisterCommandsEvent event) {
+    public static void onRegisterCommandsEvent(final RegisterCommandsEvent event) {
         Woot.setup.getLogger().info("onRegisterCommandsEvent");
         ModCommands.register(event.getDispatcher());
     }
 
     @SubscribeEvent
-    public void onServerStop(final FMLServerStoppingEvent event) {
+    public static void onServerStop(final ServerStoppingEvent event) {
         Woot.setup.getLogger().info("onServerStop");
         JsonObject jsonObject = MobSimulator.getInstance().toJson();
         File dropFile = ModFiles.INSTANCE.getLootFile();
@@ -211,10 +218,10 @@ public class ForgeEventHandlers {
      * Some entities like the EnderDragon generate multiple death events
      * so we cache the last X here and ignore any duplicates
      */
-    private final int MAX_UUID_CACHE_SIZE = 10;
-    private List<String> uuidList = new ArrayList<>();
-    private boolean ignoreDeathEvent(Entity entity) {
-        String uuid = entity.getCachedUniqueIdString();
+    private static final int MAX_UUID_CACHE_SIZE = 10;
+    private static List<String> uuidList = new ArrayList<>();
+    private static boolean ignoreDeathEvent(Entity entity) {
+        String uuid = entity.getStringUUID();
         if (uuidList.contains(uuid))
             return true;
 
