@@ -21,7 +21,7 @@ import net.minecraft.world.phys.BlockHitResult;
 
 import javax.annotation.Nullable;
 
-public class LayoutBlock extends WootBaseEntityBlock {
+public class LayoutBlock extends Block implements EntityBlock {
 
     public LayoutBlock() {
         super(Block.Properties.of().sound(SoundType.GLASS).strength(0.3F));

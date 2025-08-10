@@ -35,9 +35,10 @@ import net.neoforged.neoforge.fluids.FluidUtil;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
-public class CellBlock extends WootBaseEntityBlock implements WootDebug, FactoryComponentProvider{
+public class CellBlock extends Block implements WootDebug, FactoryComponentProvider, EntityBlock{
 
     final Class<? extends CellBlockEntityBase> tileEntityClazz;
     public CellBlock(Class<? extends CellBlockEntityBase> clazz) {
@@ -119,6 +120,11 @@ public class CellBlock extends WootBaseEntityBlock implements WootDebug, Factory
 
     @Override
     public @org.jetbrains.annotations.Nullable BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {
-        return new Cell1BlockEntity(blockPos, blockState);
+
+        try {
+            return tileEntityClazz.getDeclaredConstructor(BlockPos.class, BlockState.class).newInstance(blockPos, blockState);
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

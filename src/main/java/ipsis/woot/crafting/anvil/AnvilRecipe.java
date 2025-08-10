@@ -36,7 +36,7 @@ public record AnvilRecipe(Ingredient baseItem, List<Ingredient> ingredients, Ite
             return false;
 
         int count = 0;
-        for (int i = 1; i < 4; i++) {
+        for (int i = 0; i < 4; i++) {
             if (!anvilRecipeInput.getItem(i).isEmpty())
                 count++;
         }
@@ -46,7 +46,7 @@ public record AnvilRecipe(Ingredient baseItem, List<Ingredient> ingredients, Ite
 
         List<Integer> matchedSlots = new ArrayList<>();
         for (Ingredient ingredient : ingredients) {
-            for (int i = 1; i < 4; i++) {
+            for (int i = 0; i < 4; i++) {
                 if (!matchedSlots.contains(i) && ingredient.test(anvilRecipeInput.getItem(i))) {
                     // found ingredient in one of the slots
                     matchedSlots.add(i);

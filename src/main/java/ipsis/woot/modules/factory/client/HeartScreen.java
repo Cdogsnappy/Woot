@@ -148,8 +148,6 @@ public class HeartScreen extends WootContainerScreen<HeartMenu> {
             renderTime = Util.milliTime();
         } */
 
-        ScreenRectangle rect = this.getRectangle();
-
         if (mouseX > getGuiLeft() + TANK_LX && mouseX < getGuiLeft() + TANK_RX && mouseY > getGuiTop() + TANK_LY && mouseY < getGuiTop() + TANK_RY)
             renderFluidTankTooltip(guiGraphics, mouseX, mouseY,
                     menu.getInputFluid(), getCapacity());
@@ -159,7 +157,8 @@ public class HeartScreen extends WootContainerScreen<HeartMenu> {
     protected void renderBg(GuiGraphics guiGraphics, float v, int mouseX, int mouseY) {
         int relX = (width - imageWidth) / 2;
         int relY = (height - imageHeight) / 2;
-        guiGraphics.blit(GUI, relX, relY,0, 0.0F, 0.0F, width, height, GUI_WIDTH, GUI_HEIGHT);
+        getMinecraft().getTextureManager().getTexture(GUI).bind();
+        guiGraphics.blit(GUI, relX, relY,0, 0.0F, 0.0F, imageWidth, imageHeight, GUI_WIDTH, GUI_HEIGHT);
 
         mobElements.forEach(e -> e.drawBackground(guiGraphics, mouseX, mouseY));
         upgradeElements.forEach(e -> e.drawBackground(guiGraphics, mouseX, mouseY));
@@ -212,7 +211,7 @@ public class HeartScreen extends WootContainerScreen<HeartMenu> {
 
 
     protected void renderFg(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        ClientFactorySetup clientFactorySetup = ((HeartMenu)menu).getTileEntity().clientFactorySetup;
+        ClientFactorySetup clientFactorySetup = menu.getTileEntity().clientFactorySetup;
         if (clientFactorySetup == null)
             return;
 

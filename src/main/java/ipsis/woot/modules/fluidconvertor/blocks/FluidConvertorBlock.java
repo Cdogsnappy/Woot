@@ -16,6 +16,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
@@ -111,9 +112,8 @@ public class FluidConvertorBlock extends Block implements EntityBlock, WootDebug
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flagIn) {
         super.appendHoverText(stack, context, tooltip, flagIn);
 
-        CompoundTag nbt = stack.get(DataComponents.BLOCK_ENTITY_DATA).copyTag();
-        if (nbt == null)
-            return;
+        CustomData data = stack.get(DataComponents.BLOCK_ENTITY_DATA);
+        CompoundTag nbt = data == null ? new CompoundTag() : data.copyTag();
 
         if (nbt.contains("energy")) {
             CompoundTag nbtEnergy = nbt.getCompound("energy");

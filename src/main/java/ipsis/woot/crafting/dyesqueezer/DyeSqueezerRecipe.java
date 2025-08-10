@@ -8,12 +8,16 @@ import ipsis.woot.crafting.WootRecipes;
 import ipsis.woot.fluilds.FluidSetup;
 import ipsis.woot.modules.squeezer.DyeMakeup;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.data.recipes.RecipeOutput;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.fluids.FluidStack;
 
@@ -118,11 +122,7 @@ public record DyeSqueezerRecipe(Ingredient input, int[] dyes, int energy) implem
 
         public static final StreamCodec<RegistryFriendlyByteBuf, DyeSqueezerRecipe> STREAM_CODEC = StreamCodec.composite(
                 Ingredient.CONTENTS_STREAM_CODEC, DyeSqueezerRecipe::input,
-                ByteBufCodecs.collection(ArrayList::new, ByteBufCodecs.VAR_INT)
-                        .map(
-                                list -> list.stream().mapToInt(Integer::intValue).toArray(), // List<Integer> to int[]
-                                array -> (ArrayList<Integer>) Arrays.stream(array).boxed().toList() // int[] to List<Integer>
-                        ), DyeSqueezerRecipe::dyes,
+                StreamCodec.of(FriendlyByteBuf::writeVarIntArray, FriendlyByteBuf::readVarIntArray), DyeSqueezerRecipe::dyes,
                 ByteBufCodecs.VAR_INT, DyeSqueezerRecipe::energy,
                 DyeSqueezerRecipe::new
         );

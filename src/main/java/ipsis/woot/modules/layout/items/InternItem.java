@@ -81,6 +81,8 @@ public class InternItem extends Item {
 
     @Override
     public @NotNull InteractionResult useOn(UseOnContext context){
+        return useOnFirst(context);
+        /**
         if(firstUse(context.getItemInHand())){
             return useOnFirst(context);
         }
@@ -91,7 +93,7 @@ public class InternItem extends Item {
         if (!context.getLevel().isClientSide) {
             if (playerEntity.isCrouching()) {
                 HitResult rayTraceResult = getPlayerPOVHitResult(world, playerEntity, ClipContext.Fluid.NONE);
-                if (rayTraceResult != null && rayTraceResult.getType() == HitResult.Type.BLOCK)
+                if (rayTraceResult.getType() == HitResult.Type.BLOCK)
                     return super.useOn(context);
 
                 ToolMode mode = getToolModeFromStack(itemStack);
@@ -111,10 +113,12 @@ public class InternItem extends Item {
             }
         }
         return InteractionResult.SUCCESS;
+         **/
     }
 
     private boolean firstUse(ItemStack stack){
-        CompoundTag tag = stack.get(DataComponents.CUSTOM_DATA).copyTag();
+        CustomData data = stack.get(DataComponents.CUSTOM_DATA);
+        CompoundTag tag = data == null ? new CompoundTag() : data.copyTag();
         if(tag.contains("USEDONCE")){
             return false;
         }

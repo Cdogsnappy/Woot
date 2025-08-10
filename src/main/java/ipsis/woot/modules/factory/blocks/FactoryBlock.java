@@ -27,7 +27,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class FactoryBlock extends WootBaseEntityBlock implements FactoryComponentProvider, WootDebug {
+public class FactoryBlock extends Block implements FactoryComponentProvider, WootDebug, EntityBlock {
 
     private final FactoryComponent component;
 

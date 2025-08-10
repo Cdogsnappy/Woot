@@ -18,6 +18,9 @@ import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 
 public class InfuserSetup {
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(BuiltInRegistries.ITEM, Woot.MODID);
@@ -92,5 +95,9 @@ public class InfuserSetup {
     private static DeferredHolder<Item, DyeCasingItem> getDyeCasingItem(DeferredRegister<Item> reg, DyeColor color) {
         return reg.register(color.getName() + "_dyecasing", () -> new DyeCasingItem(color));
 
+    }
+
+    public static List<Item> getItems(){
+        return ITEMS.getEntries().stream().map(i -> i.get()).collect(Collectors.toUnmodifiableList());
     }
 }

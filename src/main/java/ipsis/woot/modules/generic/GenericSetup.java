@@ -10,6 +10,9 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 
 public class GenericSetup {
 
@@ -44,4 +47,8 @@ public class GenericSetup {
             "t3shard", () -> new GenericItem(GenericItem.GenericItemType.ELITE_UP_SHARD));
     public static final DeferredHolder<Item, GenericItem> MACHINE_CASING_ITEM = ITEMS.register(
             "machine_casing", () -> new GenericItem(GenericItem.GenericItemType.MACHINE_CASING));
+
+    public static List<Item> getItems(){
+        return ITEMS.getEntries().stream().map(i -> i.get()).collect(Collectors.toUnmodifiableList());
+    }
 }

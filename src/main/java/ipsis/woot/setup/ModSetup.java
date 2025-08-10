@@ -7,6 +7,7 @@ import ipsis.woot.Woot;
 //import ipsis.woot.compat.top.WootTopPlugin;
 
 import ipsis.woot.config.OverrideLoader;
+import ipsis.woot.crafting.WootRecipes;
 import ipsis.woot.fluilds.FluidSetup;
 import ipsis.woot.modules.anvil.AnvilSetup;
 import ipsis.woot.modules.debug.DebugSetup;
@@ -66,6 +67,8 @@ public class ModSetup {
         FluidConvertorSetup.register(eventBus);
         FactorySetup.register(eventBus);
         WootCreativeModeTab.register(eventBus);
+        WootRecipes.register(eventBus);
+        MobSimulatorSetup.register(eventBus);
     }
 
     public void commonSetup(FMLCommonSetupEvent e) {

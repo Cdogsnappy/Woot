@@ -15,6 +15,9 @@ import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 
 public class FluidConvertorSetup {
 
@@ -43,4 +46,8 @@ public class FluidConvertorSetup {
                             FLUID_CONVERTOR_BLOCK.get()).build((null)));
     public static final DeferredHolder<MenuType<?>, MenuType<FluidConvertorMenu>> FLUID_CONVERTOR_BLOCK_CONTATAINER = CONTAINERS.register(
             FLUID_CONVERTOR_TAG, () -> IMenuTypeExtension.create(FluidConvertorMenu::new));
+
+    public static List<Item> getItems(){
+        return ITEMS.getEntries().stream().map(i -> i.get()).collect(Collectors.toUnmodifiableList());
+    }
 }

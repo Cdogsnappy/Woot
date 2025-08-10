@@ -18,6 +18,9 @@ import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 
 public class OracleSetup {
 
@@ -46,4 +49,9 @@ public class OracleSetup {
 
     public static final DeferredHolder<MenuType<?>, MenuType<OracleContainer>> ORACLE_BLOCK_CONTAINER = CONTAINERS.register(
             ORACLE_TAG, () -> IMenuTypeExtension.create(OracleContainer::new));
+
+
+    public static List<Item> getItems(){
+        return ITEMS.getEntries().stream().map(i -> i.get()).collect(Collectors.toUnmodifiableList());
+    }
 }

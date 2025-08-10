@@ -14,6 +14,9 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class LayoutSetup {
 
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(BuiltInRegistries.ITEM, Woot.MODID);
@@ -41,4 +44,8 @@ public class LayoutSetup {
 
     public static final DeferredHolder<Item, InternItem> INTERN_ITEM = ITEMS.register(
             "intern", () -> new InternItem());
+
+    public static List<Item> getItems(){
+        return ITEMS.getEntries().stream().map(i -> i.get()).collect(Collectors.toUnmodifiableList());
+    }
 }

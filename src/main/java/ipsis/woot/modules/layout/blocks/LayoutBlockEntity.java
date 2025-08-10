@@ -52,7 +52,7 @@ public class LayoutBlockEntity extends BlockEntity {
 
     AbsolutePattern absolutePattern = null;
     public void refresh() {
-        if(this.level.isClientSide)
+        if(!level.isClientSide)
             return;
 
         BlockPos origin = getBlockPos().below(LAYOUT_Y_OFFSET);
@@ -62,7 +62,6 @@ public class LayoutBlockEntity extends BlockEntity {
     @Override
     public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider lookupProvider){
         this.loadAdditional(tag, lookupProvider);
-        refresh();
     }
 
     public AbsolutePattern getAbsolutePattern() { return absolutePattern; }

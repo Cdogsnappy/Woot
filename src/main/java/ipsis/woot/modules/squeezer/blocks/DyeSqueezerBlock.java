@@ -20,6 +20,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
@@ -43,7 +44,7 @@ import net.neoforged.neoforge.fluids.FluidUtil;
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class DyeSqueezerBlock extends WootBaseEntityBlock implements WootDebug, EntityBlock {
+public class DyeSqueezerBlock extends WootBaseEntityBlock implements WootDebug{
 
     public static final MapCodec<DyeSqueezerBlock> CODEC = simpleCodec(DyeSqueezerBlock::new);
 
@@ -122,7 +123,8 @@ public class DyeSqueezerBlock extends WootBaseEntityBlock implements WootDebug, 
         super.appendHoverText(stack, context, tooltip, flagIn);
 
         tooltip.add(Component.translatable("info.woot.squeezer.glow"));
-        CompoundTag nbt = stack.get(DataComponents.BLOCK_ENTITY_DATA).copyTag();
+        CustomData data =  stack.get(DataComponents.BLOCK_ENTITY_DATA);
+        CompoundTag nbt = data==null ? new CompoundTag() : data.copyTag();
 
         if (nbt.contains("energy")) {
             CompoundTag nbtEnergy = nbt.getCompound("energy");
@@ -158,18 +160,6 @@ public class DyeSqueezerBlock extends WootBaseEntityBlock implements WootDebug, 
         return new DyeSqueezerBlockEntity(blockPos, blockState);
     }
 
-    @Override
-    protected MapCodec<? extends BaseEntityBlock> codec() {
-        return CODEC;
-    }
-    @Nullable
-    @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
-        if(level.isClientSide()) {
-            return null;
-        }
 
-        return createTickerHelper(blockEntityType, SqueezerSetup.SQUEEZER_BLOCK_TILE.get(),
-                (level1, blockPos, blockState, blockEntity) -> blockEntity.tick(level));
-    }
+
 }

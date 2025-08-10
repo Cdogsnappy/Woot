@@ -66,7 +66,7 @@ public class FactoryRecipeBuilder implements RecipeBuilder {
 
     @Override
     public Item getResult() {
-        return null;
+        return drops.getFirst().itemStack().getItem();
     }
 
     @Override

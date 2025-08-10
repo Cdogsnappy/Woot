@@ -1,7 +1,14 @@
 package ipsis.woot.setup;
 
 import ipsis.woot.Woot;
+import ipsis.woot.modules.anvil.AnvilSetup;
 import ipsis.woot.modules.factory.FactorySetup;
+import ipsis.woot.modules.fluidconvertor.FluidConvertorSetup;
+import ipsis.woot.modules.generic.GenericSetup;
+import ipsis.woot.modules.infuser.InfuserSetup;
+import ipsis.woot.modules.layout.LayoutSetup;
+import ipsis.woot.modules.oracle.OracleSetup;
+import ipsis.woot.modules.squeezer.SqueezerSetup;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
@@ -26,6 +33,13 @@ public class WootCreativeModeTab {
                     .title(Component.translatable("creativetab.tutorialmod.bismuth_items"))
                     .displayItems((itemDisplayParameters, output) -> {
                         FactorySetup.getItems().forEach(output::accept);
+                        InfuserSetup.getItems().forEach(output::accept);
+                        FluidConvertorSetup.getItems().forEach(output::accept);
+                        LayoutSetup.getItems().forEach(output::accept);
+                        GenericSetup.getItems().forEach(output::accept);
+                        OracleSetup.getItems().forEach(output::accept);
+                        AnvilSetup.getItems().forEach(output::accept);
+                        SqueezerSetup.getItems().forEach(output::accept);
 
                     }).build());
 }

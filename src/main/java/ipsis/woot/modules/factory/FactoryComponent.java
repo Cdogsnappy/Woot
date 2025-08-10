@@ -39,44 +39,29 @@ public enum FactoryComponent {
     }
 
     public Block getBlock() {
-        if (this == FACTORY_A)
-            return FactorySetup.FACTORY_A_BLOCK.get();
-        else if (this == FACTORY_B)
-            return FactorySetup.FACTORY_B_BLOCK.get();
-        else if (this == FACTORY_C)
-            return FactorySetup.FACTORY_C_BLOCK.get();
-        else if (this == FACTORY_D)
-            return FactorySetup.FACTORY_D_BLOCK.get();
-        else if (this == FACTORY_E)
-            return FactorySetup.FACTORY_E_BLOCK.get();
-        else if (this == FACTORY_CONNECT)
-            return FactorySetup.FACTORY_CONNECT_BLOCK.get();
-        else if (this == FACTORY_CTR_BASE_PRI)
-            return FactorySetup.FACTORY_CTR_BASE_PRI_BLOCK.get();
-        else if (this == FACTORY_CTR_BASE_SEC)
-            return FactorySetup.FACTORY_CTR_BASE_SEC_BLOCK.get();
-        else if (this == FACTORY_UPGRADE)
-            return FactorySetup.FACTORY_UPGRADE_BLOCK.get();
-        else if (this == HEART)
-            return FactorySetup.HEART_BLOCK.get();
-        else if (this == CAP_A)
-            return FactorySetup.CAP_A_BLOCK.get();
-        else if (this == CAP_B)
-            return FactorySetup.CAP_B_BLOCK.get();
-        else if (this == CAP_C)
-            return FactorySetup.CAP_C_BLOCK.get();
-        else if (this == CAP_D)
-            return FactorySetup.CAP_D_BLOCK.get();
-        else if (this == IMPORT)
-            return FactorySetup.IMPORT_BLOCK.get();
-        else if (this == EXPORT)
-            return FactorySetup.EXPORT_BLOCK.get();
-        else if (this == CONTROLLER)
-            return FactorySetup.CONTROLLER_BLOCK.get();
-        else if (this == CELL)
-            return FactorySetup.CELL_1_BLOCK.get();
-
-        throw new IllegalArgumentException("FactoryComponent missing mapping");
+        return switch (this) {
+            case FACTORY_A -> FactorySetup.FACTORY_A_BLOCK.get();
+            case FACTORY_B -> FactorySetup.FACTORY_B_BLOCK.get();
+            case FACTORY_C -> FactorySetup.FACTORY_C_BLOCK.get();
+            case FACTORY_D -> FactorySetup.FACTORY_D_BLOCK.get();
+            case FACTORY_E -> FactorySetup.FACTORY_E_BLOCK.get();
+            case FACTORY_CONNECT -> FactorySetup.FACTORY_CONNECT_BLOCK.get();
+            case FACTORY_CTR_BASE_PRI -> FactorySetup.FACTORY_CTR_BASE_PRI_BLOCK.get();
+            case FACTORY_CTR_BASE_SEC -> FactorySetup.FACTORY_CTR_BASE_SEC_BLOCK.get();
+            case FACTORY_UPGRADE -> FactorySetup.FACTORY_UPGRADE_BLOCK.get();
+            case HEART -> FactorySetup.HEART_BLOCK.get();
+            case CAP_A -> FactorySetup.CAP_A_BLOCK.get();
+            case CAP_B -> FactorySetup.CAP_B_BLOCK.get();
+            case CAP_C -> FactorySetup.CAP_C_BLOCK.get();
+            case CAP_D -> FactorySetup.CAP_D_BLOCK.get();
+            case IMPORT -> FactorySetup.IMPORT_BLOCK.get();
+            case EXPORT -> FactorySetup.EXPORT_BLOCK.get();
+            case CONTROLLER -> FactorySetup.CONTROLLER_BLOCK.get();
+            case CELL -> FactorySetup.CELL_1_BLOCK.get();
+            default ->
+                // Handle unexpected cases - you may want to throw an exception or return null
+                    null;
+        };
     }
 
     public List<Block> getBlocks() {
@@ -93,44 +78,29 @@ public enum FactoryComponent {
     }
 
     public ItemStack getItemStack() {
-        if (this == FACTORY_A)
-            return new ItemStack(FactorySetup.FACTORY_A_BLOCK.get());
-        else if (this == FACTORY_B)
-            return new ItemStack(FactorySetup.FACTORY_B_BLOCK.get());
-        else if (this == FACTORY_C)
-            return new ItemStack(FactorySetup.FACTORY_C_BLOCK.get());
-        else if (this == FACTORY_D)
-            return new ItemStack(FactorySetup.FACTORY_D_BLOCK.get());
-        else if (this == FACTORY_E)
-            return new ItemStack(FactorySetup.FACTORY_E_BLOCK.get());
-        else if (this == FACTORY_CONNECT)
-            return new ItemStack(FactorySetup.FACTORY_CONNECT_BLOCK.get());
-        else if (this == FACTORY_CTR_BASE_PRI)
-            return new ItemStack(FactorySetup.FACTORY_CTR_BASE_PRI_BLOCK.get());
-        else if (this == FACTORY_CTR_BASE_SEC)
-            return new ItemStack(FactorySetup.FACTORY_CTR_BASE_SEC_BLOCK.get());
-        else if (this == FACTORY_UPGRADE)
-            return new ItemStack(FactorySetup.FACTORY_UPGRADE_BLOCK.get());
-        else if (this == HEART)
-            return new ItemStack(FactorySetup.HEART_BLOCK.get());
-        else if (this == CAP_A)
-            return new ItemStack(FactorySetup.CAP_A_BLOCK.get());
-        else if (this == CAP_B)
-            return new ItemStack(FactorySetup.CAP_B_BLOCK.get());
-        else if (this == CAP_C)
-            return new ItemStack(FactorySetup.CAP_C_BLOCK.get());
-        else if (this == CAP_D)
-            return new ItemStack(FactorySetup.CAP_D_BLOCK.get());
-        else if (this == IMPORT)
-            return new ItemStack(FactorySetup.IMPORT_BLOCK.get());
-        else if (this == EXPORT)
-            return new ItemStack(FactorySetup.EXPORT_BLOCK.get());
-        else if (this == CONTROLLER)
-            return new ItemStack(FactorySetup.CONTROLLER_BLOCK.get());
-        else if (this == CELL)
-            return new ItemStack(FactorySetup.CELL_1_BLOCK.get());
-
-        throw new IllegalArgumentException("FactoryComponent missing mapping");
+        return switch (this) {
+            case FACTORY_A -> new ItemStack(FactorySetup.FACTORY_A_BLOCK.get());
+            case FACTORY_B -> new ItemStack(FactorySetup.FACTORY_B_BLOCK.get());
+            case FACTORY_C -> new ItemStack(FactorySetup.FACTORY_C_BLOCK.get());
+            case FACTORY_D -> new ItemStack(FactorySetup.FACTORY_D_BLOCK.get());
+            case FACTORY_E -> new ItemStack(FactorySetup.FACTORY_E_BLOCK.get());
+            case FACTORY_CONNECT -> new ItemStack(FactorySetup.FACTORY_CONNECT_BLOCK.get());
+            case FACTORY_CTR_BASE_PRI -> new ItemStack(FactorySetup.FACTORY_CTR_BASE_PRI_BLOCK.get());
+            case FACTORY_CTR_BASE_SEC -> new ItemStack(FactorySetup.FACTORY_CTR_BASE_SEC_BLOCK.get());
+            case FACTORY_UPGRADE -> new ItemStack(FactorySetup.FACTORY_UPGRADE_BLOCK.get());
+            case HEART -> new ItemStack(FactorySetup.HEART_BLOCK.get());
+            case CAP_A -> new ItemStack(FactorySetup.CAP_A_BLOCK.get());
+            case CAP_B -> new ItemStack(FactorySetup.CAP_B_BLOCK.get());
+            case CAP_C -> new ItemStack(FactorySetup.CAP_C_BLOCK.get());
+            case CAP_D -> new ItemStack(FactorySetup.CAP_D_BLOCK.get());
+            case IMPORT -> new ItemStack(FactorySetup.IMPORT_BLOCK.get());
+            case EXPORT -> new ItemStack(FactorySetup.EXPORT_BLOCK.get());
+            case CONTROLLER -> new ItemStack(FactorySetup.CONTROLLER_BLOCK.get());
+            case CELL -> new ItemStack(FactorySetup.CELL_1_BLOCK.get());
+            default ->
+                // Handle unexpected cases - you may want to throw an exception or return null
+                    null;
+        };
     }
 
     public List<ItemStack> getStacks() {
@@ -147,41 +117,25 @@ public enum FactoryComponent {
     }
 
     public BlockState getDefaultBlockState() {
-        if (this == FACTORY_A)
-            return FactorySetup.FACTORY_A_BLOCK.get().defaultBlockState();
-        else if (this == FACTORY_B)
-            return FactorySetup.FACTORY_B_BLOCK.get().defaultBlockState();
-        else if (this == FACTORY_C)
-            return FactorySetup.FACTORY_C_BLOCK.get().defaultBlockState();
-        else if (this == FACTORY_D)
-            return FactorySetup.FACTORY_D_BLOCK.get().defaultBlockState();
-        else if (this == FACTORY_E)
-            return FactorySetup.FACTORY_E_BLOCK.get().defaultBlockState();
-        else if (this == FACTORY_CONNECT)
-            return FactorySetup.FACTORY_CONNECT_BLOCK.get().defaultBlockState();
-        else if (this == FACTORY_CTR_BASE_PRI)
-            return FactorySetup.FACTORY_CTR_BASE_PRI_BLOCK.get().defaultBlockState();
-        else if (this == FACTORY_CTR_BASE_SEC)
-            return FactorySetup.FACTORY_CTR_BASE_SEC_BLOCK.get().defaultBlockState();
-        else if (this == FACTORY_UPGRADE)
-            return FactorySetup.FACTORY_UPGRADE_BLOCK.get().defaultBlockState();
-        else if (this == CAP_A)
-            return FactorySetup.CAP_A_BLOCK.get().defaultBlockState();
-        else if (this == CAP_B)
-            return FactorySetup.CAP_B_BLOCK.get().defaultBlockState();
-        else if (this == CAP_C)
-            return FactorySetup.CAP_C_BLOCK.get().defaultBlockState();
-        else if (this == CAP_D)
-            return FactorySetup.CAP_D_BLOCK.get().defaultBlockState();
-        else if (this == IMPORT)
-            return FactorySetup.IMPORT_BLOCK.get().defaultBlockState();
-        else if (this == EXPORT)
-            return FactorySetup.EXPORT_BLOCK.get().defaultBlockState();
-        else if (this == CONTROLLER)
-            return FactorySetup.CONTROLLER_BLOCK.get().defaultBlockState();
-        else if (this == CELL)
-            return FactorySetup.CELL_1_BLOCK.get().defaultBlockState();
-
-        return FactorySetup.HEART_BLOCK.get().defaultBlockState();
+        return switch (this) {
+            case FACTORY_A -> FactorySetup.FACTORY_A_BLOCK.get().defaultBlockState();
+            case FACTORY_B -> FactorySetup.FACTORY_B_BLOCK.get().defaultBlockState();
+            case FACTORY_C -> FactorySetup.FACTORY_C_BLOCK.get().defaultBlockState();
+            case FACTORY_D -> FactorySetup.FACTORY_D_BLOCK.get().defaultBlockState();
+            case FACTORY_E -> FactorySetup.FACTORY_E_BLOCK.get().defaultBlockState();
+            case FACTORY_CONNECT -> FactorySetup.FACTORY_CONNECT_BLOCK.get().defaultBlockState();
+            case FACTORY_CTR_BASE_PRI -> FactorySetup.FACTORY_CTR_BASE_PRI_BLOCK.get().defaultBlockState();
+            case FACTORY_CTR_BASE_SEC -> FactorySetup.FACTORY_CTR_BASE_SEC_BLOCK.get().defaultBlockState();
+            case FACTORY_UPGRADE -> FactorySetup.FACTORY_UPGRADE_BLOCK.get().defaultBlockState();
+            case CAP_A -> FactorySetup.CAP_A_BLOCK.get().defaultBlockState();
+            case CAP_B -> FactorySetup.CAP_B_BLOCK.get().defaultBlockState();
+            case CAP_C -> FactorySetup.CAP_C_BLOCK.get().defaultBlockState();
+            case CAP_D -> FactorySetup.CAP_D_BLOCK.get().defaultBlockState();
+            case IMPORT -> FactorySetup.IMPORT_BLOCK.get().defaultBlockState();
+            case EXPORT -> FactorySetup.EXPORT_BLOCK.get().defaultBlockState();
+            case CONTROLLER -> FactorySetup.CONTROLLER_BLOCK.get().defaultBlockState();
+            case CELL -> FactorySetup.CELL_1_BLOCK.get().defaultBlockState();
+            default -> FactorySetup.HEART_BLOCK.get().defaultBlockState();
+        };
     }
 }

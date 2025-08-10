@@ -25,7 +25,7 @@ public abstract class CellBlockEntityBase extends MultiBlockBlockEntity implemen
     private final Optional<IFluidHandler> holder = Optional.of(tank);
 
     public CellBlockEntityBase(BlockEntityType<?> blockEntityType, BlockPos pos, BlockState state) {
-        super(pos, state);
+        super(blockEntityType, pos, state);
         tank.setCapacity(getCapacity());
         tank.setValidator(e -> e.getFluid() == FluidSetup.CONATUS_FLUID.get().getSource());
     }

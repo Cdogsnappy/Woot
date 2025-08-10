@@ -18,6 +18,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
@@ -115,7 +116,7 @@ public abstract class WootContainerScreen<T extends AbstractContainerMenu> exten
 
     public void drawFluid(GuiGraphics guiGraphics, int x, int y, FluidStack fluid, int width, int height) {
 
-        if (fluid == null)
+        if (fluid.getFluid() == Fluids.EMPTY)
             return;
 
         ResourceLocation stillTexture = IClientFluidTypeExtensions.of(fluid.getFluid()).getStillTexture();

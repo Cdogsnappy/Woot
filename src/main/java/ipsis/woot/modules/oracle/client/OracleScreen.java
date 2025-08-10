@@ -130,7 +130,7 @@ public class OracleScreen extends AbstractContainerScreen<OracleContainer> {
         getMinecraft().getTextureManager().getTexture(GUI).bind();
         int relX = (this.width - this.imageWidth) / 2;
         int relY = (this.height - this.imageHeight) / 2;
-        guiGraphics.blit(GUI, relX, relY,0, 0.0F, 0.0F, imageWidth, imageHeight, 32, 32);
+        guiGraphics.blit(GUI, relX, relY,0, 0.0F, 0.0F, imageWidth, imageHeight, 256, 256);
 
         if (!menu.simulatedDrops.isEmpty()) {
             int currRow = 0;

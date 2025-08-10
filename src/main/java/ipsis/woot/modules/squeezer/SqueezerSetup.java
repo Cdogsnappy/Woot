@@ -15,6 +15,9 @@ import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 
 public class SqueezerSetup {
 
@@ -56,4 +59,9 @@ public class SqueezerSetup {
 
     public static final DeferredHolder<MenuType<?>, MenuType<EnchantSqueezerMenu>> ENCHANT_SQUEEZER_BLOCK_CONTAINER = CONTAINERS.register(
             ENCHANT_SQUEEZER_TAG, () -> IMenuTypeExtension.create(EnchantSqueezerMenu::new));
+
+
+    public static List<Item> getItems(){
+        return ITEMS.getEntries().stream().map(i -> i.get()).collect(Collectors.toUnmodifiableList());
+    }
 }

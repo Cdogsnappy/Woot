@@ -20,4 +20,5 @@ public class WootDataComponents {
                     .persistent(CompoundTag.CODEC)
                     .networkSynchronized(ByteBufCodecs.COMPOUND_TAG)
                     .build());
+
 }

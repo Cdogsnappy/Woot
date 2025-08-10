@@ -11,6 +11,7 @@ import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
@@ -53,12 +54,19 @@ public class DyeSqueezerRecipeBuilder implements RecipeBuilder {
 
     @Override
     public Item getResult() {
-        return Items.AIR;
+        return ItemStack.EMPTY.getItem();
     }
 
     @Override
     public void save(RecipeOutput recipeOutput, ResourceLocation resourceLocation) {
         recipeOutput.accept(resourceLocation, new DyeSqueezerRecipe(ingredient, dyes, energy), null);
+
+    }
+
+    @Override
+    public void save(RecipeOutput recipeOutput, String id) {
+        ResourceLocation res = ResourceLocation.parse(dyes[0] + "_" + dyes[1] + "_" + dyes[2] + "_" + dyes[3]+ "_" + id.toLowerCase());
+        save(recipeOutput, res);
 
     }
 

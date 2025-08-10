@@ -6,20 +6,19 @@ import ipsis.woot.modules.squeezer.SqueezerSetup;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.common.property.Properties;
 import org.jetbrains.annotations.Nullable;
 
-public class WootBaseEntityBlock extends BaseEntityBlock {
-    public WootBaseEntityBlock(Properties properties) {
-        super(properties);
-    }
-
-    @Override
-    protected MapCodec<? extends BaseEntityBlock> codec() {
-        return null;
+public class WootBaseEntityBlock extends Block implements EntityBlock {
+    public WootBaseEntityBlock(BlockBehaviour.Properties prop) {
+        super(prop);
     }
 
     @Override
@@ -34,7 +33,7 @@ public class WootBaseEntityBlock extends BaseEntityBlock {
             return null;
         }
 
-        return createTickerHelper(blockEntityType, FactorySetup.WOOT_MACHINE_ENTITY.get() ,
-                (level1, blockPos, blockState, blockEntity) -> blockEntity.tick(level));
+
+        return (level1, blockPos, blockState, blockEntity) -> ((WootMachineBlockEntity)blockEntity).tick(level);
     }
 }

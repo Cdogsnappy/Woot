@@ -1,9 +1,11 @@
 package ipsis.woot.modules.layout.client;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import ipsis.woot.modules.factory.FactoryComponent;
 import ipsis.woot.modules.factory.FactorySetup;
+import ipsis.woot.modules.factory.layout.PatternRepository;
 import ipsis.woot.modules.layout.LayoutSetup;
 import ipsis.woot.modules.layout.blocks.LayoutBlockEntity;
 import ipsis.woot.modules.factory.layout.PatternBlock;
@@ -20,6 +22,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.client.model.EmptyModel;
@@ -51,8 +55,6 @@ public class LayoutTileEntitySpecialRenderer implements BlockEntityRenderer<Layo
         {
             matrixStack.translate(0.0F, 0.0F, 0.0F);
             for (PatternBlock block : tileEntityIn.getAbsolutePattern().getBlocks()) {
-                if (!showAll && block.getBlockPos().getY() != validY)
-                    continue;
 
                 matrixStack.pushPose();
                 {
@@ -60,19 +62,19 @@ public class LayoutTileEntitySpecialRenderer implements BlockEntityRenderer<Layo
                     float y = (origin.getY() - block.getBlockPos().getY()) * -1.0F;
                     float z = (origin.getZ() - block.getBlockPos().getZ()) * -1.0F;
                     matrixStack.translate(x, y, z);
-                    minX = x < minX ? x : minX;
-                    minY = y < minY ? y : minY;
-                    minZ = z < minZ ? z : minZ;
-                    maxX = x > maxX ? x : maxX;
-                    maxY = y > maxY ? y : maxY;
-                    maxZ = z > maxZ ? z : maxZ;
+                    minX = Math.min(x, minX);
+                    minY = Math.min(y, minY);
+                    minZ = Math.min(z, minZ);
+                    maxX = Math.max(x, maxX);
+                    maxY = Math.max(y, maxY);
+                    maxZ = Math.max(z, maxZ);
 
                     BlockState blockState = block.getFactoryComponent().getDefaultBlockState();
                     if (block.getFactoryComponent() == FactoryComponent.HEART)
                         blockState = FactorySetup.HEART_BLOCK.get().defaultBlockState().setValue(BlockStateProperties.HORIZONTAL_FACING, facing);
 
                     Minecraft.getInstance().getBlockRenderer().renderSingleBlock(blockState,
-                            matrixStack, bufferIn, 0x00f000f0, combinedOverlayIn, ModelData.EMPTY, RenderType.LINES);
+                            matrixStack, bufferIn, 0x00f000f0, combinedOverlayIn, ModelData.EMPTY, RenderType.solid());
                 }
                 matrixStack.popPose();;
             }
@@ -90,6 +92,7 @@ public class LayoutTileEntitySpecialRenderer implements BlockEntityRenderer<Layo
                0.9F, 0.9F, 0.9F, 1.0F, 0.5F, 0.5F, 0.5F);
         }
         matrixStack.popPose();
+
     }
 
     @Override
@@ -98,9 +101,38 @@ public class LayoutTileEntitySpecialRenderer implements BlockEntityRenderer<Layo
         if (world != null) {
             if (layoutBlockEntity.getAbsolutePattern() == null)
                 layoutBlockEntity.refresh();
+            if(layoutBlockEntity.getAbsolutePattern() == null){
+                return;
+            }
 
             textureRender(layoutBlockEntity, v, poseStack, multiBufferSource, i, i1);
         }
+    }
+
+    @Override
+    public AABB getRenderBoundingBox(LayoutBlockEntity blockEntity) {
+        return AABB.INFINITE;
+        /*
+        BlockPos pos = blockEntity.getBlockPos();
+        return new AABB(
+                pos.offset(-PatternRepository.get().getMaxXZOffset(), -PatternRepository.get().getMaxXZOffset(), -PatternRepository.get().getMaxXZOffset())
+        );
+        */
+
+    }
+
+    @Override
+    public boolean shouldRenderOffScreen(LayoutBlockEntity blockEntity) {
+        return true; // Always render regardless of screen position
+    }
+
+    @Override
+    public boolean shouldRender(LayoutBlockEntity blockEntity, Vec3 cameraPos){
+        return true;
+    }
+
+    public int getViewDistance() {
+        return 256;
     }
 
     public static final Dispatcher DISPATCHER = new Dispatcher();
@@ -112,4 +144,6 @@ public class LayoutTileEntitySpecialRenderer implements BlockEntityRenderer<Layo
             return new LayoutTileEntitySpecialRenderer();
         }
     }
+
+
 }

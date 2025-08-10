@@ -71,7 +71,7 @@ public class Squeezer {
             DyeSqueezerRecipeBuilder.dyeSqueezerRecipe(
                     Ingredient.of(d.getItemTag()),
                     DYE_ENERGY_COST,
-                    d.getRed(), d.getYellow(), d.getBlue(), d.getWhite()).save(recipeOutput);
+                    d.getRed(), d.getYellow(), d.getBlue(), d.getWhite()).save(recipeOutput, d.name());
         }
 
         /**

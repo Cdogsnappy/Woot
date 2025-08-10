@@ -4,19 +4,26 @@ import com.mojang.serialization.MapCodec;
 import ipsis.woot.modules.debug.items.DebugItem;
 import ipsis.woot.modules.factory.FactoryComponent;
 import ipsis.woot.modules.factory.FactoryComponentProvider;
+import ipsis.woot.modules.factory.FactorySetup;
 import ipsis.woot.modules.factory.Tier;
+import ipsis.woot.util.FakeMob;
 import ipsis.woot.util.WootDebug;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -32,10 +39,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class ControllerBlock extends BaseEntityBlock implements FactoryComponentProvider, WootDebug {
+public class ControllerBlock extends Block implements FactoryComponentProvider, WootDebug, EntityBlock {
 
-
-    public static final MapCodec<ControllerBlock> CODEC = simpleCodec(ControllerBlock::new);
 
     public ControllerBlock(Properties prop) {
 
@@ -93,13 +98,23 @@ public class ControllerBlock extends BaseEntityBlock implements FactoryComponent
         return debug;
     }
 
-    @Override
-    protected MapCodec<? extends BaseEntityBlock> codec() {
-        return CODEC;
-    }
+
 
     @Override
     public @Nullable BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {
         return new ControllerBlockEntity(blockPos, blockState);
     }
-}
+
+    @Override
+    public void setPlacedBy(Level level, BlockPos pos, BlockState state,
+                            @Nullable LivingEntity placer, ItemStack stack) {
+        super.setPlacedBy(level, pos, state, placer, stack);
+
+        CustomData data = stack.get(DataComponents.CUSTOM_DATA);
+        if(data != null){
+            ControllerBlockEntity cbe = level.getBlockEntity(pos, FactorySetup.CONTROLLER_BLOCK_TILE.get()).get();
+            cbe.setFakeMob(new FakeMob(data.copyTag()));
+        }
+    }
+
+    }

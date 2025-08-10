@@ -1,6 +1,8 @@
 package ipsis.woot.simulator;
 
 import com.ibm.icu.impl.Pair;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import ipsis.woot.Woot;
 import ipsis.woot.simulator.tartarus.TartarusChunkGenerator;
 import net.minecraft.core.Holder;
@@ -21,12 +23,24 @@ import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.List;
 import java.util.OptionalLong;
 
 
 public class MobSimulatorSetup {
+
+    public static final DeferredRegister<MapCodec<? extends ChunkGenerator>> CHUNK_GENERATORS =
+            DeferredRegister.create(Registries.CHUNK_GENERATOR, Woot.MODID);
+
+    public static final DeferredHolder<MapCodec<? extends ChunkGenerator>, MapCodec<TartarusChunkGenerator>> MY_CHUNK_GENERATOR =
+            CHUNK_GENERATORS.register("my_chunk_generator", () -> TartarusChunkGenerator.CODEC);
+
+    public static void register(IEventBus eventBus) {
+        CHUNK_GENERATORS.register(eventBus);
+    }
 
     public static final ResourceKey<DimensionType> TARTARUS_DIMENSION_TYPE = ResourceKey.create(
             Registries.DIMENSION_TYPE,  ResourceLocation.fromNamespaceAndPath(Woot.MODID, "mobsimulator"));
@@ -51,8 +65,8 @@ public class MobSimulatorSetup {
                 256, // logicalHeight
                 BlockTags.INFINIBURN_OVERWORLD, // infiniburn
                 BuiltinDimensionTypes.OVERWORLD_EFFECTS, // effectsLocation
-                1.0f, // ambientLight
-                new DimensionType.MonsterSettings(false, false, ConstantInt.of(0), 0)));
+                0.0f, // ambientLight
+                new DimensionType.MonsterSettings(true, false, ConstantInt.of(0), 15)));
     }
 
     public static void bootstrapStem(BootstrapContext<LevelStem> context) {
@@ -61,7 +75,7 @@ public class MobSimulatorSetup {
         HolderGetter<NoiseGeneratorSettings> noiseGenSettings = context.lookup(Registries.NOISE_SETTINGS);
 
         ChunkGenerator wrappedChunkGenerator = new TartarusChunkGenerator(new FixedBiomeSource(biomeRegistry.getOrThrow(Biomes.OCEAN)),
-                noiseGenSettings.getOrThrow(NoiseGeneratorSettings.AMPLIFIED));
+                noiseGenSettings.getOrThrow(NoiseGeneratorSettings.OVERWORLD));
 
 
         LevelStem stem = new LevelStem(dimTypes.getOrThrow(TARTARUS_DIMENSION_TYPE), wrappedChunkGenerator);

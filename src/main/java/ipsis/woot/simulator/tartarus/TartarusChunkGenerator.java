@@ -34,7 +34,7 @@ import java.util.function.Predicate;
 public class TartarusChunkGenerator extends ChunkGenerator {
 
     public final Holder<NoiseGeneratorSettings> settings;
-    public static final MapCodec<TartarusChunkGenerator> codecTarturusChunk =
+    public static final MapCodec<TartarusChunkGenerator> CODEC =
             RecordCodecBuilder.mapCodec((inst) ->
                 inst.group(BiomeSource.CODEC.fieldOf("biome_source").forGetter((i) -> i.biomeSource),
                         NoiseGeneratorSettings.CODEC.fieldOf("settings").forGetter((j) -> j.settings)).apply(inst, inst.stable(TartarusChunkGenerator::new)));
@@ -103,7 +103,7 @@ public class TartarusChunkGenerator extends ChunkGenerator {
 
     @Override
     protected MapCodec<? extends ChunkGenerator> codec() {
-        return codecTarturusChunk;
+        return CODEC;
     }
 
     @Override

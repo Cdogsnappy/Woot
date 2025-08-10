@@ -7,7 +7,9 @@ import ipsis.woot.modules.layout.LayoutSetup;
 import ipsis.woot.modules.debug.items.DebugItem;
 import ipsis.woot.modules.factory.FactoryComponent;
 import ipsis.woot.modules.factory.FactoryComponentProvider;
+import ipsis.woot.util.WootBaseEntityBlock;
 import ipsis.woot.util.WootDebug;
+import ipsis.woot.util.WootMachineBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
@@ -25,6 +27,7 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -35,12 +38,11 @@ import org.jetbrains.annotations.NotNull;
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class HeartBlock extends BaseEntityBlock implements FactoryComponentProvider, WootDebug {
+public class HeartBlock extends WootBaseEntityBlock implements FactoryComponentProvider, WootDebug {
 
-    public static final MapCodec<HeartBlock> CODEC = simpleCodec(HeartBlock::new);
 
-    public HeartBlock(Properties properties) {
-        super(Properties.of().sound(SoundType.METAL).strength(3.5F));
+    public HeartBlock(BlockBehaviour.Properties properties) {
+        super(BlockBehaviour.Properties.of().sound(SoundType.METAL).strength(3.5F));
         registerDefaultState(getStateDefinition().any().setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH));
     }
 
@@ -75,8 +77,8 @@ public class HeartBlock extends BaseEntityBlock implements FactoryComponentProvi
         if (te instanceof HeartBlockEntity && !((HeartBlockEntity) te).isFormed())
                 return ItemInteractionResult.FAIL;
 
-        if (te instanceof MenuProvider)
-            player.openMenu((MenuProvider)te, te.getBlockPos());
+        if (te instanceof HeartBlockEntity)
+            player.openMenu((HeartBlockEntity)te, te.getBlockPos());
         else
             throw new IllegalStateException("Named container provider is missing");
 
@@ -101,25 +103,10 @@ public class HeartBlock extends BaseEntityBlock implements FactoryComponentProvi
         return debug;
     }
 
-    @Override
-    protected MapCodec<? extends BaseEntityBlock> codec() {
-        return CODEC;
-    }
 
     @Override
     public @org.jetbrains.annotations.Nullable BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {
         return new HeartBlockEntity(blockPos, blockState);
     }
 
-
-    @Nullable
-    @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
-        if(level.isClientSide()) {
-            return null;
-        }
-
-        return createTickerHelper(blockEntityType, FactorySetup.HEART_BLOCK_TILE.get(),
-                (level1, blockPos, blockState, blockEntity) -> blockEntity.tick(level));
-    }
 }

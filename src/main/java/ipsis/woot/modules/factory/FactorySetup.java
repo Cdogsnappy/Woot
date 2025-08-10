@@ -339,9 +339,9 @@ public class FactorySetup {
     public static final DeferredHolder<Item, XpShardBaseItem> XP_SPLINTER_ITEM = ITEMS.register(
             XpShardBaseItem.SPLINTER_REGNAME, () -> new XpShardBaseItem(XpShardBaseItem.Variant.SPLINTER));
 
-   // public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<UpgradeBlockEntity>> FACTORY_UPGRADE_BLOCK_ENTITY = BLOCKENTITIES.register(
-           // FACTORY_UPGRADE_TAG, () ->
-                  //  BlockEntityType.Builder.of(UpgradeBlockEntity::new, FACTORY_UPGRADE_BLOCK.get()).build(null));
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<UpgradeBlockEntity>> FACTORY_UPGRADE_BLOCK_ENTITY = BLOCKENTITIES.register(
+            FACTORY_UPGRADE_TAG, () ->
+                   BlockEntityType.Builder.of(UpgradeBlockEntity::new, FACTORY_UPGRADE_BLOCK.get()).build(null));
 
     public static List<Item> getItems(){
         return ITEMS.getEntries().stream().map(i -> i.get()).collect(Collectors.toUnmodifiableList());

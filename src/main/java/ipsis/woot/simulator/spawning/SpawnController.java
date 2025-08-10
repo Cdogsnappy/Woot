@@ -143,9 +143,9 @@ public class SpawnController {
 
         int xp = 1;
         try {
-            Method getExp = ObfuscationReflectionHelper.findMethod(LivingEntity.class, "func_70693_a", Player.class);
+            Method getExp = ObfuscationReflectionHelper.findMethod(LivingEntity.class, "getExperienceReward", Level.class, Entity.class);
             getExp.setAccessible(true);
-            xp = (int)getExp.invoke(entity, fakePlayer);
+            xp = (int)getExp.invoke(world, entity);
         } catch (Throwable e) {
             Woot.setup.getLogger().debug("Reflection of getExperiencePoints failed {}", e);
         }

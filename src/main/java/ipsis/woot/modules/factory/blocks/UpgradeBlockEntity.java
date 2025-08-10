@@ -26,7 +26,7 @@ import java.util.List;
 public class UpgradeBlockEntity extends MultiBlockBlockEntity implements WootDebug {
 
     public UpgradeBlockEntity(BlockPos pos, BlockState state) {
-        super(pos, state);
+        super(FactorySetup.FACTORY_UPGRADE_BLOCK_ENTITY.get(), pos, state);
     }
 
     public boolean tryAddUpgrade(Level world, Player playerEntity, BlockState state, Perk type) {

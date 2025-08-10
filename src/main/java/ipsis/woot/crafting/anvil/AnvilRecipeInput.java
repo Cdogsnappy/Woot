@@ -22,6 +22,6 @@ public record AnvilRecipeInput(ItemStack baseItem, List<ItemStack> ingredients) 
 
     @Override
     public int size() {
-        return 0;
+        return ingredients().size();
     }
 }

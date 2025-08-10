@@ -14,6 +14,7 @@ import ipsis.woot.modules.factory.perks.Perk;
 import ipsis.woot.simulator.MobSimulator;
 import ipsis.woot.util.FakeMob;
 import ipsis.woot.util.WootDebug;
+import ipsis.woot.util.WootMachineBlockEntity;
 import ipsis.woot.util.helper.StorageHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
@@ -44,7 +45,7 @@ import java.util.*;
  * The factory is formed manually by the user via the intern -> interrupt
  * When an attached block is removed or unloaded it should inform the heart -> interrupt
  */
-public class HeartBlockEntity extends BlockEntity implements MultiBlockMaster, WootDebug, MenuProvider {
+public class HeartBlockEntity extends WootMachineBlockEntity implements MultiBlockMaster, WootDebug, MenuProvider {
 
     static final Logger LOGGER = LogManager.getLogger();
 

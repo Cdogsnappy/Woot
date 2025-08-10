@@ -15,6 +15,9 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 
 public class AnvilSetup {
 
@@ -49,4 +52,8 @@ public class AnvilSetup {
             "shard_die", () -> new DieItem(DieItem.DieType.SHARD));
     public static final DeferredHolder<Item, DieItem> DYE_DIE_ITEM = ITEMS.register(
             "dye_die", () -> new DieItem(DieItem.DieType.DYE));
+
+    public static List<Item> getItems(){
+        return ITEMS.getEntries().stream().map(i -> i.get()).collect(Collectors.toUnmodifiableList());
+    }
 }

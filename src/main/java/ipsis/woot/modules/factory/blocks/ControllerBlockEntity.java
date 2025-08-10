@@ -10,8 +10,10 @@ import ipsis.woot.util.FakeMob;
 import ipsis.woot.util.WootDebug;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -50,6 +52,10 @@ public class ControllerBlockEntity extends MultiBlockBlockEntity implements Woot
         return fakeMob;
     }
 
+    public void setFakeMob(FakeMob fakeMob){
+        this.fakeMob = fakeMob;
+    }
+
     public Tier getTier() {
         if (fakeMob == null || !fakeMob.isValid())
             return Tier.UNKNOWN;
@@ -65,7 +71,7 @@ public class ControllerBlockEntity extends MultiBlockBlockEntity implements Woot
          */
         CompoundTag nbt = new CompoundTag();
         FakeMob.writeToNBT(fakeMob, nbt);
-        itemStack.set(WootDataComponents.MOB_DATA.get(), nbt);
+        itemStack.set(DataComponents.CUSTOM_DATA, CustomData.of(nbt));
         return itemStack;
     }
 

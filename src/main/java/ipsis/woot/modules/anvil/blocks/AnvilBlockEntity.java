@@ -172,12 +172,12 @@ public class AnvilBlockEntity extends BlockEntity implements WootDebug {
 
     private void readFromNBT(CompoundTag compoundNBT) {
         if (compoundNBT.contains(ModNBT.Anvil.BASE_ITEM_TAG)) {
-            ListTag listNBT = compoundNBT.getList(ModNBT.INVENTORY_TAG, 10);
+            ListTag listNBT = compoundNBT.getList(ModNBT.INVENTORY_TAG, 9);
             for (int i = 0; i < listNBT.size(); i++) {
                 CompoundTag itemTags = listNBT.getCompound(i);
                 int j = itemTags.getInt(ModNBT.INVENTORY_SLOT_TAG);
                 if (j >= 0 && j < ingredients.length) {
-                    ingredients[j] = ItemStack.parse(level.registryAccess(), itemTags).get();
+                    ingredients[j] = ItemStack.parse(level.registryAccess(), itemTags).orElse(ItemStack.EMPTY);
                 }
             }
         }
