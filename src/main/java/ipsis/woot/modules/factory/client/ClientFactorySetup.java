@@ -50,7 +50,7 @@ public class ClientFactorySetup {
     public List<FluidStack> fluidIng = new ArrayList<>();
 
 
-    private ClientFactorySetup() {}
+    public ClientFactorySetup() {}
 
 
 
@@ -59,6 +59,9 @@ public class ClientFactorySetup {
 
     public static final StreamCodec<RegistryFriendlyByteBuf, HashMap<FakeMob, MobParam>> PARAM_MAP_CODEC =
             ExtraWootCodecs.mapStreamCodec(FakeMob.STREAM_CODEC, MobParam.STREAM_CODEC, HashMap::new);
+
+    public static final StreamCodec<RegistryFriendlyByteBuf, List<FakeMob>> MOB_LIST_CODEC =
+            ExtraWootCodecs.listStreamCodec(FakeMob.STREAM_CODEC);
 
 
     public static final StreamCodec<RegistryFriendlyByteBuf, ClientFactorySetup> STREAM_CODEC =
@@ -89,7 +92,6 @@ public class ClientFactorySetup {
                         ClientFactorySetup factorySetup = new ClientFactorySetup();
                         factorySetup.tier = Tier.byIndex(buf.readInt());
                         factorySetup.cellCapacity = buf.readInt();
-                        buf.readInt(); /// fluid amount
                         factorySetup.looting = buf.readInt();
                         factorySetup.exotic = Exotic.getExotic(buf.readInt());
 
@@ -97,12 +99,11 @@ public class ClientFactorySetup {
                         factorySetup.recipeFluid = buf.readInt();
                         factorySetup.shardRolls = buf.readInt();
                         factorySetup.shardDropChance = buf.readDouble();
-                        factorySetup.shardDrops[0] = buf.readDouble();
-                        factorySetup.shardDrops[1] = buf.readDouble();
-                        factorySetup.shardDrops[2] = buf.readDouble();
+                        factorySetup.shardDrops = Arrays.stream(buf.readArray(Double[]::new, ByteBufCodecs.DOUBLE)).mapToDouble(Double::doubleValue).toArray();
                         factorySetup.mobParams = PARAM_MAP_CODEC.decode(buf);
                         factorySetup.mobInfo = MAP_CODEC.decode(buf);
                         factorySetup.controllerMobs = factorySetup.mobParams.keySet().stream().toList();
+
                         factorySetup.perkCapped = buf.readBoolean();
                         int size = buf.readVarInt();
                         for(int i = 0; i < size; ++i){

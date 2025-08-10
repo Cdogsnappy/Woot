@@ -38,6 +38,9 @@ public abstract class CellBlockEntityBase extends MultiBlockBlockEntity implemen
     }
 
     private void readFromNBT(CompoundTag compound) {
+        if(this.level == null){
+            return;
+        }
         if (compound.contains(ModNBT.TANK_TAG))
             tank.readFromNBT(this.level.registryAccess(), compound.getCompound(ModNBT.TANK_TAG));
     }

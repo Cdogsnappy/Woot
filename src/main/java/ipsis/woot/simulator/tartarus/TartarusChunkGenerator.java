@@ -124,7 +124,7 @@ public class TartarusChunkGenerator extends ChunkGenerator {
 
         if (chunkAccess.getPos().x == WORK_CHUNK_X && chunkAccess.getPos().z == WORK_CHUNK_Z) {
             Woot.setup.getLogger().debug("generateSurface: work chunk creating cells");
-            BlockState wallState = Blocks.GLASS.defaultBlockState();
+            BlockState wallState = Blocks.BEDROCK.defaultBlockState();
             calcCellStructures();
 
             for (int y = 0; y < 256; y += 8) {
@@ -148,7 +148,18 @@ public class TartarusChunkGenerator extends ChunkGenerator {
 
     @Override
     public CompletableFuture<ChunkAccess> fillFromNoise(Blender blender, RandomState randomState, StructureManager structureManager, ChunkAccess chunkAccess) {
-        return null;
+        return CompletableFuture.supplyAsync(() -> {
+            // Create a simple flat stone platform at y=64
+            for (int x = 0; x < 16; x++) {
+                for (int z = 0; z < 16; z++) {
+                    BlockPos pos = new BlockPos(x, 0, z);
+                    chunkAccess.setBlockState(pos, Blocks.BEDROCK.defaultBlockState(), false);
+                }
+            }
+
+            return chunkAccess;
+        });
+
     }
 
     @Override
@@ -168,7 +179,17 @@ public class TartarusChunkGenerator extends ChunkGenerator {
 
     @Override
     public @NotNull NoiseColumn getBaseColumn(int i, int i1, LevelHeightAccessor levelHeightAccessor, RandomState randomState) {
-        return null;
+        int minY = levelHeightAccessor.getMinBuildHeight();
+        int maxY = levelHeightAccessor.getMaxBuildHeight();
+
+        // Create an array to hold the block states for this column
+        BlockState[] column = new BlockState[maxY - minY];
+        for( int x = minY; x < maxY; x++){
+            column[x-minY] = Blocks.AIR.defaultBlockState();
+        }
+
+        // Fill the column with blocks (basic example)
+        return new NoiseColumn(minY, column);
     }
 
     @Override

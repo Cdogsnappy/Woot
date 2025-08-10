@@ -48,7 +48,7 @@ public class MobSimulatorSetup {
             Registries.LEVEL_STEM, ResourceLocation.fromNamespaceAndPath(Woot.MODID, "tartarus"));
 
     public static final ResourceKey<Level> TARTARUS_LEVEL_KEY = ResourceKey.create(Registries.DIMENSION,
-            ResourceLocation.fromNamespaceAndPath(Woot.MODID, "tartarus_type"));
+            ResourceLocation.fromNamespaceAndPath(Woot.MODID, "tartarus"));
 
     public static void bootstrapType(BootstrapContext<DimensionType> context) {
         context.register(TARTARUS_DIMENSION_TYPE, new DimensionType(

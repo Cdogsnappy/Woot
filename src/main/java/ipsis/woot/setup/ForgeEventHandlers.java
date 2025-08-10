@@ -137,6 +137,9 @@ public class ForgeEventHandlers {
     private static List<TickTrack> tickTracks = new ArrayList<>();
     @SubscribeEvent
     public static void onWorldTick(LevelTickEvent.Post event) {
+        if(event.getLevel().isClientSide){
+            return;
+        }
 
         TickTrack currTick = null;
         for (TickTrack tickTrack : tickTracks) {

@@ -165,6 +165,7 @@ public class FluidSetup {
         BLOCKS.register(eventBus);
         ITEMS.register(eventBus);
         FLUIDS.register(eventBus);
+        FLUID_TYPES.register(eventBus);
     }
 
 }

@@ -373,7 +373,7 @@ public class FormedSetup {
                     },
                     (buf) -> {
                         FormedSetup factorySetup = new FormedSetup();
-                        factorySetup.tier = Tier.byIndex(buf.readInt());
+                        factorySetup.tier = Tier.STREAM_CODEC.decode(buf);
                         factorySetup.cellCapacity = buf.readInt();
                         factorySetup.controllerMobs = MOB_LIST_CODEC.decode(buf);
                         factorySetup.perks = GROUP_MAP_CODEC.decode(buf);

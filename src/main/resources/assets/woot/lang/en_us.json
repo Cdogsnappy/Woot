@@ -191,7 +191,7 @@
   "commands.woot.simulation.status.waiting": "Waiting for cell {0}",
   "config.waila.plugin_woot": "Woot",
   "config.waila.plugin_woot.display_layout_items": "Show Layout Items",
-  "fluid.woot.conatus_fluid": "Conatus Fluid",
+  "fluid.woot.conatus": "Conatus Fluid",
   "fluid.woot.enchant_fluid": "Liquid Enchant",
   "fluid.woot.mob_essence_fluid": "Purge Fluid",
   "fluid.woot.puredye_fluid": "Pure Dye Fluid",
