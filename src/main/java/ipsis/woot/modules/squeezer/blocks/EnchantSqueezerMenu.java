@@ -136,14 +136,14 @@ public class EnchantSqueezerMenu extends WootContainer implements TankPacketHand
     public FluidStack getOutputFluid() { return outputFluid; }
 
     public void addListeners() {
-        addIntegerListener(new DataSlot() {
+        addDataSlot(new DataSlot() {
             @Override
             public int get() { return tileEntity.getEnergy(); }
 
             @Override
             public void set(int i) { energy = i; }
         });
-        addShortListener(new DataSlot() {
+        addDataSlot(new DataSlot() {
             @Override
             public int get() { return tileEntity.getProgress(); }
 

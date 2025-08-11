@@ -6,6 +6,7 @@ import ipsis.woot.crafting.fluidconvertor.FluidConvertorRecipe;
 import ipsis.woot.mod.ModNBT;
 import ipsis.woot.modules.fluidconvertor.FluidConvertorConfiguration;
 import ipsis.woot.modules.fluidconvertor.FluidConvertorSetup;
+import ipsis.woot.modules.infuser.InfuserSetup;
 import ipsis.woot.util.WootDebug;
 import ipsis.woot.util.WootFluidTank;
 import ipsis.woot.util.WootMachineBlockEntity;
@@ -26,6 +27,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.energy.EnergyStorage;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
@@ -42,32 +44,34 @@ import java.util.Optional;
 
 public class FluidConvertorBlockEntity extends WootMachineBlockEntity implements WootDebug, MenuProvider {
 
+    static final int INPUT_SLOT = 0;
     public FluidConvertorBlockEntity(BlockPos pos, BlockState state) {
         super(FluidConvertorSetup.FLUID_CONVERTOR_BLOCK_TILE.get(), pos, state);
+        stackInputHandler = new ItemStackHandler(1)
+        {
+            @Override
+            protected void onContentsChanged(int slot) {
+                FluidConvertorBlockEntity.this.onContentsChanged(slot);
+                setChanged();
+            }
+
+            public boolean isItemValidForSlot(int slot, @Nonnull ItemStack stack) {
+                if (slot == INPUT_SLOT)
+                    return FluidConvertorRecipe.isValidCatalyst(stack);
+                return false;
+            }
+
+            @Nonnull
+            @Override
+            public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
+                if (!isItemValidForSlot(slot, stack))
+                    return stack;
+                return super.insertItem(slot, stack, simulate);
+            }
+        };
     }
 
-    public final ItemStackHandler inventory = new ItemStackHandler(1)
-    {
-        @Override
-        protected void onContentsChanged(int slot) {
-            FluidConvertorBlockEntity.this.onContentsChanged(slot);
-            setChanged();
-        }
 
-        public boolean isItemValidForSlot(int slot, @Nonnull ItemStack stack) {
-            if (slot == INPUT_SLOT)
-                return FluidConvertorRecipe.isValidCatalyst(stack);
-            return false;
-        }
-
-        @Nonnull
-        @Override
-        public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
-            if (!isItemValidForSlot(slot, stack))
-                return stack;
-            return super.insertItem(slot, stack, simulate);
-        }
-    };
 
     public void configureSides() {
         Direction direction = level.getBlockState(getBlockPos()).getValue(BlockStateProperties.HORIZONTAL_FACING);
@@ -122,7 +126,7 @@ public class FluidConvertorBlockEntity extends WootMachineBlockEntity implements
         if (!level.isClientSide)
             return;
 
-        if (outputTank.map(WootFluidTank::isEmpty).orElse(true))
+        if (fluidOutputHandler.isEmpty())
             return;
 
         for (Direction direction : Direction.values()) {
@@ -137,10 +141,10 @@ public class FluidConvertorBlockEntity extends WootMachineBlockEntity implements
             Optional<IFluidHandler> lazyOptional = Optional.ofNullable(level.getCapability(Capabilities.FluidHandler.BLOCK, te.getBlockPos(), direction.getOpposite()));
             if (lazyOptional.isPresent()) {
                 IFluidHandler iFluidHandler = lazyOptional.orElseThrow(NullPointerException::new);
-                FluidStack fluidStack = outputTank.map(WootFluidTank::getFluid).orElse(FluidStack.EMPTY);
+                FluidStack fluidStack = fluidOutputHandler.getFluid();
                 if (!fluidStack.isEmpty()) {
                     int filled = iFluidHandler.fill(fluidStack, IFluidHandler.FluidAction.EXECUTE);
-                    outputTank.ifPresent(f -> f.internalDrain(filled, IFluidHandler.FluidAction.EXECUTE));
+                    fluidOutputHandler.drain(filled, IFluidHandler.FluidAction.EXECUTE);
                     setChanged();
                 }
             }
@@ -148,82 +152,25 @@ public class FluidConvertorBlockEntity extends WootMachineBlockEntity implements
     }
 
     //-------------------------------------------------------------------------
-    //region Tanks
-    private Optional<FluidTank> inputTank = Optional.of(this.createInputTank());
-    private Optional<WootFluidTank> outputTank = Optional.of(this.createOutputTank());
-    private FluidTank createInputTank() {
-        return new FluidTank(FluidConvertorConfiguration.FLUID_CONV_INPUT_TANK_CAPACITY.get());
-    }
-    private WootFluidTank createOutputTank() {
-        return new WootFluidTank(FluidConvertorConfiguration.FLUID_CONV_OUTPUT_TANK_CAPACITY.get()).setAccess(false, true);
-    }
 
-    public FluidStack getInputTankFluid() { return inputTank.map(h -> h.getFluid()).orElse(FluidStack.EMPTY); }
-    public FluidStack getOutputTankFluid() { return outputTank.map(h -> h.getFluid()).orElse(FluidStack.EMPTY); }
+
+    public FluidStack getInputTankFluid() { return fluidInputHandler.getFluid(); }
+    public FluidStack getOutputTankFluid() { return fluidOutputHandler.getFluid(); }
     //endregion
 
     //-------------------------------------------------------------------------
-    //region Energy
-    private Optional<EnergyStorage> energyStorage = Optional.of(this.createEnergy());
-    private EnergyStorage createEnergy() {
-        return new EnergyStorage(FluidConvertorConfiguration.FLUID_CONV_MAX_ENERGY.get(), FluidConvertorConfiguration.FLUID_CONV_MAX_ENERGY_RX.get());
-    }
 
     public int getEnergy() {
-        return energyStorage.map(h -> h.getEnergyStored()).orElse(0);
+        return energyStorage.getEnergyStored();
     }
     //endregion
 
     //-------------------------------------------------------------------------
-    //region Inventory
-    public static final int INPUT_SLOT = 0;
-    private final Optional<IItemHandler> inventoryGetter = Optional.of(inventory);
-    public IItemHandler getInventory() { return inventory; }
+
     //endregion
 
     //-------------------------------------------------------------------------
-
-
-    @Override
-    public void loadAdditional( CompoundTag tag, HolderLookup.Provider registries) {
-        if (tag.contains(ModNBT.INPUT_INVENTORY_TAG))
-            inventory.deserializeNBT(registries, tag.getCompound(ModNBT.INPUT_INVENTORY_TAG));
-
-        CompoundTag inputTankTag = tag.getCompound(ModNBT.INPUT_TANK_TAG);
-        inputTank.ifPresent(h -> h.readFromNBT(registries, inputTankTag));
-
-        CompoundTag outputTankTag = tag.getCompound(ModNBT.OUTPUT_TANK_TAG);
-        outputTank.ifPresent(h -> h.setFluid(FluidStack.parse(registries, outputTankTag).get()));
-
-        CompoundTag energyTag = tag.getCompound(ModNBT.ENERGY_TAG);
-        energyStorage.ifPresent(h -> h.deserializeNBT(registries, energyTag));
-        super.loadAdditional(tag, registries);
-    }
-
-
-
-    @Override
-    public void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-
-        tag.put(ModNBT.INPUT_INVENTORY_TAG, inventory.serializeNBT(registries));
-
-        inputTank.ifPresent(h -> {
-            CompoundTag tankTag = h.writeToNBT(registries, new CompoundTag());
-            tag.put(ModNBT.INPUT_TANK_TAG, tankTag);
-        });
-
-        outputTank.ifPresent(h -> {
-            CompoundTag tankTag = (CompoundTag)h.getFluid().save(registries);
-            tag.put(ModNBT.OUTPUT_TANK_TAG, tankTag);
-        });
-
-        energyStorage.ifPresent(h -> {
-            CompoundTag energyTag = (CompoundTag)h.serializeNBT(registries);
-            tag.put(ModNBT.ENERGY_TAG, energyTag);
-        });
-
-        super.saveAdditional(tag, registries);
-    }
+    
     //endregion
 
     //-------------------------------------------------------------------------
@@ -258,12 +205,12 @@ public class FluidConvertorBlockEntity extends WootMachineBlockEntity implements
 
     @Override
     protected boolean hasEnergy() {
-        return energyStorage.map(e -> e.getEnergyStored() > 0).orElse(false);
+        return energyStorage.getEnergyStored() > 0;
     }
 
     @Override
     protected int useEnergy() {
-        return energyStorage.map(e -> e.extractEnergy(FluidConvertorConfiguration.FLUID_CONV_ENERYG_PER_TICK.get(), false)).orElse(0);
+        return energyStorage.extractEnergy(FluidConvertorConfiguration.FLUID_CONV_ENERYG_PER_TICK.get(), false);
     }
 
     @Override
@@ -285,21 +232,21 @@ public class FluidConvertorBlockEntity extends WootMachineBlockEntity implements
 
         FluidConvertorRecipe finishedRecipe = currRecipe;
 
-        inventory.extractItem(INPUT_SLOT, finishedRecipe.getCatalystCount(), false);
-        inputTank.ifPresent(f -> f.drain(finishedRecipe.getInputFluid().getAmount(),
-                IFluidHandler.FluidAction.EXECUTE));
+        stackInputHandler.extractItem(0, finishedRecipe.getCatalystCount(), false);
+        fluidInputHandler.drain(finishedRecipe.getInputFluid().getAmount(),
+                IFluidHandler.FluidAction.EXECUTE);
 
-        outputTank.ifPresent(f -> f.internalFill(finishedRecipe.getOutput().copy(), IFluidHandler.FluidAction.EXECUTE));
+        fluidOutputHandler.fill(finishedRecipe.getOutput().copy(), IFluidHandler.FluidAction.EXECUTE);
         setChanged();
     }
 
     @Override
     protected boolean canStart() {
 
-        if (energyStorage.map(f -> f.getEnergyStored() <= 0).orElse(true))
+        if (energyStorage.getEnergyStored() <= 0)
             return false;
 
-        if (inputTank.map(f -> f.isEmpty()).orElse(true))
+        if (fluidInputHandler.isEmpty())
             return false;
 
         getRecipe();
@@ -308,11 +255,11 @@ public class FluidConvertorBlockEntity extends WootMachineBlockEntity implements
             return false;
 
         // Only start if we have enough of the catalyst
-        if (inventory.getStackInSlot(INPUT_SLOT).getCount() < currRecipe.getCatalystCount())
+        if (stackInputHandler.getStackInSlot(INPUT_SLOT).getCount() < currRecipe.getCatalystCount())
             return false;
 
         // Only start if we have enough input fluid
-        FluidStack inFluid = inputTank.map(h -> h.getFluid()).orElse(FluidStack.EMPTY);
+        FluidStack inFluid = fluidInputHandler.getFluid();
         if (inFluid.isEmpty())
             return false;
 
@@ -320,16 +267,10 @@ public class FluidConvertorBlockEntity extends WootMachineBlockEntity implements
             return false;
 
         // Only start if we can hold the output
-        if (outputTank.map(h -> {
-            int amount = currRecipe.getOutput().getAmount();
-            int filled = h.internalFill(new FluidStack(currRecipe.outputFluid().getFluidHolder(), amount), IFluidHandler.FluidAction.SIMULATE);
-            return amount == filled;
-        }).orElse(false)) {
-            // tank can hold the new output fluid
-            return true;
-        }
+        int amount = currRecipe.getOutput().getAmount();
+        int filled = fluidOutputHandler.fill(new FluidStack(currRecipe.outputFluid().getFluidHolder(), amount), IFluidHandler.FluidAction.SIMULATE);
+        return amount == filled;
 
-        return false;
     }
 
     @Override
@@ -342,11 +283,11 @@ public class FluidConvertorBlockEntity extends WootMachineBlockEntity implements
             return false;
 
         // Only valid if we have enough of the catalyst
-        if (inventory.getStackInSlot(INPUT_SLOT).getCount() < currRecipe.getCatalystCount())
+        if (stackInputHandler.getStackInSlot(INPUT_SLOT).getCount() < currRecipe.getCatalystCount())
             return false;
 
         // Only valid if we have enough input fluid
-        FluidStack inFluid = inputTank.map(h -> h.getFluid()).orElse(FluidStack.EMPTY);
+        FluidStack inFluid = fluidInputHandler.getFluid();
         if (inFluid.isEmpty())
             return false;
 
@@ -368,12 +309,12 @@ public class FluidConvertorBlockEntity extends WootMachineBlockEntity implements
     private void getRecipe() {
         clearRecipe();
 
-        FluidStack inFluid = inputTank.map(h -> h.getFluid()).orElse(FluidStack.EMPTY);
+        FluidStack inFluid = fluidInputHandler.getFluid();
         if (inFluid.isEmpty()) {
             return;
         }
 
-        ItemStack catalyst = inventory.getStackInSlot(INPUT_SLOT);
+        ItemStack catalyst = stackInputHandler.getStackInSlot(INPUT_SLOT);
         if (catalyst.isEmpty()) {
             return;
         }
@@ -391,10 +332,10 @@ public class FluidConvertorBlockEntity extends WootMachineBlockEntity implements
     public void dropContents(Level world, BlockPos pos) {
 
         List<ItemStack> drops = new ArrayList<>();
-        ItemStack itemStack = inventory.getStackInSlot(INPUT_SLOT);
+        ItemStack itemStack = stackInputHandler.getStackInSlot(INPUT_SLOT);
         if (!itemStack.isEmpty()) {
             drops.add(itemStack);
-            inventory.insertItem(INPUT_SLOT, ItemStack.EMPTY, false);
+            stackInputHandler.insertItem(INPUT_SLOT, ItemStack.EMPTY, false);
         }
         super.dropContents(drops);
     }
@@ -402,6 +343,24 @@ public class FluidConvertorBlockEntity extends WootMachineBlockEntity implements
     @Override
     public @org.jetbrains.annotations.Nullable AbstractContainerMenu createMenu(int i, Inventory inventory, Player player) {
         return new FluidConvertorMenu(i, inventory, this);
+    }
+
+    public static void registerCapabilities(RegisterCapabilitiesEvent event){
+        event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK,
+                FluidConvertorSetup.FLUID_CONVERTOR_BLOCK_TILE.get(),
+                (be, direction) -> be.energyStorage);
+        event.registerBlockEntity(Capabilities.FluidHandler.BLOCK,
+                FluidConvertorSetup.FLUID_CONVERTOR_BLOCK_TILE.get(),
+                (be, direction) -> {
+                    if(direction == be.getBlockState().getValue(BlockStateProperties.HORIZONTAL_FACING).getClockWise() || direction == Direction.DOWN){
+                        return be.fluidOutputHandler;
+                    }
+                    return be.fluidInputHandler;
+                });
+
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK,
+                FluidConvertorSetup.FLUID_CONVERTOR_BLOCK_TILE.get(),
+                (be, direction) -> be.stackInputHandler);
     }
 
 }

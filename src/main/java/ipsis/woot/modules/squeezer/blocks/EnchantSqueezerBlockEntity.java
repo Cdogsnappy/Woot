@@ -30,6 +30,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.items.IItemHandler;
@@ -119,13 +120,9 @@ public class EnchantSqueezerBlockEntity extends WootMachineBlockEntity implement
 
     //-------------------------------------------------------------------------
     //region Energy
-    private Optional<WootEnergyStorage> energyStorage = Optional.of(createEnergy());
-    private WootEnergyStorage createEnergy() {
-        return new WootEnergyStorage(SqueezerConfiguration.ENCH_SQUEEZER_MAX_ENERGY.get(), SqueezerConfiguration.ENCH_SQUEEZER_MAX_ENERGY_RX.get());
-    }
 
-    public int getEnergy() { return energyStorage.map(h -> h.getEnergyStored()).orElse(0); }
-    public void setEnergy(int v) { energyStorage.ifPresent(h -> h.setEnergy(v)); }
+
+    public int getEnergy() { return energyStorage.getEnergyStored(); }
     //endregion
 
     //-------------------------------------------------------------------------
@@ -152,8 +149,6 @@ public class EnchantSqueezerBlockEntity extends WootMachineBlockEntity implement
         CompoundTag tankTag = tag.getCompound(ModNBT.OUTPUT_TANK_TAG);
         outputTank.ifPresent(h -> h.setFluid(FluidStack.parse(registries, tankTag).get()));
 
-        CompoundTag energyTag = tag.getCompound(ModNBT.ENERGY_TAG);
-        energyStorage.ifPresent(h -> h.deserializeNBT(registries, energyTag));
     }
 
     @Override
@@ -161,14 +156,12 @@ public class EnchantSqueezerBlockEntity extends WootMachineBlockEntity implement
         tag.put(ModNBT.INPUT_INVENTORY_TAG, inventory.serializeNBT(registries));
 
         outputTank.ifPresent(h -> {
-            CompoundTag tankTag = (CompoundTag)h.getFluid().save(registries);
-            tag.put(ModNBT.OUTPUT_TANK_TAG, tankTag);
+            if(!h.getFluid().isEmpty()) {
+                CompoundTag tankTag = (CompoundTag) h.getFluid().save(registries);
+                tag.put(ModNBT.OUTPUT_TANK_TAG, tankTag);
+            }
         });
 
-        energyStorage.ifPresent(h -> {
-            CompoundTag energyTag = (CompoundTag)h.serializeNBT(registries);
-            tag.put(ModNBT.ENERGY_TAG, energyTag);
-        });
 
         super.saveAdditional(tag, registries);
     }
@@ -200,12 +193,12 @@ public class EnchantSqueezerBlockEntity extends WootMachineBlockEntity implement
 
     @Override
     protected boolean hasEnergy() {
-        return energyStorage.map(e -> e.getEnergyStored() > 0).orElse(false);
+        return energyStorage.getEnergyStored() > 0;
     }
 
     @Override
     protected int useEnergy() {
-        return energyStorage.map(e -> e.extractEnergy(SqueezerConfiguration.ENCH_SQUEEZER_ENERGY_PER_TICK.get(), false)).orElse(0);
+        return energyStorage.extractEnergy(SqueezerConfiguration.ENCH_SQUEEZER_ENERGY_PER_TICK.get(), false);
     }
 
     @Override
@@ -239,7 +232,7 @@ public class EnchantSqueezerBlockEntity extends WootMachineBlockEntity implement
     @Override
     protected boolean canStart() {
 
-        if (energyStorage.map(f -> f.getEnergyStored() <= 0).orElse((true)))
+        if (energyStorage.getEnergyStored() <= 0)
             return false;
 
         ItemStack itemStack = inventory.getStackInSlot(INPUT_SLOT);
@@ -333,5 +326,18 @@ public class EnchantSqueezerBlockEntity extends WootMachineBlockEntity implement
     @Override
     public @org.jetbrains.annotations.Nullable AbstractContainerMenu createMenu(int i, Inventory inventory, Player player) {
         return new EnchantSqueezerMenu(i, inventory, this);
+    }
+
+    public static void registerCapabilities(RegisterCapabilitiesEvent event){
+        event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK,
+                SqueezerSetup.ENCHANT_SQUEEZER_BLOCK_TILE.get(),
+                (be, side) -> be.energyStorage);
+
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK,
+                SqueezerSetup.ENCHANT_SQUEEZER_BLOCK_TILE.get(),
+                (be, side) -> be.stackInputHandler);
+        event.registerBlockEntity(Capabilities.FluidHandler.BLOCK,
+                SqueezerSetup.ENCHANT_SQUEEZER_BLOCK_TILE.get(),
+                (be, side) -> be.fluidOutputHandler);
     }
 }

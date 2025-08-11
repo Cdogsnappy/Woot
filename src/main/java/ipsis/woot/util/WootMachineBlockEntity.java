@@ -1,9 +1,13 @@
 package ipsis.woot.util;
 
+import ipsis.woot.mod.ModNBT;
 import ipsis.woot.modules.factory.FactorySetup;
 import ipsis.woot.util.helper.WorldHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.world.Containers;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -11,6 +15,13 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.energy.EnergyStorage;
+import net.neoforged.neoforge.energy.IEnergyStorage;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
+import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.items.ItemStackHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -34,6 +45,16 @@ public class WootMachineBlockEntity extends BlockEntity {
 
     protected static final Logger LOGGER = LogManager.getLogger();
 
+    public IEnergyStorage energyStorage = new WootEnergyStorage(10000);
+
+    public ItemStackHandler stackInputHandler = new ItemStackHandler();
+
+    public ItemStackHandler stackOutputHandler = new ItemStackHandler();
+
+    public FluidTank fluidInputHandler = new FluidTank(5000);
+
+    public FluidTank fluidOutputHandler = new FluidTank(5000);
+
     public WootMachineBlockEntity(BlockPos pos, BlockState state) {
         super(FactorySetup.WOOT_MACHINE_ENTITY.get(), pos, state);
         for (Direction direction : Direction.values())
@@ -45,6 +66,37 @@ public class WootMachineBlockEntity extends BlockEntity {
         for (Direction direction : Direction.values())
             settings.put(direction, Mode.NONE);
     }
+
+    @Override
+    public void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        tag.putInt(ModNBT.ENERGY_TAG, energyStorage.getEnergyStored());
+        tag.put(ModNBT.INPUT_INVENTORY_TAG, stackInputHandler.serializeNBT(registries));
+        tag.put(ModNBT.OUTPUT_INVENTORY_TAG, stackOutputHandler.serializeNBT(registries));
+        tag.put(ModNBT.INPUT_TANK_TAG, fluidInputHandler.writeToNBT(registries, new CompoundTag()));
+        tag.put(ModNBT.OUTPUT_TANK_TAG, fluidOutputHandler.writeToNBT(registries, new CompoundTag()));
+        super.saveAdditional(tag, registries);
+    }
+
+    @Override
+    public void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        if(tag.contains(ModNBT.ENERGY_TAG)) {
+            energyStorage = new WootEnergyStorage(10000, 1000, 1000, tag.getInt(ModNBT.ENERGY_TAG));
+        }
+        if(tag.contains(ModNBT.INPUT_INVENTORY_TAG)){
+            stackInputHandler.deserializeNBT(registries, tag.getCompound(ModNBT.INPUT_INVENTORY_TAG));
+        }
+        if(tag.contains(ModNBT.OUTPUT_INVENTORY_TAG)){
+            stackOutputHandler.deserializeNBT(registries, tag.getCompound(ModNBT.OUTPUT_INVENTORY_TAG));
+        }
+        if(tag.contains(ModNBT.INPUT_TANK_TAG)){
+            fluidInputHandler.readFromNBT(registries, tag.getCompound(ModNBT.INPUT_TANK_TAG));
+        }
+        if(tag.contains(ModNBT.OUTPUT_TANK_TAG)){
+            fluidOutputHandler.readFromNBT(registries, tag.getCompound(ModNBT.OUTPUT_TANK_TAG));
+        }
+        super.loadAdditional(tag, registries);
+    }
+
 
 
     public void tick(Level level) {
@@ -174,6 +226,7 @@ public class WootMachineBlockEntity extends BlockEntity {
         setChanged();
         WorldHelper.updateClient(level, getBlockPos());
     }
+
 
 
 

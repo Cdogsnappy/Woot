@@ -14,12 +14,15 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.common.property.Properties;
+import net.neoforged.neoforge.energy.IEnergyStorage;
 import org.jetbrains.annotations.Nullable;
 
 public class WootBaseEntityBlock extends Block implements EntityBlock {
     public WootBaseEntityBlock(BlockBehaviour.Properties prop) {
         super(prop);
     }
+
+
 
     @Override
     public @Nullable BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {

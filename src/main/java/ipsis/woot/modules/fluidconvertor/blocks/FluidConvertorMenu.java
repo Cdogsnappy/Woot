@@ -39,7 +39,7 @@ public class FluidConvertorMenu extends WootContainer implements TankPacketHandl
         tileEntity = (FluidConvertorBlockEntity) entity;
         this.player = playerInventory.player;
 
-        addOwnSlots(tileEntity.inventory);
+        addOwnSlots(tileEntity.stackInputHandler);
         addPlayerSlots(playerInventory);
         addListeners();
     }
@@ -85,7 +85,7 @@ public class FluidConvertorMenu extends WootContainer implements TankPacketHandl
 
 
     public void addListeners() {
-        addIntegerListener(new DataSlot() {
+        addDataSlot(new DataSlot() {
             @Override
             public int get() { return tileEntity.getEnergy(); }
 
@@ -93,7 +93,7 @@ public class FluidConvertorMenu extends WootContainer implements TankPacketHandl
             public void set(int i) { energy = i; }
         });
 
-        addShortListener(new DataSlot() {
+        addDataSlot(new DataSlot() {
             @Override
             public int get() { return tileEntity.getProgress(); }
 

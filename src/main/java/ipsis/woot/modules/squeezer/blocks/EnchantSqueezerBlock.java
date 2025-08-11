@@ -14,6 +14,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.MenuProvider;
+import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -61,20 +62,18 @@ public class EnchantSqueezerBlock extends WootBaseEntityBlock implements WootDeb
     @Override
     public ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos,
                                            Player player, InteractionHand hand, BlockHitResult hitResult) {
-        if (!level.isClientSide)
+        if (level.isClientSide)
             return ItemInteractionResult.SUCCESS;
 
-        if (!(level.getBlockEntity(pos) instanceof EnchantSqueezerBlockEntity))
+        if (!(level.getBlockEntity(pos) instanceof EnchantSqueezerBlockEntity squeezer))
             throw new IllegalStateException("Tile entity is missing");
-
-        EnchantSqueezerBlockEntity squeezer = (EnchantSqueezerBlockEntity) level.getBlockEntity(pos);
 
         if (FluidUtil.getFluidHandler(stack).isPresent())
             return FluidUtil.interactWithFluidHandler(player, hand, level, pos, null) ? ItemInteractionResult.SUCCESS : ItemInteractionResult.FAIL;
 
         // open the gui
-        if (squeezer instanceof MenuProvider)
-            player.openMenu(squeezer, squeezer.getBlockPos());
+        if (squeezer != null)
+            player.openMenu(new SimpleMenuProvider(squeezer, Component.literal("")), squeezer.getBlockPos());
         else
             throw new IllegalStateException("Named container provider is missing");
 

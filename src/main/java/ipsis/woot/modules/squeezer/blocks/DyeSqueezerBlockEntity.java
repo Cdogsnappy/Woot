@@ -22,6 +22,7 @@ import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.item.crafting.SingleRecipeInput;
@@ -29,7 +30,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.energy.EnergyStorage;
+import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.items.IItemHandler;
@@ -50,30 +53,31 @@ public class DyeSqueezerBlockEntity extends WootMachineBlockEntity implements Wo
     private int blue = 0;
     private int white = 0;
 
+
+
     public DyeSqueezerBlockEntity(BlockPos pos, BlockState state) {
         super(SqueezerSetup.SQUEEZER_BLOCK_TILE.get(), pos, state);
-    }
-
-    public final ItemStackHandler inventory = new ItemStackHandler(1)
-    {
-        @Override
-        protected void onContentsChanged(int slot) {
+        this.stackInputHandler = new ItemStackHandler(1)
+        {
+            @Override
+            protected void onContentsChanged(int slot) {
             DyeSqueezerBlockEntity.this.onContentsChanged(slot);
             setChanged();
         }
 
-        public boolean isItemValidForSlot(int slot, @Nonnull ItemStack stack) {
+            public boolean isItemValidForSlot(int slot, @Nonnull ItemStack stack) {
             return slot == 0 ? DyeSqueezerRecipe.isValidInput(stack) : false;
         }
 
-        @Nonnull
-        @Override
-        public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
+            @Nonnull
+            @Override
+            public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
             if (!isItemValidForSlot(slot, stack))
                 return stack;
             return super.insertItem(slot, stack, simulate);
         }
-    };
+        };
+    }
 
     @Override
     public void onLoad() {
@@ -83,28 +87,23 @@ public class DyeSqueezerBlockEntity extends WootMachineBlockEntity implements Wo
 
     //-------------------------------------------------------------------------
     //region Tanks
-    private Optional<WootFluidTank> outputTank = Optional.of(this.createTank());
+    private WootFluidTank outputTank = this.createTank();
     private WootFluidTank createTank() {
         return new WootFluidTank(SqueezerConfiguration.DYE_SQUEEZER_TANK_CAPACITY.get(), h -> h.is(new FluidStack(FluidSetup.PUREDYE_FLUID.get(), 1).getFluidType())).setAccess(false, true);
     }
-    public FluidStack getOutputTankFluid() { return outputTank.map(h -> h.getFluid()).orElse(FluidStack.EMPTY); }
+    public FluidStack getOutputTankFluid() { return outputTank.getFluid(); }
     //endregion
 
     //-------------------------------------------------------------------------
     //region Energy
-    private Optional<WootEnergyStorage> energyStorage = Optional.of(this.createEnergy());
-    private WootEnergyStorage createEnergy() {
-        return new WootEnergyStorage(SqueezerConfiguration.DYE_SQUEEZER_MAX_ENERGY.get());
-    }
 
-    public int getEnergy() { return energyStorage.map(EnergyStorage::getEnergyStored).orElse(0); }
+
+
+    public int getEnergy() { return energyStorage.getEnergyStored(); }
     //endregion
 
     //-------------------------------------------------------------------------
     //region Inventory
-    public static int INPUT_SLOT = 0;
-    private final Optional<IItemHandler> inventoryGetter = Optional.of(inventory);
-    public IItemHandler getInventory() { return inventory; }
     //endregion
 
     //-------------------------------------------------------------------------
@@ -119,16 +118,10 @@ public class DyeSqueezerBlockEntity extends WootMachineBlockEntity implements Wo
 
     private void readFromNBT(CompoundTag tag, HolderLookup.Provider registries) {
 
-        if (tag.contains(ModNBT.INPUT_INVENTORY_TAG))
-            inventory.deserializeNBT(registries, tag.getCompound(ModNBT.INPUT_INVENTORY_TAG));
 
         CompoundTag tankTag = tag.getCompound(ModNBT.OUTPUT_TANK_TAG);
         FluidStack fluidStack = FluidStack.parseOptional(registries, tankTag);
-        outputTank.get().setFluid(fluidStack);
-
-        CompoundTag energyTag = tag.getCompound(ModNBT.ENERGY_TAG);
-        int cap = SqueezerConfiguration.DYE_SQUEEZER_MAX_ENERGY.get();
-        energyStorage = Optional.of(new WootEnergyStorage(cap, cap, cap, energyTag.getInt("energy")));
+        outputTank.setFluid(fluidStack);
 
         if (tag.contains(ModNBT.DyeSqueezer.INTERNAL_DYE_TANKS_TAG)) {
             CompoundTag dyeTag = tag.getCompound(ModNBT.DyeSqueezer.INTERNAL_DYE_TANKS_TAG);
@@ -147,19 +140,14 @@ public class DyeSqueezerBlockEntity extends WootMachineBlockEntity implements Wo
 
     @Override
     public void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        tag.put(ModNBT.INPUT_INVENTORY_TAG,
-                inventory.serializeNBT(registries));
 
-        outputTank.ifPresent(h -> {
-            Tag tankTag = h.getFluid().save(registries);
+        if(!outputTank.getFluid().isEmpty()) {
+            Tag tankTag = outputTank.getFluid().save(registries);
             tag.put(ModNBT.OUTPUT_TANK_TAG, tankTag);
-        });
+        }
 
-        energyStorage.ifPresent(h -> {
-            CompoundTag energyTag = new CompoundTag();
-            energyTag.putInt("energy", h.getEnergyStored());
-            tag.put(ModNBT.ENERGY_TAG, energyTag);
-        });
+
+
 
         CompoundTag dyeTag = new CompoundTag();
         dyeTag.putInt(ModNBT.DyeSqueezer.RED_TAG, red);
@@ -207,7 +195,7 @@ public class DyeSqueezerBlockEntity extends WootMachineBlockEntity implements Wo
         if (level.getGameTime() % 20 == 0)
             generatePureFluid();
 
-        if (outputTank.map(WootFluidTank::isEmpty).orElse(true))
+        if (outputTank.isEmpty())
             return;
 
 
@@ -219,10 +207,10 @@ public class DyeSqueezerBlockEntity extends WootMachineBlockEntity implements Wo
             Optional<IFluidHandler> lazyOptional = Optional.ofNullable(level.getCapability(Capabilities.FluidHandler.BLOCK,te.getBlockPos(), direction.getOpposite()));
             if (lazyOptional.isPresent()) {
                 IFluidHandler iFluidHandler = lazyOptional.orElseThrow(NullPointerException::new);
-                FluidStack fluidStack = outputTank.map(WootFluidTank::getFluid).orElse(FluidStack.EMPTY);
+                FluidStack fluidStack = outputTank.getFluid();
                 if (!fluidStack.isEmpty()) {
                     int filled = iFluidHandler.fill(fluidStack, IFluidHandler.FluidAction.EXECUTE);
-                    outputTank.ifPresent(f -> f.internalDrain(filled, IFluidHandler.FluidAction.EXECUTE));
+                    outputTank.internalDrain(filled, IFluidHandler.FluidAction.EXECUTE);
                     setChanged();
                 }
             }
@@ -231,12 +219,12 @@ public class DyeSqueezerBlockEntity extends WootMachineBlockEntity implements Wo
 
     @Override
     protected boolean hasEnergy() {
-        return energyStorage.map(e -> e.getEnergyStored() > 0).orElse(false);
+        return energyStorage.getEnergyStored() > 0;
     }
 
     @Override
     protected int useEnergy() {
-        return energyStorage.map(e -> e.extractEnergy(SqueezerConfiguration.DYE_SQUEEZER_ENERGY_PER_TICK.get(), false)).orElse(0);
+        return energyStorage.extractEnergy(SqueezerConfiguration.DYE_SQUEEZER_ENERGY_PER_TICK.get(), false);
     }
 
     @Override
@@ -250,16 +238,14 @@ public class DyeSqueezerBlockEntity extends WootMachineBlockEntity implements Wo
     }
 
     private void generatePureFluid() {
-        outputTank.ifPresent(f -> {
             while (canCreateOutput() && canStoreOutput()) {
-                f.internalFill(new FluidStack(FluidSetup.PUREDYE_FLUID.get(), DyeMakeup.LCM * 4), IFluidHandler.FluidAction.EXECUTE);
+                outputTank.internalFill(new FluidStack(FluidSetup.PUREDYE_FLUID.get(), DyeMakeup.LCM * 4), IFluidHandler.FluidAction.EXECUTE);
                 red -= DyeMakeup.LCM;
                 yellow -= DyeMakeup.LCM;
                 blue -= DyeMakeup.LCM;
                 white -= DyeMakeup.LCM;
                 setChanged();
             }
-        });
     }
 
     @Override
@@ -283,7 +269,7 @@ public class DyeSqueezerBlockEntity extends WootMachineBlockEntity implements Wo
         blue = Math.clamp(blue, 0, SqueezerConfiguration.DYE_SQUEEZER_INTERNAL_FLUID_MAX.get());
         white = Math.clamp(white, 0, SqueezerConfiguration.DYE_SQUEEZER_INTERNAL_FLUID_MAX.get());
 
-        inventory.extractItem(INPUT_SLOT, 1, false);
+        stackInputHandler.extractItem(0, 1, false);
         generatePureFluid();
         setChanged();
     }
@@ -291,10 +277,10 @@ public class DyeSqueezerBlockEntity extends WootMachineBlockEntity implements Wo
     @Override
     protected boolean canStart() {
 
-        if (energyStorage.map(f -> f.getEnergyStored() <= 0).orElse(true))
+        if (energyStorage.getEnergyStored() <= 0)
             return false;
 
-        if (inventory.getStackInSlot(INPUT_SLOT).isEmpty())
+        if (stackInputHandler.getStackInSlot(0).isEmpty())
             return false;
 
         getRecipe();
@@ -315,7 +301,7 @@ public class DyeSqueezerBlockEntity extends WootMachineBlockEntity implements Wo
         if (currRecipe == null)
             return false;
 
-        if (inventory.getStackInSlot(INPUT_SLOT).isEmpty())
+        if (stackInputHandler.getStackInSlot(0).isEmpty())
             return false;
 
         // stack count is always 1
@@ -330,7 +316,7 @@ public class DyeSqueezerBlockEntity extends WootMachineBlockEntity implements Wo
 
     private void getRecipe() {
         currRecipe = level.getRecipeManager().getRecipeFor(WootRecipes.DYE_SQUEEZER_TYPE.get(),
-                new SingleRecipeInput(getInventory().getStackInSlot(INPUT_SLOT)),
+                new SingleRecipeInput(stackInputHandler.getStackInSlot(0)),
                 level).get().value();
     }
 
@@ -353,23 +339,23 @@ public class DyeSqueezerBlockEntity extends WootMachineBlockEntity implements Wo
     }
 
     private boolean canCreateOutput() { return red >= DyeMakeup.LCM && yellow >= DyeMakeup.LCM && blue >= DyeMakeup.LCM && white >= DyeMakeup.LCM; }
-    private boolean canStoreOutput() { return outputTank.map(h -> h.internalFill(new FluidStack(FluidSetup.PUREDYE_FLUID.get(), DyeMakeup.LCM * 4), IFluidHandler.FluidAction.SIMULATE ) == DyeMakeup.LCM * 4).orElse(false); }
+    private boolean canStoreOutput() { return outputTank.internalFill(new FluidStack(FluidSetup.PUREDYE_FLUID.get(), DyeMakeup.LCM * 4), IFluidHandler.FluidAction.SIMULATE ) == DyeMakeup.LCM * 4; }
 
 
 
     public void dropContents(Level level, BlockPos pos) {
 
         List<ItemStack> drops = new ArrayList<>();
-        ItemStack itemStack = inventory.getStackInSlot(INPUT_SLOT).copy();
+        ItemStack itemStack = stackInputHandler.getStackInSlot(0).copy();
         if (!itemStack.isEmpty()) {
             drops.add(itemStack);
-            inventory.insertItem(INPUT_SLOT, ItemStack.EMPTY, false);
+            stackInputHandler.insertItem(0, ItemStack.EMPTY, false);
         }
         super.dropContents(drops);
     }
 
     public TankPacket getOutputTankPacket() {
-        return new TankPacket(outputTank.map(f -> f.getFluid()).orElse(FluidStack.EMPTY), 0);
+        return new TankPacket(outputTank.getFluid(), 1);
     }
 
     private boolean dumpExcess = false;
@@ -381,12 +367,25 @@ public class DyeSqueezerBlockEntity extends WootMachineBlockEntity implements Wo
     public List<String> getDebugText(List<String> debug, UseOnContext itemUseContext) {
         debug.add("====> SqueezerTileEntity");
         debug.add("      r:" + red + " y:" + yellow + " b:" + blue + " w:" + white);
-        outputTank.ifPresent(h -> debug.add("     p:" + h.getFluidAmount()));
         return debug;
     }
 
     @Override
     public @org.jetbrains.annotations.Nullable AbstractContainerMenu createMenu(int i, Inventory inventory, Player player) {
         return new DyeSqueezerContainer(i, inventory, this);
+    }
+
+    public static void registerCapabilities(RegisterCapabilitiesEvent event){
+        event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK,
+                SqueezerSetup.SQUEEZER_BLOCK_TILE.get(),
+                (be, side) -> be.energyStorage);
+
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK,
+                SqueezerSetup.SQUEEZER_BLOCK_TILE.get(),
+                (be, side) -> be.stackInputHandler);
+
+        event.registerBlockEntity(Capabilities.FluidHandler.BLOCK,
+                SqueezerSetup.SQUEEZER_BLOCK_TILE.get(),
+                (be, side) -> be.fluidOutputHandler);
     }
 }

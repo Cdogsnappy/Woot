@@ -50,12 +50,9 @@ public class InfuserMenu extends WootContainer implements TankPacketHandler {
     }
 
     private void addOwnSlots() {
-        IItemHandler handler = Capabilities.ItemHandler.BLOCK.getCapability(this.blockEntity.getLevel(), this.blockEntity.getBlockPos(), this.blockEntity.getBlockState(),
-                this.blockEntity, null);
-
-                addSlot(new SlotItemHandler(handler, 0, 46, 40));
-                addSlot(new SlotItemHandler(handler, 1, 64, 40));
-                addSlot(new SlotItemHandler(handler, 2, 118, 40));
+                addSlot(new SlotItemHandler(blockEntity.stackInputHandler, 0, 46, 40));
+                addSlot(new SlotItemHandler(blockEntity.stackInputHandler, 1, 64, 40));
+                addSlot(new SlotItemHandler(blockEntity.stackOutputHandler, 0, 118, 40));
     }
 
     private void addPlayerSlots(Inventory playerInventory) {
@@ -166,7 +163,7 @@ public class InfuserMenu extends WootContainer implements TankPacketHandler {
     }
 
     public void addListeners() {
-        addIntegerListener(new DataSlot() {
+        addDataSlot(new DataSlot() {
             @Override
             public int get() { return blockEntity.getEnergy(); }
 
@@ -174,7 +171,7 @@ public class InfuserMenu extends WootContainer implements TankPacketHandler {
             public void set(int i) { energy = i; }
         });
 
-        addIntegerListener(new DataSlot() {
+        addDataSlot(new DataSlot() {
             @Override
             public int get() { return blockEntity.getProgress(); }
 

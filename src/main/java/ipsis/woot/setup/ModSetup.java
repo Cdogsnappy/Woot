@@ -14,25 +14,35 @@ import ipsis.woot.modules.debug.DebugSetup;
 import ipsis.woot.modules.factory.FactorySetup;
 import ipsis.woot.modules.factory.generators.LootGeneration;
 import ipsis.woot.modules.fluidconvertor.FluidConvertorSetup;
+import ipsis.woot.modules.fluidconvertor.blocks.FluidConvertorBlock;
 import ipsis.woot.modules.generic.GenericSetup;
 import ipsis.woot.modules.infuser.InfuserSetup;
+import ipsis.woot.modules.infuser.blocks.InfuserBlockEntity;
 import ipsis.woot.modules.layout.LayoutSetup;
 import ipsis.woot.modules.oracle.OracleSetup;
 import ipsis.woot.modules.squeezer.SqueezerSetup;
+import ipsis.woot.modules.squeezer.blocks.DyeSqueezerBlockEntity;
+import ipsis.woot.modules.squeezer.blocks.EnchantSqueezerBlockEntity;
 import ipsis.woot.modules.tools.ToolsSetup;
 import ipsis.woot.policy.PolicyRegistry;
 import ipsis.woot.modules.factory.layout.PatternRepository;
 import ipsis.woot.mod.ModFiles;
 import ipsis.woot.simulator.MobSimulator;
 import ipsis.woot.simulator.MobSimulatorSetup;
+import ipsis.woot.util.WootEnergyStorage;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.items.ItemStackHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -40,6 +50,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.io.FileReader;
 
+@EventBusSubscriber
 public class ModSetup {
 
     private Logger logger = LogManager.getLogger();
@@ -69,6 +80,16 @@ public class ModSetup {
         WootCreativeModeTab.register(eventBus);
         WootRecipes.register(eventBus);
         MobSimulatorSetup.register(eventBus);
+    }
+
+
+    @SubscribeEvent // on the mod event bus
+    public static void registerCapabilities(RegisterCapabilitiesEvent event) {
+        EnchantSqueezerBlockEntity.registerCapabilities(event);
+        DyeSqueezerBlockEntity.registerCapabilities(event);
+        InfuserBlockEntity.registerCapabilities(event);
+
+
     }
 
     public void commonSetup(FMLCommonSetupEvent e) {

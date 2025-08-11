@@ -157,8 +157,9 @@ public class InternItem extends Item {
 
         InteractionResult result = InteractionResult.PASS;
         ItemStack itemStack = context.getItemInHand();
+        Player playerEntity = context.getPlayer();
 
-        if (!context.getPlayer().isCrouching() && !context.getLevel().isClientSide) {
+        if (!playerEntity.isCrouching() && !context.getLevel().isClientSide) {
             Block b = context.getLevel().getBlockState(context.getClickedPos()).getBlock();
             if (b instanceof HeartBlock) {
                 BlockState blockState = context.getLevel().getBlockState(context.getClickedPos());
@@ -196,6 +197,26 @@ public class InternItem extends Item {
                 }
             }
         }
+        else if (playerEntity.isCrouching()) {
+            HitResult rayTraceResult = getPlayerPOVHitResult(context.getLevel(), playerEntity, ClipContext.Fluid.NONE);
+
+
+            ToolMode mode = getToolModeFromStack(itemStack);
+            mode = mode.getNext();
+            setToolModeInStack(itemStack, mode);
+            if (mode.isBuildMode()) {
+                playerEntity.sendSystemMessage(
+                        Component.translatable(
+                                "info.woot.intern.mode.build",
+                                StringHelper.translate(mode.getTier().getTranslationKey())));
+            } else if (mode.isValidateMode()) {
+                playerEntity.sendSystemMessage(
+                        Component.translatable(
+                                "info.woot.intern.mode.validate",
+                                StringHelper.translate(mode.getTier().getTranslationKey())));
+            }
+        }
+
 
         // Returning SUCCESS will filter out the MAIN_HAND hand from onBlockActivated
         return InteractionResult.PASS;

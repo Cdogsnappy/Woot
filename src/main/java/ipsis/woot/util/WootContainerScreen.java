@@ -43,10 +43,10 @@ public abstract class WootContainerScreen<T extends AbstractContainerMenu> exten
             filled = curr * 100 / max;
         filled = Math.clamp(filled, 0, 100);
         int h = filled * height / 100;
-        guiGraphics.fill(this.getRectangle().left() + x1,
-                this.getRectangle().top() + y1 - h + 1,
-                this.getRectangle().left() + x1 + width,
-                this.getRectangle().top() + y1 + 1, 0xffff0000);
+        guiGraphics.fill(this.getGuiLeft() + x1,
+                this.getGuiTop() + y1 - h + 1,
+                this.getGuiLeft() + x1 + width,
+                this.getGuiTop() + y1 + 1, 0xffff0000);
     }
 
     /**

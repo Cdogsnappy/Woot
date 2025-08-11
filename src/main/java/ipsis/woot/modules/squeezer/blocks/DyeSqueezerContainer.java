@@ -12,9 +12,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.ContainerLevelAccess;
-import net.minecraft.world.inventory.DataSlot;
-import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -29,6 +27,7 @@ public class DyeSqueezerContainer extends WootContainer implements TankPacketHan
 
     public DyeSqueezerBlockEntity tileEntity;
     public Player player;
+    public ContainerData containerData;
 
     public DyeSqueezerContainer(int containerId, Inventory inv, FriendlyByteBuf extraData) {
         this(containerId, inv, inv.player.level().getBlockEntity(extraData.readBlockPos()));
@@ -36,8 +35,8 @@ public class DyeSqueezerContainer extends WootContainer implements TankPacketHan
 
     public DyeSqueezerContainer(int windowId, Inventory playerInventory, BlockEntity entity) {
         super(SqueezerSetup.SQUEEZER_BLOCK_CONTAINER.get(), windowId);
-        tileEntity = (DyeSqueezerBlockEntity)entity;
-        addOwnSlots(tileEntity.getInventory());
+        tileEntity = (DyeSqueezerBlockEntity) entity;
+        addOwnSlots(tileEntity.stackInputHandler);
         addPlayerSlots(playerInventory);
         addListeners();
         this.player = playerInventory.player;
@@ -130,8 +129,8 @@ public class DyeSqueezerContainer extends WootContainer implements TankPacketHan
     private int blue = 0;
     private int white = 0;
     private int progress = 0;
-    private FluidStack pureDye = FluidStack.EMPTY;
     private int energy = 0;
+    private FluidStack pureDye = FluidStack.EMPTY;
     private boolean dumpExcess = false;
 
     @OnlyIn(Dist.CLIENT)
@@ -147,54 +146,56 @@ public class DyeSqueezerContainer extends WootContainer implements TankPacketHan
     @OnlyIn(Dist.CLIENT)
     public FluidStack getPureDye() { return this.pureDye; }
     @OnlyIn(Dist.CLIENT)
-    public int getEnergy() { return this.energy; }
+    public int getEnergy() { return energy; }
     @OnlyIn(Dist.CLIENT)
     public boolean getDumpExcess() { return this.dumpExcess; }
 
     public void addListeners() {
-        addShortListener(new DataSlot() {
+        addDataSlot(new DataSlot() {
             @Override
             public int get() { return tileEntity.getRed(); }
 
             @Override
             public void set(int i) { red = i; }
         });
-        addShortListener(new DataSlot() {
+        addDataSlot(new DataSlot() {
             @Override
             public int get() { return tileEntity.getBlue(); }
 
             @Override
             public void set(int i) { blue = i; }
         });
-        addShortListener(new DataSlot() {
+        addDataSlot(new DataSlot() {
             @Override
             public int get() { return tileEntity.getWhite(); }
 
             @Override
             public void set(int i) { white = i; }
         });
-        addShortListener(new DataSlot() {
+        addDataSlot(new DataSlot() {
             @Override
             public int get() { return tileEntity.getYellow(); }
 
             @Override
             public void set(int i) { yellow = i; }
         });
-        addIntegerListener(new DataSlot() {
+        addDataSlot(new DataSlot() {
             @Override
             public int get() { return tileEntity.getEnergy(); }
 
             @Override
-            public void set(int i) { energy = i; }
+            public void set(int i){
+                energy = i;
+            }
         });
-        addShortListener(new DataSlot() {
+        addDataSlot(new DataSlot() {
             @Override
             public int get() { return tileEntity.getProgress(); }
 
             @Override
             public void set(int i) { progress = i; }
         });
-        addShortListener(new DataSlot() {
+        addDataSlot(new DataSlot() {
             @Override
             public int get() { return tileEntity.getDumpExcess() ? 1 : 0; }
 

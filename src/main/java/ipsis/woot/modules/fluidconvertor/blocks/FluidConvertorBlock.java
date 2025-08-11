@@ -66,7 +66,7 @@ public class FluidConvertorBlock extends Block implements EntityBlock, WootDebug
 
     @Override
     public ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hitResult) {
-        if (!level.isClientSide)
+        if (level.isClientSide)
             return ItemInteractionResult.SUCCESS;
 
         if (!(level.getBlockEntity(pos) instanceof FluidConvertorBlockEntity))
@@ -78,7 +78,7 @@ public class FluidConvertorBlock extends Block implements EntityBlock, WootDebug
             return FluidUtil.interactWithFluidHandler(player, handIn, level, pos, hitResult.getDirection()) ? ItemInteractionResult.SUCCESS : ItemInteractionResult.FAIL;
         } else {
             // open the gui
-            if (tileEntity instanceof MenuProvider)
+            if (tileEntity != null)
                 player.openMenu(tileEntity, tileEntity.getBlockPos());
             else
                 throw new IllegalStateException("Named container provider is missing");

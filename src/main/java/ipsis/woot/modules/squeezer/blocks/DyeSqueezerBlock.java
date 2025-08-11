@@ -69,8 +69,10 @@ public class DyeSqueezerBlock extends WootBaseEntityBlock implements WootDebug{
     @Override
     public ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos,
                                            Player player, InteractionHand hand, BlockHitResult hitResult) {
-        if (!level.isClientSide)
+        if (level.isClientSide)
             return ItemInteractionResult.SUCCESS;
+
+        player.openMenu((DyeSqueezerBlockEntity)level.getBlockEntity(pos), pos);
 
         if (!(level.getBlockEntity(pos) instanceof DyeSqueezerBlockEntity))
             throw new IllegalStateException("Tile entity is missing");
@@ -87,10 +89,8 @@ public class DyeSqueezerBlock extends WootBaseEntityBlock implements WootDebug{
                             Component.translatable("chat.woot.squeezer.strict"));
         } else {
             // open the gui
-            if (squeezer instanceof MenuProvider)
-                player.openMenu(squeezer, squeezer.getBlockPos());
-            else
-                throw new IllegalStateException("Named container provider is missing");
+            player.openMenu(squeezer, squeezer.getBlockPos());
+
         }
 
         return ItemInteractionResult.SUCCESS; // Block was activated

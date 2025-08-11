@@ -1,5 +1,6 @@
 package ipsis.woot.modules.debug.blocks;
 
+import ipsis.woot.Woot;
 import ipsis.woot.modules.debug.DebugSetup;
 import ipsis.woot.util.WootMachineBlockEntity;
 import net.minecraft.core.BlockPos;
@@ -9,6 +10,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.EnergyStorage;
+import net.neoforged.neoforge.energy.IEnergyStorage;
 
 public class CreativePowerBlockEntity extends WootMachineBlockEntity {
 
@@ -25,9 +27,10 @@ public class CreativePowerBlockEntity extends WootMachineBlockEntity {
         for (Direction facing : Direction.values()) {
             BlockEntity te = level.getBlockEntity(getBlockPos().offset(facing.getNormal()));
             if (te != null) {
-                EnergyStorage e = (EnergyStorage) level.getCapability(Capabilities.EnergyStorage.BLOCK, getBlockPos(), facing.getOpposite());
+                IEnergyStorage e =  level.getCapability(Capabilities.EnergyStorage.BLOCK, te.getBlockPos(),te.getBlockState(), te, facing.getOpposite());
                 if(e != null && e.canReceive()){
                     e.receiveEnergy(1000, false);
+                    te.setChanged();
                 }
 
             }

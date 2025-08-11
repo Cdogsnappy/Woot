@@ -49,7 +49,7 @@ public class SqueezerSetup {
 
     public static final String ENCHANT_SQUEEZER_TAG = "enchsqueezer";
     public static final DeferredHolder<Block, EnchantSqueezerBlock> ENCHANT_SQUEEZER_BLOCK = BLOCKS.register(
-            ENCHANT_SQUEEZER_TAG, () -> new EnchantSqueezerBlock());
+            ENCHANT_SQUEEZER_TAG, EnchantSqueezerBlock::new);
     public static final DeferredHolder<Item, BlockItem> ENCHANT_SQUEEZER_BLOCK_ITEM = ITEMS.register(
             ENCHANT_SQUEEZER_TAG, () ->
                     new BlockItem(ENCHANT_SQUEEZER_BLOCK.get(), Woot.createStandardProperties()));
