@@ -1,5 +1,5 @@
 {
-  "parent": "neoforge:item/mask/bucket_fluid_drip",
-  "loader": "neoforge:bucket",
+  "parent": "neoforge:item/bucket",
+  "loader": "neoforge:fluid_container",
   "fluid": "woot:puredye_fluid"
 }

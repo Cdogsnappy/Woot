@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import ipsis.woot.Woot;
 import ipsis.woot.commands.ModCommands;
+import ipsis.woot.fluilds.FluidSetup;
 import ipsis.woot.mod.ModFiles;
 import ipsis.woot.modules.anvil.AnvilRecipes;
 import ipsis.woot.modules.factory.multiblock.MultiBlockTracker;
@@ -25,6 +26,7 @@ import ipsis.woot.util.oss.WootFakePlayer;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
@@ -39,6 +41,10 @@ import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.RecipesUpdatedEvent;
+import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
+import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
+import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
+import net.neoforged.neoforge.client.model.DynamicFluidContainerModel;
 import net.neoforged.neoforge.common.util.FakePlayer;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
@@ -48,6 +54,7 @@ import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -214,6 +221,95 @@ public class ForgeEventHandlers {
         File dropFile = ModFiles.INSTANCE.getLootFile();
         Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
         SerializationHelper.writeJsonFile(dropFile, GSON.toJson(jsonObject));
+    }
+
+    @SubscribeEvent
+    public static void onRegisterClientExtensions(RegisterClientExtensionsEvent event) {
+        event.registerFluidType(new IClientFluidTypeExtensions() {
+            @Override
+            public @NotNull ResourceLocation getStillTexture() {
+                return FluidSetup.ENCHANT_STILL;
+            }
+
+            @Override
+            public @NotNull ResourceLocation getFlowingTexture() {
+                return FluidSetup.ENCHANT_FLOWING;
+            }
+
+
+
+            @Override
+            public int getTintColor() {
+                return 0xFFFFFFFF;
+            }
+        }, FluidSetup.ENCHANT_FLUID_TYPE.get());
+
+        event.registerFluidType(new IClientFluidTypeExtensions() {
+            @Override
+            public @NotNull ResourceLocation getStillTexture() {
+                return FluidSetup.MOB_ESSENCE_STILL;
+            }
+
+            @Override
+            public @NotNull ResourceLocation getFlowingTexture() {
+                return FluidSetup.MOB_ESSENCE_FLOWING;
+            }
+
+
+
+            @Override
+            public int getTintColor() {
+                return 0xFFFFFFFF;
+            }
+        }, FluidSetup.MOB_ESSENCE_FLUID_TYPE.get());
+
+        event.registerFluidType(new IClientFluidTypeExtensions() {
+            @Override
+            public @NotNull ResourceLocation getStillTexture() {
+                return FluidSetup.CONATUS_STILL;
+            }
+
+            @Override
+            public @NotNull ResourceLocation getFlowingTexture() {
+                return FluidSetup.CONATUS_FLOWING;
+            }
+
+
+
+            @Override
+            public int getTintColor() {
+                return 0xFFFFFFFF;
+            }
+        }, FluidSetup.CONATUS_FLUID_TYPE.get());
+
+
+        event.registerFluidType(new IClientFluidTypeExtensions() {
+            @Override
+            public @NotNull ResourceLocation getStillTexture() {
+                return FluidSetup.PUREDYE_STILL;
+            }
+
+            @Override
+            public @NotNull ResourceLocation getFlowingTexture() {
+                return FluidSetup.PUREDYE_FLOWING;
+            }
+
+
+
+            @Override
+            public int getTintColor() {
+                return 0xFFFFFFFF;
+            }
+        }, FluidSetup.PUREDYE_FLUID_TYPE.get());
+    }
+
+    @SubscribeEvent
+    public static void onRegisterItemColors(RegisterColorHandlersEvent.Item event) {
+        event.register(new DynamicFluidContainerModel.Colors(), FluidSetup.CONATUS_FLUID_BUCKET.get());
+        event.register(new DynamicFluidContainerModel.Colors(), FluidSetup.PUREDYE_FLUID_BUCKET.get());
+        event.register(new DynamicFluidContainerModel.Colors(), FluidSetup.MOB_ESSENCE_FLUID_BUCKET.get());
+        event.register(new DynamicFluidContainerModel.Colors(), FluidSetup.ENCHANT_FLUID_BUCKET.get());
+
     }
 
     /**

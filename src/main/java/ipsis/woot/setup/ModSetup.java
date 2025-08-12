@@ -15,6 +15,7 @@ import ipsis.woot.modules.factory.FactorySetup;
 import ipsis.woot.modules.factory.generators.LootGeneration;
 import ipsis.woot.modules.fluidconvertor.FluidConvertorSetup;
 import ipsis.woot.modules.fluidconvertor.blocks.FluidConvertorBlock;
+import ipsis.woot.modules.fluidconvertor.blocks.FluidConvertorBlockEntity;
 import ipsis.woot.modules.generic.GenericSetup;
 import ipsis.woot.modules.infuser.InfuserSetup;
 import ipsis.woot.modules.infuser.blocks.InfuserBlockEntity;
@@ -65,6 +66,8 @@ public class ModSetup {
         };
     }
 
+
+
     public static void registrySetup(IEventBus eventBus) {
         InfuserSetup.register(eventBus);
         SqueezerSetup.register(eventBus);
@@ -88,6 +91,7 @@ public class ModSetup {
         EnchantSqueezerBlockEntity.registerCapabilities(event);
         DyeSqueezerBlockEntity.registerCapabilities(event);
         InfuserBlockEntity.registerCapabilities(event);
+        FluidConvertorBlockEntity.registerCapabilities(event);
 
 
     }

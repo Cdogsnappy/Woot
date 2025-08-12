@@ -66,7 +66,7 @@ public class FluidConvertorMenu extends WootContainer implements TankPacketHandl
 
     @Override
     public boolean stillValid(Player playerIn) {
-        return stillValid(ContainerLevelAccess.create(playerIn.level(),tileEntity.getBlockPos()), playerIn, InfuserSetup.INFUSER_BLOCK.get());
+        return stillValid(ContainerLevelAccess.create(playerIn.level(),tileEntity.getBlockPos()), playerIn, FluidConvertorSetup.FLUID_CONVERTOR_BLOCK.get());
     }
 
     private FluidStack inputFluid = FluidStack.EMPTY;
@@ -106,14 +106,14 @@ public class FluidConvertorMenu extends WootContainer implements TankPacketHandl
     public void broadcastChanges() {
         super.broadcastChanges();
 
-        if (!FluidStack.isSameFluidSameComponents(inputFluid, tileEntity.getInputTankFluid())) {
+        if (!FluidStack.isSameFluidSameComponents(inputFluid, tileEntity.getInputTankFluid()) || inputFluid.getAmount() != tileEntity.getInputTankFluid().getAmount()) {
             inputFluid = tileEntity.getInputTankFluid().copy();
             TankPacket tankPacket = new TankPacket(inputFluid, 0);
             PacketDistributor.sendToPlayer((ServerPlayer)player, tankPacket);
 
         }
 
-        if (!FluidStack.isSameFluidSameComponents(outputFluid, tileEntity.getOutputTankFluid())) {
+        if (!FluidStack.isSameFluidSameComponents(outputFluid, tileEntity.getOutputTankFluid()) || outputFluid.getAmount() != tileEntity.getOutputTankFluid().getAmount()) {
             outputFluid = tileEntity.getOutputTankFluid().copy();
             TankPacket tankPacket = new TankPacket(outputFluid, 1);
             PacketDistributor.sendToPlayer((ServerPlayer)player, tankPacket);

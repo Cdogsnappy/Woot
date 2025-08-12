@@ -34,11 +34,14 @@ public class InfuserScreen extends WootContainerScreen<InfuserMenu> {
     private static final int TANK_WIDTH = TANK_RX - TANK_LX + 1;
     private static final int TANK_HEIGHT = TANK_RY - TANK_LY + 1;
 
+    private int currFluidRender = 0;
+
     public InfuserScreen(InfuserMenu container, Inventory playerInventory, Component name) {
         super(container, playerInventory, name);
         imageWidth = GUI_XSIZE;
         imageHeight = GUI_YSIZE;
         inventoryLabelY = imageHeight - 94;
+        currFluidRender = menu.getInputFluid().getAmount();
     }
 
     
@@ -76,14 +79,25 @@ public class InfuserScreen extends WootContainerScreen<InfuserMenu> {
                 ENERGY_WIDTH,
                 menu.getEnergy(), InfuserConfiguration.INFUSER_MAX_ENERGY.get());
 
+
+        int renderDiff = menu.getInputFluid().getAmount() - currFluidRender;
+        if(renderDiff == 0){}
+        else if (Math.abs(renderDiff) < 20){
+            currFluidRender = menu.getInputFluid().getAmount();
+        }
+        else{
+            currFluidRender += (int) Math.ceil(renderDiff*.08F);
+        }
+
         renderFluidTank(
                 guiGraphics,
-                TANK_LX,
-                TANK_RY,
+                TANK_LX + getGuiLeft(),
+                TANK_RY + getGuiTop(),
                 TANK_HEIGHT,
                 TANK_WIDTH,
                 InfuserConfiguration.INFUSER_TANK_CAPACITY.get(),
-                menu.getInputFluid());
+                menu.getInputFluid(),
+                currFluidRender);
 
     }
 }

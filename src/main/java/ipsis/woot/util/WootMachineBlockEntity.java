@@ -51,9 +51,9 @@ public class WootMachineBlockEntity extends BlockEntity {
 
     public ItemStackHandler stackOutputHandler = new ItemStackHandler();
 
-    public FluidTank fluidInputHandler = new FluidTank(5000);
+    public FluidTank fluidInputHandler = new FluidTank(10000);
 
-    public FluidTank fluidOutputHandler = new FluidTank(5000);
+    public FluidTank fluidOutputHandler = new FluidTank(10000);
 
     public WootMachineBlockEntity(BlockPos pos, BlockState state) {
         super(FactorySetup.WOOT_MACHINE_ENTITY.get(), pos, state);
@@ -132,7 +132,7 @@ public class WootMachineBlockEntity extends BlockEntity {
                 processOff();;
             }
         } else if (!isDisabled()) {
-            if (level.getGameTime() % 10 == 0 && canStart()) {
+            if (canStart()) {
                 // have a valid set of input items and enough energy
                 processStart(); // set processMax and processRem
                 processTick(); // use energy and update processRem

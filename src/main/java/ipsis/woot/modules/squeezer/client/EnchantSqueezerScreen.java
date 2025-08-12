@@ -38,11 +38,14 @@ public class EnchantSqueezerScreen extends WootContainerScreen<EnchantSqueezerMe
     private static final int TANK_WIDTH = TANK_RX - TANK_LX + 1;
     private static final int TANK_HEIGHT = TANK_RY - TANK_LY + 1;
 
+    private int currFluidRender = 0;
+
     public EnchantSqueezerScreen(EnchantSqueezerMenu menu, Inventory playerInventory, Component name) {
         super(menu, playerInventory, name);
         imageWidth = GUI_XSIZE;
         imageHeight = GUI_YSIZE;
         inventoryLabelY = imageHeight - 94;
+        currFluidRender = menu.getOutputFluid().getAmount();
     }
 
     @Override
@@ -80,14 +83,24 @@ public class EnchantSqueezerScreen extends WootContainerScreen<EnchantSqueezerMe
                 menu.getEnergy(),
                 SqueezerConfiguration.ENCH_SQUEEZER_MAX_ENERGY.get());
 
+        int renderDiff = menu.getOutputFluid().getAmount() - currFluidRender;
+        if(renderDiff == 0){}
+        else if (Math.abs(renderDiff) < 20){
+            currFluidRender = menu.getOutputFluid().getAmount();
+        }
+        else{
+            currFluidRender += (int) Math.ceil(renderDiff*.08F);
+        }
+
         renderFluidTank(
                 guiGraphics,
-                TANK_LX,
-                TANK_RY,
+                TANK_LX + getGuiLeft(),
+                TANK_RY + getGuiTop(),
                 TANK_HEIGHT,
                 TANK_WIDTH,
                 SqueezerConfiguration.ENCH_SQUEEZER_TANK_CAPACITY.get(),
-                menu.getOutputFluid());
+                menu.getOutputFluid(),
+                currFluidRender);
 
     }
 

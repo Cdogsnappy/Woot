@@ -157,7 +157,7 @@ public class EnchantSqueezerMenu extends WootContainer implements TankPacketHand
     public void broadcastChanges() {
         super.broadcastChanges();
 
-        if (!FluidStack.isSameFluidSameComponents(outputFluid, tileEntity.getOutputTankFluid())) {
+        if (!FluidStack.isSameFluidSameComponents(outputFluid, tileEntity.getOutputTankFluid()) || outputFluid.getAmount() != tileEntity.getOutputTankFluid().getAmount()) {
             outputFluid = tileEntity.getOutputTankFluid().copy();
             TankPacket tankPacket = new TankPacket(outputFluid, 0);
             PacketDistributor.sendToPlayer((ServerPlayer)player, tankPacket);

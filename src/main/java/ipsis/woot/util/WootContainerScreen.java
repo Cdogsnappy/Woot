@@ -4,12 +4,15 @@ package ipsis.woot.util;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
+import ipsis.woot.Woot;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.network.chat.Component;
@@ -58,7 +61,7 @@ public abstract class WootContainerScreen<T extends AbstractContainerMenu> exten
             filled = curr * 100 / max;
         filled = Math.clamp(filled, 0, 100);
         int h = filled * height / 100;
-        drawFluid(guiGraphics, this.getRectangle().left() + x1, getRectangle().top() + y1 - h + 1, fluidStack, width,  h);
+        drawFluid(guiGraphics, x1, y1 - h + 1, fluidStack, width,  h);
     }
 
     public void renderFluidTank(GuiGraphics guiGraphics, int x1, int y1, int height, int width, int max, FluidStack fluidStack)  {
@@ -67,7 +70,16 @@ public abstract class WootContainerScreen<T extends AbstractContainerMenu> exten
             filled = fluidStack.getAmount() * 100 / max;
         filled = Math.clamp(filled, 0, 100);
         int h = filled * height / 100;
-        drawFluid(guiGraphics, this.getRectangle().left() + x1, this.getRectangle().top() + y1 - h + 1, fluidStack, width,  h);
+        drawFluid(guiGraphics, x1, y1 - h + 1, fluidStack, width,  h);
+    }
+
+    public void renderFluidTank(GuiGraphics guiGraphics, int x1, int y1, int height, int width, int max, FluidStack fluidStack, int amount)  {
+        int filled = 0;
+        if (max > 0)
+            filled = amount * 100 / max;
+        filled = Math.clamp(filled, 0, 100);
+        int h = filled * height / 100;
+        drawFluid(guiGraphics, x1, y1 - h + 1, fluidStack, width,  h);
     }
 
     public void renderHorizontalBar(GuiGraphics guiGraphics, int x1, int y1, int x2, int y2, int curr, int max, int color) {
@@ -81,19 +93,9 @@ public abstract class WootContainerScreen<T extends AbstractContainerMenu> exten
                 rect.left() + x2 + l, rect.top() + y2, color);
     }
 
-    public void renderHorizontalGauge(GuiGraphics guiGraphics, int x1, int y1, int x2, int y2, int curr, int max, int color) {
-        ScreenRectangle rect = this.getRectangle();
-        guiGraphics.fill(rect.left() + x1, rect.top() + y1, rect.left() + x2, rect.top() + y2, color);
+    public void renderHorizontalGauge(GuiGraphics guiGraphics, int x1, int y1, int x2, int y2, int color) {
+        guiGraphics.fill(getGuiLeft() + x1, getGuiTop() + y1, getGuiLeft() + x2, getGuiTop() + y2, color);
 
-        if (max > 0) {
-            int p = curr * (x2 - x1) / max;
-            for (int i = 0; i < p; i++)
-                guiGraphics.vLine(
-                        rect.left() + x1 + 1 + i,
-                        rect.top() + y1,
-                        rect.top() + y2 - 1,
-                        i % 2 == 0 ? color : 0xff000000);
-        }
     }
 
     public void renderFluidTankTooltip(GuiGraphics guiGraphics, int mouseX, int mouseY, FluidStack fluidStack, int capacity) {
@@ -114,18 +116,26 @@ public abstract class WootContainerScreen<T extends AbstractContainerMenu> exten
         guiGraphics.renderComponentTooltip(this.font, tooltip, mouseX, mouseY);
     }
 
-    public void drawFluid(GuiGraphics guiGraphics, int x, int y, FluidStack fluid, int width, int height) {
+    public void drawFluid(GuiGraphics guiGraphics, int x, int y, FluidStack fluidStack, int width, int height) {
 
-        if (fluid.getFluid() == Fluids.EMPTY)
+        if (fluidStack.getFluid() == Fluids.EMPTY)
             return;
 
-        ResourceLocation stillTexture = IClientFluidTypeExtensions.of(fluid.getFluid()).getStillTexture();
-        // Get sprite from texture atlas
-        TextureAtlas textureAtlas = Minecraft.getInstance().getModelManager().getAtlas(InventoryMenu.BLOCK_ATLAS);
-        TextureAtlasSprite sprite = textureAtlas.getSprite(stillTexture);
+        Fluid fluid = fluidStack.getFluid();
+        IClientFluidTypeExtensions clientFluid = IClientFluidTypeExtensions.of(fluid);
+        ResourceLocation sprite = clientFluid.getStillTexture(fluidStack);
+        ResourceLocation sprite_flowing = clientFluid.getFlowingTexture(fluidStack);
+
+        TextureAtlasSprite fluidTexture = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS)
+                .apply(sprite);
 
         // Get fluid color
-        int color = IClientFluidTypeExtensions.of(fluid.getFluid()).getTintColor();
+        int color = clientFluid.getTintColor();
+
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+
+        // Set color
 
         // Set color and render
         RenderSystem.setShaderColor(
@@ -136,7 +146,7 @@ public abstract class WootContainerScreen<T extends AbstractContainerMenu> exten
         );
 
         RenderSystem.setShaderTexture(0, InventoryMenu.BLOCK_ATLAS);
-        drawTiledTexture(guiGraphics, x, y, sprite, width, height);
+        drawTiledTexture(guiGraphics, x, y, fluidTexture, width, height);
 
         // Reset color
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
@@ -163,7 +173,6 @@ public abstract class WootContainerScreen<T extends AbstractContainerMenu> exten
                 drawScaledTexturedModelRectFromIcon(guiGraphics,x + i, y + j, icon, drawWidth, drawHeight);
             }
         }
-        GlStateManager._clearColor(1.0F, 1.0F, 1.0F, 1.0F);
     }
 
     public void drawScaledTexturedModelRectFromIcon(GuiGraphics guiGraphics, int x, int y, TextureAtlasSprite icon, int width, int height) {
@@ -179,13 +188,6 @@ public abstract class WootContainerScreen<T extends AbstractContainerMenu> exten
         float u1 = minU + (maxU - minU) * width / 16F;
         float v1 = minV + (maxV - minV) * height / 16F;
 
-        guiGraphics.blit(
-                icon.atlasLocation(),  // Resource location of the texture atlas
-                x, y,                  // x, y position
-                0,                     // z level (usually 0 for GUI elements)
-                minU, minV,           // starting UV coordinates
-                width, height,        // width and height to render
-                icon.contents().width(), icon.contents().height()  // texture width and height
-        );
+        guiGraphics.blit(x,y,0,width,height,icon);
     }
 }

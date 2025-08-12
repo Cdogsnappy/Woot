@@ -320,11 +320,11 @@ public class FluidConvertorBlockEntity extends WootMachineBlockEntity implements
         }
 
         // Get a list of recipes with matching catalyst
-        RecipeHolder<FluidConvertorRecipe> recipe = level.getRecipeManager().getRecipeFor(
+        Optional<RecipeHolder<FluidConvertorRecipe>> recipe = level.getRecipeManager().getRecipeFor(
                 WootRecipes.FLUID_CONVERTOR_TYPE.get(),
-                new ConvertorRecipeInput(catalyst, inFluid),level).get();
+                new ConvertorRecipeInput(catalyst, inFluid),level);
 
-        currRecipe = recipe == null ? null : recipe.value();
+        currRecipe = recipe.map(RecipeHolder::value).orElse(null);
 
     }
 
@@ -352,7 +352,7 @@ public class FluidConvertorBlockEntity extends WootMachineBlockEntity implements
         event.registerBlockEntity(Capabilities.FluidHandler.BLOCK,
                 FluidConvertorSetup.FLUID_CONVERTOR_BLOCK_TILE.get(),
                 (be, direction) -> {
-                    if(direction == be.getBlockState().getValue(BlockStateProperties.HORIZONTAL_FACING).getClockWise() || direction == Direction.DOWN){
+                    if(direction == null || direction == be.getBlockState().getValue(BlockStateProperties.HORIZONTAL_FACING).getClockWise() || direction == Direction.DOWN){
                         return be.fluidOutputHandler;
                     }
                     return be.fluidInputHandler;

@@ -1,7 +1,6 @@
 package ipsis.woot.modules.factory.blocks;
 
 import ipsis.woot.config.Config;
-import ipsis.woot.datagen.WootDataComponents;
 import ipsis.woot.mod.ModNBT;
 import ipsis.woot.modules.factory.FactorySetup;
 import ipsis.woot.modules.factory.Tier;

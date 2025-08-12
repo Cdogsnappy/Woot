@@ -24,10 +24,22 @@ import java.util.function.Supplier;
 public record TankPacket(FluidStack fluidStack, int tankId) implements CustomPacketPayload {
 
     public static final Type<TankPacket> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(Woot.MODID, "tankpacket"));
-    public static final StreamCodec<RegistryFriendlyByteBuf, TankPacket> STREAM_CODEC = StreamCodec.composite(
-            FluidStack.STREAM_CODEC, TankPacket::fluidStack,
-            ByteBufCodecs.VAR_INT, TankPacket::tankId,
-            TankPacket::new
+    public static final StreamCodec<RegistryFriendlyByteBuf, TankPacket> STREAM_CODEC = StreamCodec.of(
+            (buf, pac) -> {
+                if(pac.fluidStack.isEmpty()) {
+                    buf.writeVarInt(0);
+                }
+                else{
+                    buf.writeVarInt(1);
+                    FluidStack.STREAM_CODEC.encode(buf, pac.fluidStack);
+                }
+                buf.writeVarInt(pac.tankId);
+
+            },
+            (buf)
+                    ->  new TankPacket(buf.readVarInt() == 0 ? FluidStack.EMPTY : FluidStack.STREAM_CODEC.decode(buf), buf.readVarInt())
+
+
     );
 
 

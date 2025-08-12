@@ -355,7 +355,7 @@ public class DyeSqueezerBlockEntity extends WootMachineBlockEntity implements Wo
     }
 
     public TankPacket getOutputTankPacket() {
-        return new TankPacket(outputTank.getFluid(), 1);
+        return new TankPacket(outputTank.getFluid(), 0);
     }
 
     private boolean dumpExcess = false;

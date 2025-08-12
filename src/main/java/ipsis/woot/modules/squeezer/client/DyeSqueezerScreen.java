@@ -40,6 +40,9 @@ public class DyeSqueezerScreen extends WootContainerScreen<DyeSqueezerContainer>
     private static final int TANK_WIDTH = TANK_RX - TANK_LX + 1;
     private static final int TANK_HEIGHT = TANK_RY - TANK_LY + 1;
 
+    private static final int X1 = 82;
+    private static final int X1_length = 50;
+
     public DyeSqueezerScreen(DyeSqueezerContainer menu, Inventory playerInventory, Component name) {
         super(menu, playerInventory, name);
         imageWidth = GUI_XSIZE;
@@ -109,17 +112,14 @@ public class DyeSqueezerScreen extends WootContainerScreen<DyeSqueezerContainer>
         guiGraphics.blit(GUI, getGuiLeft() + 58, getGuiTop() + 30, 180, 0,(int)(19 * (progress / 100.0F)) , 40);
 
         // NB: The tanks will change the texture so progress has to be above that or rebind the texture
-        renderHorizontalGauge(guiGraphics, 82, 30, 132, 37,
-                menu.getRedDyeAmount(), SqueezerConfiguration.DYE_SQUEEZER_INTERNAL_FLUID_MAX.get(),
+
+        renderHorizontalGauge(guiGraphics, X1, 30,X1 +  (int) (X1_length*(((float)menu.getRedDyeAmount())/((float)SqueezerConfiguration.DYE_SQUEEZER_INTERNAL_FLUID_MAX.get()))), 38,
                 0xff000000 | DyeColor.RED.getMapColor().col);
-        renderHorizontalGauge(guiGraphics, 82, 40, 132, 47,
-                menu.getYellowDyeAmount(), SqueezerConfiguration.DYE_SQUEEZER_INTERNAL_FLUID_MAX.get(),
+        renderHorizontalGauge(guiGraphics, X1, 40, X1 +  (int) (X1_length*(((float)menu.getYellowDyeAmount())/((float)SqueezerConfiguration.DYE_SQUEEZER_INTERNAL_FLUID_MAX.get()))), 48,
                 0xff000000 | DyeColor.YELLOW.getMapColor().col);
-        renderHorizontalGauge(guiGraphics, 82, 50, 132, 57,
-                menu.getBlueDyeAmount(), SqueezerConfiguration.DYE_SQUEEZER_INTERNAL_FLUID_MAX.get(),
+        renderHorizontalGauge(guiGraphics, X1, 50, X1 +  (int) (X1_length*(((float)menu.getBlueDyeAmount())/((float)SqueezerConfiguration.DYE_SQUEEZER_INTERNAL_FLUID_MAX.get()))), 58,
                 0xff000000 | DyeColor.BLUE.getMapColor().col);
-        renderHorizontalGauge(guiGraphics, 82, 60, 132, 67,
-                menu.getWhiteDyeAmount(), SqueezerConfiguration.DYE_SQUEEZER_INTERNAL_FLUID_MAX.get(),
+        renderHorizontalGauge(guiGraphics, X1, 60, X1 +  (int) (X1_length*(((float)menu.getWhiteDyeAmount())/((float)SqueezerConfiguration.DYE_SQUEEZER_INTERNAL_FLUID_MAX.get()))), 68,
                 0xff000000 | DyeColor.WHITE.getMapColor().col);
 
         renderEnergyBar(
@@ -132,8 +132,8 @@ public class DyeSqueezerScreen extends WootContainerScreen<DyeSqueezerContainer>
 
         renderFluidTank(
                 guiGraphics,
-                TANK_LX,
-                TANK_RY,
+                TANK_LX + getGuiLeft(),
+                TANK_RY + getGuiTop(),
                 TANK_HEIGHT,
                 TANK_WIDTH,
                 SqueezerConfiguration.DYE_SQUEEZER_TANK_CAPACITY.get(),

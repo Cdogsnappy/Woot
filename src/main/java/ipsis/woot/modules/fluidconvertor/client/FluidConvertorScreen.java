@@ -40,11 +40,16 @@ public class FluidConvertorScreen extends WootContainerScreen<FluidConvertorMenu
     private static final int OUT_TANK_WIDTH = OUT_TANK_RX - OUT_TANK_LX + 1;
     private static final int OUT_TANK_HEIGHT = OUT_TANK_RY - OUT_TANK_LY + 1;
 
+    private float currInputRender = 0;
+    private float currOutputRender = 0;
+
     public FluidConvertorScreen(FluidConvertorMenu container, Inventory playerInventory, Component name) {
         super(container, playerInventory, name);
         imageWidth = GUI_XSIZE;
         imageHeight = GUI_YSIZE;
         inventoryLabelY = imageHeight - 94;
+        currInputRender = container.getInputFluid().getAmount();
+        currOutputRender = container.getOutputFluid().getAmount();
     }
 
     @Override
@@ -83,23 +88,43 @@ public class FluidConvertorScreen extends WootContainerScreen<FluidConvertorMenu
                 ENERGY_WIDTH,
                 menu.getEnergy(), InfuserConfiguration.INFUSER_MAX_ENERGY.get());
 
-        renderFluidTank(
-                guiGraphics,
-                IN_TANK_LX,
-                IN_TANK_RY,
-                IN_TANK_HEIGHT,
-                IN_TANK_WIDTH,
-                FluidConvertorConfiguration.FLUID_CONV_INPUT_TANK_CAPACITY.get(),
-                menu.getInputFluid());
+        float renderDiff = menu.getInputFluid().getAmount() - currInputRender;
+        if(renderDiff == 0){}
+        else if (Math.abs(renderDiff) < 80){
+            currInputRender = menu.getInputFluid().getAmount();
+        }
+        else{
+            currInputRender += renderDiff*.05F;
+        }
 
         renderFluidTank(
                 guiGraphics,
-                OUT_TANK_LX,
-                OUT_TANK_RY,
+                IN_TANK_LX + getGuiLeft(),
+                IN_TANK_RY + getGuiTop(),
+                IN_TANK_HEIGHT,
+                IN_TANK_WIDTH,
+                FluidConvertorConfiguration.FLUID_CONV_INPUT_TANK_CAPACITY.get(),
+                menu.getInputFluid(),
+                (int) currInputRender);
+
+        renderDiff = menu.getOutputFluid().getAmount() - currOutputRender;
+        if(renderDiff == 0){}
+        else if (Math.abs(renderDiff) < 80){
+            currOutputRender = menu.getOutputFluid().getAmount();
+        }
+        else{
+            currOutputRender +=renderDiff*.05F;
+        }
+
+        renderFluidTank(
+                guiGraphics,
+                OUT_TANK_LX + getGuiLeft(),
+                OUT_TANK_RY + getGuiTop(),
                 OUT_TANK_HEIGHT,
                 OUT_TANK_WIDTH,
                 FluidConvertorConfiguration.FLUID_CONV_OUTPUT_TANK_CAPACITY.get(),
-                menu.getOutputFluid());
+                menu.getOutputFluid(),
+                (int) currOutputRender);
     }
 
 

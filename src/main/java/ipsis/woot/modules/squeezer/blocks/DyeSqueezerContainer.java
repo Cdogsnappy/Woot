@@ -27,7 +27,6 @@ public class DyeSqueezerContainer extends WootContainer implements TankPacketHan
 
     public DyeSqueezerBlockEntity tileEntity;
     public Player player;
-    public ContainerData containerData;
 
     public DyeSqueezerContainer(int containerId, Inventory inv, FriendlyByteBuf extraData) {
         this(containerId, inv, inv.player.level().getBlockEntity(extraData.readBlockPos()));
@@ -207,8 +206,11 @@ public class DyeSqueezerContainer extends WootContainer implements TankPacketHan
     @Override
     public void broadcastChanges() {
         super.broadcastChanges();
+        if(tileEntity.getLevel().isClientSide){
+            return;
+        }
 
-        if (!FluidStack.isSameFluidSameComponents(pureDye,tileEntity.getOutputTankFluid())) {
+        if (!FluidStack.isSameFluidSameComponents(pureDye,tileEntity.getOutputTankFluid()) || pureDye.getAmount() != tileEntity.getOutputTankFluid().getAmount()) {
             pureDye = tileEntity.getOutputTankFluid().copy();
 
             PacketDistributor.sendToPlayer((ServerPlayer)player, tileEntity.getOutputTankPacket());

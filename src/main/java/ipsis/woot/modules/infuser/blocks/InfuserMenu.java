@@ -1,5 +1,6 @@
 package ipsis.woot.modules.infuser.blocks;
 
+import ipsis.woot.Woot;
 import ipsis.woot.crafting.infuser.InfuserRecipe;
 import ipsis.woot.fluilds.network.TankPacket;
 import ipsis.woot.modules.infuser.InfuserSetup;
@@ -23,6 +24,7 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.capability.templates.FluidHandlerItemStack;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -42,6 +44,10 @@ public class InfuserMenu extends WootContainer implements TankPacketHandler {
     public InfuserMenu(int windowId, Inventory playerInventory, BlockEntity entity) {
         super(InfuserSetup.INFUSER_BLOCK_CONTAINER.get(), windowId);
         blockEntity = (InfuserBlockEntity) entity;
+        if(!entity.getLevel().isClientSide){
+            TankPacket tankPacket = new TankPacket(inputFluid, 0);
+            PacketDistributor.sendToPlayer((ServerPlayer)playerInventory.player, tankPacket);
+        }
         this.playerInventory = playerInventory;
 
         addOwnSlots();
@@ -86,8 +92,10 @@ public class InfuserMenu extends WootContainer implements TankPacketHandler {
     @Override
     public void broadcastChanges() {
         super.broadcastChanges();
+        if(blockEntity.getLevel().isClientSide)
+            return;
 
-        if (!FluidStack.isSameFluid(inputFluid, blockEntity.getTankFluid())) {
+        if (!FluidStack.isSameFluidSameComponents(inputFluid, blockEntity.getTankFluid()) || inputFluid.getAmount() != blockEntity.getTankFluid().getAmount()) {
             inputFluid = blockEntity.getTankFluid().copy();
             TankPacket tankPacket = new TankPacket(inputFluid, 0);
             if(playerInventory.player instanceof ServerPlayer){
@@ -176,7 +184,11 @@ public class InfuserMenu extends WootContainer implements TankPacketHandler {
             public int get() { return blockEntity.getProgress(); }
 
             @Override
-            public void set(int i) { progress = i; }
+            public void set(int i) {
+                if(i < progress){
+                    broadcastChanges();
+                }
+                progress = i; }
         });
     }
 

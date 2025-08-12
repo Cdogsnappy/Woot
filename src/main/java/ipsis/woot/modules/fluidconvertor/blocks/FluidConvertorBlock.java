@@ -2,6 +2,7 @@ package ipsis.woot.modules.fluidconvertor.blocks;
 
 import ipsis.woot.modules.debug.items.DebugItem;
 import ipsis.woot.modules.fluidconvertor.FluidConvertorConfiguration;
+import ipsis.woot.util.WootBaseEntityBlock;
 import ipsis.woot.util.WootDebug;
 import ipsis.woot.util.helper.StringHelper;
 import net.minecraft.core.BlockPos;
@@ -37,7 +38,7 @@ import net.neoforged.neoforge.fluids.FluidUtil;
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class FluidConvertorBlock extends Block implements EntityBlock, WootDebug {
+public class FluidConvertorBlock extends WootBaseEntityBlock implements WootDebug {
 
     public FluidConvertorBlock() {
         super(Block.Properties.of().sound(SoundType.METAL).strength(3.5F));
@@ -75,7 +76,9 @@ public class FluidConvertorBlock extends Block implements EntityBlock, WootDebug
         FluidConvertorBlockEntity tileEntity = (FluidConvertorBlockEntity) level.getBlockEntity(pos);
 
         if (FluidUtil.getFluidHandler(stack).isPresent()) {
-            return FluidUtil.interactWithFluidHandler(player, handIn, level, pos, hitResult.getDirection()) ? ItemInteractionResult.SUCCESS : ItemInteractionResult.FAIL;
+            return FluidUtil.interactWithFluidHandler(player, handIn, level, pos, FluidUtil.getFluidHandler(stack).get().getFluidInTank(0).isEmpty() ? null : Direction.UP)
+                    ? ItemInteractionResult.SUCCESS : ItemInteractionResult.FAIL;
+
         } else {
             // open the gui
             if (tileEntity != null)
