@@ -6,6 +6,7 @@ import ipsis.woot.modules.factory.blocks.HeartBlockEntity;
 import ipsis.woot.modules.oracle.blocks.OracleTileEntity;
 import ipsis.woot.modules.oracle.network.SimulatedMobDropsSummaryReply;
 import ipsis.woot.modules.oracle.network.SimulatedMobsReply;
+import ipsis.woot.simulator.MobSimulator;
 import ipsis.woot.util.oss.NetworkTools;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -45,7 +46,7 @@ public record ServerDataRequest(String s, BlockPos pos, int requestType) impleme
             switch(Type.fromIndex(request.requestType)){
                 case DROP_REGISTRY_STATUS:
                     if (te instanceof OracleTileEntity) {
-                        PacketDistributor.sendToPlayer((ServerPlayer)serverPlayerEntity, new SimulatedMobsReply(new ArrayList<>()));
+                        PacketDistributor.sendToPlayer((ServerPlayer)serverPlayerEntity, new SimulatedMobsReply(MobSimulator.getInstance().getKnownMobs().stream().toList()));
                         break;
                     }
                 case SIMULATED_MOB_DROPS:

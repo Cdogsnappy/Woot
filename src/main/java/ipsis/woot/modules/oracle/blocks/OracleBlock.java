@@ -37,7 +37,7 @@ public class OracleBlock extends Block implements EntityBlock {
 
         BlockEntity te = level.getBlockEntity((pos));
         if (te instanceof OracleTileEntity ot)
-            ((ServerPlayer)player).openMenu(new SimpleMenuProvider(ot, Component.literal("Oracle")), pos);
+            ((ServerPlayer)player).openMenu(ot, pos);
         else
             throw new IllegalStateException("Named container provider is missing");
 

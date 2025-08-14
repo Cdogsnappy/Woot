@@ -48,9 +48,10 @@ public class OracleContainer extends AbstractContainerMenu {
     public List<FakeMob> simulatedMobs = new ArrayList<>();
     public List<SimulatedMobDropSummary> simulatedDrops = new ArrayList<>();
     public void refreshMobs() {
-        PacketDistributor.sendToServer(new ServerDataRequest("", getPos(), ServerDataRequest.Type.DROP_REGISTRY_STATUS.ordinal()));
         simulatedMobs.clear();
         simulatedDrops.clear();
+        PacketDistributor.sendToServer(new ServerDataRequest("", getPos(), ServerDataRequest.Type.DROP_REGISTRY_STATUS.ordinal()));
+
     }
 
     public void refreshDrops(int index) {

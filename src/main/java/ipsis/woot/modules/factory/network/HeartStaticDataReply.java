@@ -48,14 +48,6 @@ public record HeartStaticDataReply(FormedSetup formedSetup, HeartRecipe recipe, 
                 setup.perks.add(Helper.getPerk(group, formedSetup().getAllPerks().get(group)))
         );
         setup.mobParams.putAll(formedSetup.getAllMobParams());
-        setup.controllerMobs.forEach((fakeMob -> {
-            List<SimulatedMobDropSummary> summaries = MobSimulator.getInstance().getDropSummary(fakeMob);
-            List<ItemStack> drops = new ArrayList<>();
-            summaries.forEach((s) -> {
-                drops.add(s.stack());
-            });
-            setup.mobInfo.put(fakeMob, new ClientFactorySetup.Mob(drops));
-        }));
         setup.exotic = formedSetup.getExotic();
         setup.cellCapacity = formedSetup.getCellCapacity();
         setup.looting = formedSetup.getLootingLevel();
@@ -64,14 +56,23 @@ public record HeartStaticDataReply(FormedSetup formedSetup, HeartRecipe recipe, 
         setup.perkCapped = formedSetup.isPerkCapped();
         setup.shardDropChance = formedSetup().getShardDropChance();
         setup.shardDrops = new double[]{formedSetup.getBasicShardWeight(), formedSetup.getAdvancedShardWeight(), formedSetup.getEliteShardWeight()};
+
+        //Drops population
+        setup.controllerMobs.forEach((mob) -> {
+            setup.mobInfo.put(mob, new ClientFactorySetup.Mob(MobSimulator.getInstance().getDropSummary(mob)));
+
+        });
+
     }
 
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, HeartStaticDataReply> STREAM_CODEC = StreamCodec.composite(
-            FormedSetup.STREAM_CODEC, HeartStaticDataReply::formedSetup,
-            HeartRecipe.STREAM_CODEC, HeartStaticDataReply::recipe,
-            ClientFactorySetup.STREAM_CODEC, HeartStaticDataReply::clientSetup,
-            HeartStaticDataReply::new
+
+    public static final StreamCodec<RegistryFriendlyByteBuf, HeartStaticDataReply> STREAM_CODEC = StreamCodec.of(
+            (buf, reply) -> {
+                ClientFactorySetup.STREAM_CODEC.encode(buf, reply.clientSetup);
+            },
+            (buf) -> new HeartStaticDataReply(null, null, ClientFactorySetup.STREAM_CODEC.decode(buf))
+
     );
 
 

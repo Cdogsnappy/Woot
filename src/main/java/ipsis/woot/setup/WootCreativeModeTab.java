@@ -30,7 +30,7 @@ public class WootCreativeModeTab {
 
     public static final Supplier<CreativeModeTab> WOOT_ITEMS_TAB = CREATIVE_MODE_TAB.register("bismuth_items_tab",
             () -> CreativeModeTab.builder().icon(() -> new ItemStack(FactorySetup.HEART_BLOCK_ITEM.get()))
-                    .title(Component.translatable("creativetab.tutorialmod.bismuth_items"))
+                    .title(Component.translatable("woot.creativetab"))
                     .displayItems((itemDisplayParameters, output) -> {
                         FactorySetup.getItems().forEach(output::accept);
                         InfuserSetup.getItems().forEach(output::accept);

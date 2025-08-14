@@ -156,6 +156,7 @@ public class SimulationCommand {
     private static int learnEntity(CommandContext<CommandSourceStack> source, ResourceLocation resourceLocation, String tag) throws CommandSyntaxException {
 
         FakeMob fakeMob;
+        String s = resourceLocation.toString();
         if (tag.equalsIgnoreCase(""))
             fakeMob = new FakeMob(resourceLocation.toString());
         else

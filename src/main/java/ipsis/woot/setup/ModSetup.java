@@ -12,6 +12,7 @@ import ipsis.woot.fluilds.FluidSetup;
 import ipsis.woot.modules.anvil.AnvilSetup;
 import ipsis.woot.modules.debug.DebugSetup;
 import ipsis.woot.modules.factory.FactorySetup;
+import ipsis.woot.modules.factory.blocks.*;
 import ipsis.woot.modules.factory.generators.LootGeneration;
 import ipsis.woot.modules.fluidconvertor.FluidConvertorSetup;
 import ipsis.woot.modules.fluidconvertor.blocks.FluidConvertorBlock;
@@ -92,6 +93,10 @@ public class ModSetup {
         DyeSqueezerBlockEntity.registerCapabilities(event);
         InfuserBlockEntity.registerCapabilities(event);
         FluidConvertorBlockEntity.registerCapabilities(event);
+        Cell1BlockEntity.registerCapabilities(event);
+        Cell2BlockEntity.registerCapabilities(event);
+        Cell3BlockEntity.registerCapabilities(event);
+        Cell4BlockEntity.registerCapabilities(event);
 
 
     }
@@ -106,9 +111,9 @@ public class ModSetup {
         LootGeneration.get().loadFromConfig();
 
         File dropFile = ModFiles.INSTANCE.getLootFile();
-        Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+        Gson GSON = new Gson();
         try {
-            JsonObject jsonObject = GsonHelper.fromJson(GSON, new FileReader(dropFile), JsonObject.class);
+            JsonObject jsonObject = GSON.fromJson(new FileReader(dropFile), JsonObject.class);
             MobSimulator.getInstance().fromJson(jsonObject);
         } catch (Exception exception) {
             Woot.setup.getLogger().warn("Failed to load loot file {}", dropFile.getAbsolutePath());

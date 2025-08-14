@@ -110,7 +110,7 @@ public class FluidSetup {
                     .sound(SoundActions.BUCKET_FILL, SoundEvents.BUCKET_FILL)
                     .sound(SoundActions.BUCKET_EMPTY, SoundEvents.BUCKET_EMPTY)));
 
-    public static DeferredHolder<Fluid, Fluid> ENCHANT_FLUID = FLUIDS.register("enchant_still", () -> new BaseFlowingFluid.Source(FluidSetup.ENCHANT_FLUID_PROPERTIES));
+    public static DeferredHolder<Fluid, Fluid> ENCHANT_FLUID = FLUIDS.register("enchant_fluid", () -> new BaseFlowingFluid.Source(FluidSetup.ENCHANT_FLUID_PROPERTIES));
     public static DeferredHolder<Fluid, FlowingFluid> ENCHANT_FLUID_FLOWING = FLUIDS.register("enchant_flow", () -> new BaseFlowingFluid.Flowing(FluidSetup.ENCHANT_FLUID_PROPERTIES));
     public static DeferredHolder<Block, LiquidBlock> ENCHANT_FLUID_BLOCK = BLOCKS.register("enchant_fluid_block",
             () -> new LiquidBlock(ENCHANT_FLUID_FLOWING.get(),

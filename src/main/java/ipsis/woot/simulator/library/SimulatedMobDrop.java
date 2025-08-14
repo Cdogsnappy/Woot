@@ -10,6 +10,8 @@ import ipsis.woot.Woot;
 import ipsis.woot.simulator.SimulatedMobDropSummary;
 import ipsis.woot.util.helper.MathHelper;
 import ipsis.woot.util.helper.RandomHelper;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.random.WeightedEntry;
 import net.minecraft.util.random.WeightedRandom;
@@ -26,6 +28,8 @@ public class SimulatedMobDrop {
     protected float[] customChanceToDrop;
     protected boolean hasCustom;
     protected SimulatedMob simulatedMob;
+
+
 
     protected List<HashMap<Integer, Integer>> simulatedStackSize;
     protected List<HashMap<Integer, Integer>> customStackSize;
@@ -162,11 +166,12 @@ public class SimulatedMobDrop {
     }
 
     public SimulatedMobDropSummary createSummary() {
-        return new SimulatedMobDropSummary(itemStack.copy(), Arrays.asList(calculateDropChance(0),
-                calculateDropChance(1),
-                calculateDropChance(2),
-                calculateDropChance(3))
-                );
+        List<Float> chances = new ArrayList<Float>();
+        chances.add(calculateDropChance(0));
+        for(int i = 1; i < 4; i++){
+            chances.add(Math.max(chances.get(i-1),calculateDropChance(i)));
+        }
+        return new SimulatedMobDropSummary(itemStack.copy(), chances);
     }
 
     public @Nonnull ItemStack getRolledDrop(int looting) {

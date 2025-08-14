@@ -120,10 +120,10 @@ public class LootLibrary {
         if (jsonObject == null || jsonObject.isJsonNull())
             throw new JsonSyntaxException("JsonObject cannot be null");
 
-        if (GsonHelper.convertToInt(jsonObject, TAG_VERSION) != JSON_VERSION)
+        if (jsonObject.get(TAG_VERSION).getAsInt() != JSON_VERSION)
             throw new JsonSyntaxException("Loot file version missing or invalid");
 
-        for (JsonElement jsonElement : GsonHelper.getAsJsonArray(jsonObject, TAG_SIMULATED_MOBS)) {
+        for (JsonElement jsonElement : jsonObject.getAsJsonArray(TAG_SIMULATED_MOBS)) {
             if (jsonElement == null || !jsonElement.isJsonObject())
                 throw new JsonSyntaxException("Simulated mob must be an object");
 

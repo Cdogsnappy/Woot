@@ -12,6 +12,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
@@ -41,11 +42,11 @@ public class FakePlayerPool {
 
     private static Map<Integer, WootFakePlayer> fakePlayerMap;
 
-    private static void addFakePlayer(@Nonnull WootFakePlayer fakePlayer, int looting, Enchantment enchantment) {
-        ItemStack sword = new ItemStack(Items.DIAMOND_SWORD);
+    private static void addFakePlayer(@Nonnull WootFakePlayer fakePlayer, int looting, Holder<Enchantment> enchantment) {
+        ItemStack sword = new ItemStack(Items.NETHERITE_SWORD);
         if (looting > 0 && enchantment != null)
-            sword.enchant(Holder.direct(enchantment), looting);
-        fakePlayer.setItemSlot(EquipmentSlot.MAINHAND, sword);
+            sword.enchant(enchantment, looting);
+        fakePlayer.setItemInHand(InteractionHand.MAIN_HAND, sword);
         fakePlayerMap.put(looting, fakePlayer);
     }
 
@@ -53,7 +54,7 @@ public class FakePlayerPool {
         fakePlayerMap = new HashMap<>();
         RegistryAccess registryAccess = level.registryAccess(); // or player.level().registryAccess()
         Registry<Enchantment> enchantmentRegistry = registryAccess.registryOrThrow(Registries.ENCHANTMENT);
-        Enchantment enchantment = enchantmentRegistry.get(Enchantments.LOOTING);
+        Holder<Enchantment> enchantment = enchantmentRegistry.getHolderOrThrow(Enchantments.LOOTING);
         if (enchantment == null)
             Woot.setup.getLogger().warn("FakePlayerPool failed to find looting enchantment");
 
@@ -78,6 +79,7 @@ public class FakePlayerPool {
         UUID uuid = fp.getUUID();
         return GP_LOOT_0.getId().equals(uuid) || GP_LOOT_1.getId().equals(uuid) || GP_LOOT_2.getId().equals(uuid) || GP_LOOT_3.getId().equals(uuid);
     }
+
 
 
 }

@@ -131,6 +131,7 @@ public class HeartBlockEntity extends WootMachineBlockEntity implements MultiBlo
            if (!isRunning())
                return;
 
+
            tickRecipe();
            if (consumedUnits >= recipe.getNumTicks()) {
                // get and process the ingredients
@@ -157,6 +158,8 @@ public class HeartBlockEntity extends WootMachineBlockEntity implements MultiBlo
            }
        }
     }
+
+
 
 
     private List<ItemStack> createItemIngredients(HeartRecipe recipe, FormedSetup formedSetup) {
@@ -316,7 +319,7 @@ public class HeartBlockEntity extends WootMachineBlockEntity implements MultiBlo
     int consumedUnits = 0;
     void tickRecipe() {
         // Purely the passage of time
-        consumedUnits++;
+        consumedUnits+=LAZY_TICK_RATE;
        setChanged();
     }
 

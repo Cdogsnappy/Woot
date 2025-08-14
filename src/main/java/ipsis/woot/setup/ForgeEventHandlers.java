@@ -28,6 +28,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -80,15 +81,19 @@ public class ForgeEventHandlers {
 
         if (!FakePlayerPool.isFakePlayer(damageSource.getDirectEntity()))
             return;
+        FakePlayer fakePlayer  = (FakePlayer)damageSource.getDirectEntity();
 
+        ItemStack stack = fakePlayer.getItemInHand(InteractionHand.MAIN_HAND);
         // Cancel our fake spawns
         event.setCanceled(true);
 
         Registry<Enchantment> enchantmentRegistry = damageSource.getEntity().level().registryAccess().registryOrThrow(Registries.ENCHANTMENT);
         Holder<Enchantment> lootingHolder = enchantmentRegistry.getHolderOrThrow(Enchantments.LOOTING);
 
+        int level = stack.getEnchantmentLevel(lootingHolder);
+
         List<ItemStack> drops = ItemEntityHelper.convertToItemStacks(event.getDrops());
-        FakeMobKey fakeMobKey = new FakeMobKey(new FakeMob(mob), event.getSource().getWeaponItem().getEnchantmentLevel(lootingHolder));
+        FakeMobKey fakeMobKey = new FakeMobKey(new FakeMob(mob), fakePlayer.getItemInHand(InteractionHand.MAIN_HAND).getEnchantmentLevel(lootingHolder));
         if (fakeMobKey.getMob().isValid()) {
             ipsis.woot.simulator.MobSimulator.getInstance().learnSimulatedDrops(fakeMobKey, drops);
         }

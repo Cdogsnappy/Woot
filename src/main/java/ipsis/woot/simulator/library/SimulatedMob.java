@@ -16,6 +16,7 @@ import ipsis.woot.util.helper.MathHelper;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.common.Tags;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -63,6 +64,9 @@ public class SimulatedMob {
     }
 
     public void addSimulatedDrop(int looting, ItemStack itemStack) {
+        if(itemStack.is(Tags.Items.TOOLS)){//Don't add tools to loot, they just suck...
+            return;
+        }
         if (itemStack.isEmpty() || itemStack.getCount() == 0)
             return;
 
@@ -134,7 +138,7 @@ public class SimulatedMob {
     }
 
     public static @Nullable SimulatedMob fromJson(JsonObject jsonObject) {
-        String mob = GsonHelper.convertToString(jsonObject, TAG_MOB);
+        String mob = jsonObject.get(TAG_MOB).getAsString();
         FakeMob fakeMob = new FakeMob(mob);
         if (!fakeMob.isValid()) {
             Woot.setup.getLogger().info("SimulatedMob:fromJson invalid mob {}", mob);
@@ -146,7 +150,7 @@ public class SimulatedMob {
             return null;
         }
 
-        JsonArray killsArray = GsonHelper.getAsJsonArray(jsonObject, TAG_SIM_KILLS);
+        JsonArray killsArray = jsonObject.getAsJsonArray(TAG_SIM_KILLS);
         if (killsArray.size() != 4)
             throw new JsonSyntaxException("Simulated kills array must be of size 4");
 
@@ -154,7 +158,7 @@ public class SimulatedMob {
         for (int i = 0; i < 4; i++)
             simulatedMob.simulatedKills[i] = killsArray.get(i).getAsInt();
 
-        for (JsonElement jsonElement : GsonHelper.getAsJsonArray(jsonObject, TAG_DROPS)) {
+        for (JsonElement jsonElement : jsonObject.getAsJsonArray(TAG_DROPS)) {
             if (jsonElement == null || !jsonElement.isJsonObject())
                 throw new JsonSyntaxException("Simulated drop must be an object");
 

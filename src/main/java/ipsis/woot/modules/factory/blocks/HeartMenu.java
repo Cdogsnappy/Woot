@@ -57,7 +57,11 @@ public class HeartMenu extends WootContainer implements TankPacketHandler  {
     public void broadcastChanges() {
         super.broadcastChanges();
 
-        if (!inputFluid.is(tileEntity.getTankFluid().getFluid())) {
+        if(tileEntity.getLevel().isClientSide){
+            return;
+        }
+
+        if (!inputFluid.is(tileEntity.getTankFluid().getFluid()) || inputFluid.getAmount() != tileEntity.getTankFluid().getAmount()) {
             inputFluid = tileEntity.getTankFluid().copy();
             TankPacket tankPacket = new TankPacket(inputFluid, 0);
             if(pInventory.player instanceof ServerPlayer pl) {
@@ -80,14 +84,14 @@ public class HeartMenu extends WootContainer implements TankPacketHandler  {
 
 
     private void addListeners() {
-        addShortListener(new DataSlot() {
+        addDataSlot(new DataSlot() {
             @Override
             public int get() { return tileEntity.getProgress(); }
 
             @Override
             public void set(int i) { progress = i; }
         });
-        addIntegerListener(new DataSlot() {
+        addDataSlot(new DataSlot() {
             @Override
             public int get() {
                 return tileEntity.getCellType();

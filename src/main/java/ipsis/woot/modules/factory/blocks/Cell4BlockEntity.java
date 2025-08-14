@@ -4,6 +4,8 @@ import ipsis.woot.modules.factory.FactoryConfiguration;
 import ipsis.woot.modules.factory.FactorySetup;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 
 public class Cell4BlockEntity extends CellBlockEntityBase {
 
@@ -19,5 +21,12 @@ public class Cell4BlockEntity extends CellBlockEntityBase {
     @Override
     public int getMaxTransfer() {
         return FactoryConfiguration.CELL_4_MAX_TRANSFER.get();
+    }
+
+    public static void registerCapabilities(RegisterCapabilitiesEvent event){
+        event.registerBlockEntity(Capabilities.FluidHandler.BLOCK,
+                FactorySetup.CELL_4_BLOCK_TILE.get(),
+                (be, direction) -> be.tank);
+
     }
 }

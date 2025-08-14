@@ -4,6 +4,7 @@ import ipsis.woot.modules.factory.Exotic;
 import ipsis.woot.modules.factory.MobParam;
 import ipsis.woot.modules.factory.perks.Perk;
 import ipsis.woot.modules.factory.Tier;
+import ipsis.woot.simulator.SimulatedMobDropSummary;
 import ipsis.woot.util.ExtraWootCodecs;
 import ipsis.woot.util.FakeMob;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -33,13 +34,13 @@ public class ClientFactorySetup {
     public double shardDropChance = 0.0F;
     public double[] shardDrops = new double[]{ 0.0F, 0.0F, 0.0F };
 
-    public static record Mob (List<ItemStack> drops) {
+    public static record Mob (List<SimulatedMobDropSummary> drops) {
         public Mob(){
             this(new ArrayList<>());
         }
 
         public static final StreamCodec<RegistryFriendlyByteBuf, Mob> STREAM_CODEC =
-                StreamCodec.composite(ByteBufCodecs.collection(ArrayList::new,ItemStack.STREAM_CODEC), Mob::drops,
+                StreamCodec.composite(ByteBufCodecs.collection(ArrayList::new,SimulatedMobDropSummary.STREAM_CODEC), Mob::drops,
                         Mob::new);
     }
 

@@ -1,5 +1,6 @@
 package ipsis.woot.modules.factory.blocks;
 
+import ipsis.woot.Woot;
 import ipsis.woot.modules.debug.items.DebugItem;
 import ipsis.woot.modules.factory.FactoryComponent;
 import ipsis.woot.modules.factory.FactoryComponentProvider;
@@ -30,6 +31,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.BlockHitResult;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidUtil;
 import org.jetbrains.annotations.NotNull;
@@ -54,19 +56,21 @@ public class CellBlock extends Block implements WootDebug, FactoryComponentProvi
 
 
     @Override
-    public @NotNull ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult p_225533_6_) {
-        if (worldIn.isClientSide)
+    public @NotNull ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult p_225533_6_) {
+        if (level.isClientSide)
             return ItemInteractionResult.SUCCESS;
 
-        if (!(worldIn.getBlockEntity(pos) instanceof CellBlockEntityBase))
+        if (!(level.getBlockEntity(pos) instanceof CellBlockEntityBase))
             throw new IllegalStateException("Tile entity is missing");
 
 
-        ItemStack heldItem = player.getItemInHand(handIn);
-        if (FluidUtil.getFluidHandler(heldItem).isPresent())
-            return FluidUtil.interactWithFluidHandler(player, handIn, worldIn, pos, null) ? ItemInteractionResult.SUCCESS : ItemInteractionResult.FAIL;
+        CellBlockEntityBase cb = (CellBlockEntityBase) level.getBlockEntity(pos);
+        Woot.setup.getLogger().debug(cb.tank.getCapacity());
+        Woot.setup.getLogger().debug(level.getCapability(Capabilities.FluidHandler.BLOCK, pos, null));
+        if (FluidUtil.getFluidHandler(stack).isPresent())
+            return FluidUtil.interactWithFluidHandler(player, handIn, level, pos, null) ? ItemInteractionResult.SUCCESS : ItemInteractionResult.FAIL;
 
-        return super.useItemOn(stack, state, worldIn, pos, player, handIn, p_225533_6_);
+        return super.useItemOn(stack, state, level, pos, player, handIn, p_225533_6_);
     }
 
     @OnlyIn(Dist.CLIENT)

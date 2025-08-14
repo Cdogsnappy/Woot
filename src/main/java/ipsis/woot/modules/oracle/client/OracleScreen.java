@@ -36,7 +36,7 @@ public class OracleScreen extends AbstractContainerScreen<OracleContainer> {
     private ResourceLocation GUI = ResourceLocation.fromNamespaceAndPath(Woot.MODID, "textures/gui/oracle.png");
 
     public OracleScreen(OracleContainer container, Inventory inv, Component title) {
-        super(container, inv, title);
+        super(container, inv, Component.translatable("gui.woot.oracle.name"));
         imageWidth = 180;
         imageHeight = 177;
     }
@@ -44,12 +44,13 @@ public class OracleScreen extends AbstractContainerScreen<OracleContainer> {
 
     @Override
     public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        renderBg(guiGraphics, partialTick, mouseX, mouseY);
         super.render(guiGraphics, mouseX, mouseY, partialTick);
-        guiGraphics.drawString(this.font,title, this.titleLabelX, this.titleLabelY, 4210752);
+        guiGraphics.drawString(this.font,title, this.titleLabelX + getGuiLeft(), this.titleLabelY + getGuiTop(), 4210752, false);
 
         if (menu.simulatedMobs.isEmpty()) {
             String mob = "N/A";
-            guiGraphics.drawString(this.font, mob, (this.imageWidth / 2 - this.font.width(mob) / 2), 25, 4210752);
+            guiGraphics.drawString(this.font, mob, (this.imageWidth / 2 - this.font.width(mob) / 2) + getGuiLeft(), 25 + getGuiTop(), 4210752, false);
         } else {
             FakeMob fakeMob = menu.simulatedMobs.get(mobIndex);
             EntityType<?> entityType = BuiltInRegistries.ENTITY_TYPE.get(fakeMob.getResourceLocation());
@@ -57,7 +58,7 @@ public class OracleScreen extends AbstractContainerScreen<OracleContainer> {
                 String mob = Component.literal(entityType.toShortString()).getString();
                 if (fakeMob.hasTag())
                     mob += "[" + fakeMob.getTag() + "]";
-                guiGraphics.drawString(this.font, mob, (this.imageWidth / 2 - this.font.width(mob) / 2), 25, 4210752);
+                guiGraphics.drawString(this.font, mob, getGuiLeft() + (this.imageWidth / 2 - this.font.width(mob) / 2), getGuiTop() + 25, 4210752, false);
             }
         }
 
@@ -127,10 +128,9 @@ public class OracleScreen extends AbstractContainerScreen<OracleContainer> {
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float v, int i, int i1) {
         guiGraphics.setColor(1.0F, 1.0F, 1.0F, 1.0F);
-        getMinecraft().getTextureManager().getTexture(GUI).bind();
         int relX = (this.width - this.imageWidth) / 2;
         int relY = (this.height - this.imageHeight) / 2;
-        guiGraphics.blit(GUI, relX, relY,0, 0.0F, 0.0F, imageWidth, imageHeight, 256, 256);
+        guiGraphics.blit(GUI, relX, relY,0,0, imageWidth, imageHeight);
 
         if (!menu.simulatedDrops.isEmpty()) {
             int currRow = 0;
@@ -149,5 +149,10 @@ public class OracleScreen extends AbstractContainerScreen<OracleContainer> {
                 }
             }
         }
+    }
+
+    @Override
+    protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+
     }
 }

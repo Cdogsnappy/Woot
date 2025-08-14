@@ -26,7 +26,7 @@ public class MobSimulatorConfiguration {
             SIMULATION_MOB_COUNT = COMMON_BUILDER
                     .comment("Number of simulated mobs to learn from")
                     .defineInRange(ConfigPath.Simulation.MOB_SAMPLE_SIZE_TAG,
-                            ConfigDefaults.Simulation.MOB_SAMPLE_SIZE_DEF, 100, 5000);
+                            ConfigDefaults.Simulation.MOB_SAMPLE_SIZE_DEF, 500, 5000);
 
             SIMULATION_TICKS_PER_SIM_TICK = COMMON_BUILDER
                     .comment("Number of ticks per tick of the simulator")

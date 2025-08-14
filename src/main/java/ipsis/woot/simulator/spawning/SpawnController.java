@@ -142,13 +142,8 @@ public class SpawnController {
         FakePlayer fakePlayer = FakePlayerPool.getFakePlayer((ServerLevel)world, 0);
 
         int xp = 1;
-        try {
-            Method getExp = ObfuscationReflectionHelper.findMethod(LivingEntity.class, "getExperienceReward", Level.class, Entity.class);
-            getExp.setAccessible(true);
-            xp = (int)getExp.invoke(world, entity);
-        } catch (Throwable e) {
-            Woot.setup.getLogger().debug("Reflection of getExperiencePoints failed {}", e);
-        }
+        xp = ((LivingEntity) entity).getExperienceReward((ServerLevel) entity.level(), fakePlayer);
+
 
         Woot.setup.getLogger().debug("updateCache: caching mob:{} xp:{} health:{}", fakeMob, xp, health);
         addToCache(fakeMob, entity instanceof Animal, xp, health);

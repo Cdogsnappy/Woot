@@ -132,7 +132,8 @@ public class InternItem extends Item {
      */
     private static final String NBT_MODE = "mode";
     private static void setToolModeInStack(ItemStack itemStack, ToolMode toolMode) {
-        CompoundTag compound = itemStack.get(DataComponents.CUSTOM_DATA).copyTag();
+        CustomData data = itemStack.get(DataComponents.CUSTOM_DATA);
+        CompoundTag compound = data == null ? new CompoundTag() : data.copyTag();
 
         compound.putString(NBT_MODE, toolMode.name());
         itemStack.set(DataComponents.CUSTOM_DATA, CustomData.of(compound));
@@ -140,7 +141,8 @@ public class InternItem extends Item {
 
     private static ToolMode getToolModeFromStack(ItemStack itemStack) {
         ToolMode mode = ToolMode.BUILD_1; // default
-        CompoundTag compound = itemStack.get(DataComponents.CUSTOM_DATA).copyTag();
+        CustomData data = itemStack.get(DataComponents.CUSTOM_DATA);
+        CompoundTag compound = data == null ? new CompoundTag() : data.copyTag();
         if (!compound.contains(NBT_MODE)) {
             setToolModeInStack(itemStack, mode);
         } else {

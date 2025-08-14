@@ -12,6 +12,7 @@ import ipsis.woot.modules.factory.items.PerkItem;
 import ipsis.woot.modules.factory.perks.Perk;
 import ipsis.woot.setup.NetworkChannel;
 import ipsis.woot.setup.ServerDataRequest;
+import ipsis.woot.simulator.SimulatedMobDropSummary;
 import ipsis.woot.util.FakeMob;
 import ipsis.woot.util.WootContainerScreen;
 import ipsis.woot.util.helper.RenderHelper;
@@ -55,6 +56,7 @@ public class HeartScreen extends WootContainerScreen<HeartMenu> {
         imageHeight = GUI_HEIGHT;
         imageWidth = GUI_WIDTH;
         font = Minecraft.getInstance().font;
+        currFluidRender = menu.getInputFluid().getAmount();
     }
 
     private List<GuiItemStackElement> dropElements = new ArrayList<>();
@@ -68,24 +70,26 @@ public class HeartScreen extends WootContainerScreen<HeartMenu> {
     private int DROPS_COLS = 13;
     private int DROPS_ROWS = 4;
     private int DROPS_X = 10;
-    private int DROPS_Y = 114;
-    private int MOBS_X = 9;
-    private int MOBS_Y = 56;
-    private int PERKS_X = 98;
-    private int PERKS_Y = 56;
+    private int DROPS_Y = 144;
+    private int MOBS_X = 10;
+    private int MOBS_Y = 76;
+    private int PERKS_X = 99;
+    private int PERKS_Y = 76;
     private int RECIPE_X = 10;
-    private int RECIPE_Y = 84;
+    private int RECIPE_Y = 110;
     private float DROP_CYCLE_MS = 5000.0F;
     private int TEXT_COLOR = 4210752;
     private static final int TANK_LX = 226;
     private static final int TANK_LY = 8;
     private static final int TANK_RX = 241;
     private static final int TANK_RY = 91;
-    private int EXOTIC_X = 180;
-    private int EXOTIC_Y = 56;
+    private static int EXOTIC_X = 190;
+    private static int EXOTIC_Y = 76;
     private StackElement exoticElement = new StackElement(EXOTIC_X, EXOTIC_Y);
 
     private long renderTime;
+
+    private int currFluidRender;
 
     @Override
     protected void init() {
@@ -93,18 +97,18 @@ public class HeartScreen extends WootContainerScreen<HeartMenu> {
 
         // Mobs
         for (int i = 0; i < 4; i++)
-            mobElements.add(new GuiItemStackElement(1 + MOBS_X + (i * 18), 10 + MOBS_Y, true));
+            mobElements.add(new GuiItemStackElement( MOBS_X + (i * 18),  MOBS_Y, true));
 
         // Upgrades
         for (int i = 0; i < 4; i++)
-            upgradeElements.add(new GuiItemStackElement(PERKS_X + (i * 18), PERKS_Y + 10, true));
+            upgradeElements.add(new GuiItemStackElement(PERKS_X + (i * 18), PERKS_Y, true));
 
         // Recipe
 
         // Drops
         for (int row = 0; row < DROPS_ROWS; row++) {
             for (int col = 0; col < DROPS_COLS; col++) {
-                dropElements.add(new GuiItemStackElement(DROPS_X + (col * 18), 10 + DROPS_Y + (row * 18)));
+                dropElements.add(new GuiItemStackElement(DROPS_X + (col * 18), DROPS_Y + (row * 18)));
             }
         }
 
@@ -129,6 +133,11 @@ public class HeartScreen extends WootContainerScreen<HeartMenu> {
     }
 
     public void attemptRenderTooltip(GuiGraphics guiGraphics, int mouseX, int mouseY){
+
+        if(mouseX > getGuiLeft() + EXOTIC_X && mouseX < getGuiLeft() + EXOTIC_X + 18 &&  mouseY > getGuiTop() + EXOTIC_Y && mouseY < getGuiTop() + EXOTIC_Y + 18){
+            exoticElement.drawTooltip(guiGraphics, mouseX, mouseY);
+        }
+
 
         if((mouseX > getGuiLeft() + MOBS_X && mouseX < getGuiLeft() + MOBS_X + 18*mobElements.size()) && (mouseY > getGuiTop() + MOBS_Y && mouseY < getGuiTop() + MOBS_Y + 18*mobElements.size())){
             mobElements.get((mouseX - (getGuiLeft() + MOBS_X))/18).drawTooltip(guiGraphics, mouseX, mouseY);
@@ -178,8 +187,7 @@ public class HeartScreen extends WootContainerScreen<HeartMenu> {
     protected void renderBg(GuiGraphics guiGraphics, float v, int mouseX, int mouseY) {
         int relX = (width - imageWidth) / 2;
         int relY = (height - imageHeight) / 2;
-        getMinecraft().getTextureManager().getTexture(GUI).bind();
-        guiGraphics.blit(GUI, relX, relY,0, 0.0F, 0.0F, imageWidth, imageHeight, GUI_WIDTH, GUI_HEIGHT);
+        guiGraphics.blit(GUI, relX, relY,0,0, imageWidth, imageHeight);
 
         mobElements.forEach(e -> e.drawBackground(guiGraphics, mouseX, mouseY));
         upgradeElements.forEach(e -> e.drawBackground(guiGraphics, mouseX, mouseY));
@@ -187,14 +195,24 @@ public class HeartScreen extends WootContainerScreen<HeartMenu> {
         recipeElements.forEach(e -> e.drawBackground(guiGraphics, mouseX, mouseY));
         exoticElement.drawBackground(mouseX, mouseY);
 
+        int renderDiff = menu.getInputFluid().getAmount() - currFluidRender;
+        if(renderDiff == 0){}
+        else if (Math.abs(renderDiff) < 20){
+            currFluidRender = menu.getInputFluid().getAmount();
+        }
+        else{
+            currFluidRender += (int) Math.ceil(renderDiff*.08F);
+        }
+
         renderFluidTank(
                 guiGraphics,
-                TANK_LX,
-                TANK_RY,
+                getGuiLeft() + TANK_LX,
+                getGuiTop() + TANK_RY,
                 TANK_RY - TANK_LY + 1,
                 TANK_RX - TANK_LX + 1,
                 getCapacity(),
-                menu.getInputFluid());
+                menu.getInputFluid(),
+                currFluidRender);
     }
 
     /**
@@ -205,25 +223,35 @@ public class HeartScreen extends WootContainerScreen<HeartMenu> {
     /**
      * return true if unique drop added
      */
-    private boolean addToDropElements(int idx, FakeMob fakeMob, ItemStack itemStack) {
-        List<Component> tooltip = getTooltipFromItem(getMinecraft(), itemStack);
+    private boolean addToDropElements(int idx, FakeMob fakeMob, SimulatedMobDropSummary summary) {
+        List<Component> tooltip = getTooltipFromItem(getMinecraft(), summary.stack());
         EntityType<?> entityType = BuiltInRegistries.ENTITY_TYPE.get(fakeMob.getResourceLocation());
         if (entityType != null) {
             Component iTextComponent =Component.translatable(entityType.getDescriptionId());
+            int index = 0;
+            if(this.menu.getTileEntity().clientFactorySetup.perks.contains(Perk.looting_1)){
+                index = 1;
+            }
+            else if(this.menu.getTileEntity().clientFactorySetup.perks.contains(Perk.looting_2)){
+                index = 2;
+            }
+            else if(this.menu.getTileEntity().clientFactorySetup.perks.contains(Perk.looting_3)){
+                index = 3;
+            }
             tooltip.add(Component.literal(String.format("%s : %.2f%%",
-                    iTextComponent.getString(), itemStack.getCount() / 100.0F)));
+                    iTextComponent.getString(), summary.chanceToDrop().get(index))));
         }
 
         boolean found = false;
         for (GuiItemStackElement guiItemStackElement : dropElements) {
-            if (guiItemStackElement.itemStack.is(itemStack.getItem())) {
+            if (guiItemStackElement.itemStack.is(summary.stack().getItem())) {
                 guiItemStackElement.addToolTip(tooltip);
                 found = true;
                 break;
             }
         }
         if (!found) {
-            dropElements.get(idx).setItemStack(itemStack);
+            dropElements.get(idx).setItemStack(summary.stack());
             dropElements.get(idx).addToolTip(tooltip);
             return true;
         }
@@ -247,8 +275,8 @@ public class HeartScreen extends WootContainerScreen<HeartMenu> {
 
                 knownMobs.add(fakeMob);
                 ClientFactorySetup.Mob mobInfo = clientFactorySetup.mobInfo.get(fakeMob);
-                for (ItemStack itemStack : mobInfo.drops()) {
-                    if (addToDropElements(idx, fakeMob, itemStack))
+                for (SimulatedMobDropSummary sum : mobInfo.drops()) {
+                    if (addToDropElements(idx, fakeMob, sum))
                         idx = (idx + 1) % dropElements.size();
                 }
             }
@@ -349,14 +377,14 @@ public class HeartScreen extends WootContainerScreen<HeartMenu> {
         addInfoLine(guiGraphics, 2,StringHelper.translate("gui.woot.heart.1"), clientFactorySetup.recipeTicks + " ticks");
         addInfoLine(guiGraphics, 3, StringHelper.translate("gui.woot.heart.2"), ((HeartMenu)menu).getProgress() + "%");
 
-        guiGraphics.drawString(font, StringHelper.translate("gui.woot.heart.3"), getGuiLeft() +MOBS_X, getGuiTop() +MOBS_Y, TEXT_COLOR, false);
-        guiGraphics.drawString(font, StringHelper.translate("gui.woot.heart.4"), getGuiLeft() +PERKS_X, getGuiTop() +PERKS_Y, TEXT_COLOR, false);
-        guiGraphics.drawString(font, StringHelper.translate("gui.woot.heart.5"), getGuiLeft() +DROPS_X, getGuiTop() +DROPS_Y, TEXT_COLOR, false);
-        guiGraphics.drawString(font, StringHelper.translate("gui.woot.heart.6"), getGuiLeft() +RECIPE_X, getGuiTop() +RECIPE_Y, TEXT_COLOR, false);
-        guiGraphics.drawString(font, StringHelper.translate("gui.woot.heart.7"), getGuiLeft() + EXOTIC_X, getGuiTop() + EXOTIC_Y, TEXT_COLOR, false);
+        guiGraphics.drawString(font, StringHelper.translate("gui.woot.heart.3"), getGuiLeft() +MOBS_X, getGuiTop() +MOBS_Y - 10, TEXT_COLOR, false);
+        guiGraphics.drawString(font, StringHelper.translate("gui.woot.heart.4"), getGuiLeft() +PERKS_X, getGuiTop() +PERKS_Y - 10, TEXT_COLOR, false);
+        guiGraphics.drawString(font, StringHelper.translate("gui.woot.heart.5"), getGuiLeft() +DROPS_X, getGuiTop() +DROPS_Y - 10, TEXT_COLOR, false);
+        guiGraphics.drawString(font, StringHelper.translate("gui.woot.heart.6"), getGuiLeft() +RECIPE_X, getGuiTop() +RECIPE_Y - 10, TEXT_COLOR, false);
+        guiGraphics.drawString(font, StringHelper.translate("gui.woot.heart.7"), getGuiLeft() + EXOTIC_X, getGuiTop() + EXOTIC_Y - 10, TEXT_COLOR, false);
 
-        mobElements.forEach(e -> e.drawScaledForeground(guiGraphics, mouseX, mouseY, .98F, .9F));
-        upgradeElements.forEach(e -> e.drawScaledForeground(guiGraphics, mouseX, mouseY, 1F, .88F));
+        mobElements.forEach(e -> e.drawForeground(guiGraphics, mouseX, mouseY));
+        upgradeElements.forEach(e -> e.drawForeground(guiGraphics, mouseX, mouseY));
         recipeElements.forEach(e -> e.drawForeground(guiGraphics, mouseX, mouseY));
         dropElements.forEach(e -> e.drawForeground(guiGraphics, mouseX, mouseY));
         exoticElement.drawForeground(guiGraphics, mouseX, mouseY);
@@ -418,9 +446,7 @@ public class HeartScreen extends WootContainerScreen<HeartMenu> {
 
             ItemStack itemStack = itemStacks.get(idx);
             List<Component> tooltip = tooltips.get(idx);
-            if (RenderHelper.isPointInRegion(x, y, 16, 16, mouseX, mouseY, getRectangle().left(),getRectangle().top())) {
-                guiGraphics.renderTooltip(font, tooltip, Optional.empty(), mouseX, mouseY);
-            }
+            guiGraphics.renderTooltip(font, tooltip, Optional.empty(), mouseX, mouseY);
         }
 
 
@@ -517,30 +543,6 @@ public class HeartScreen extends WootContainerScreen<HeartMenu> {
             guiGraphics.renderItem(itemStack, getGuiLeft() + posX, getGuiTop() + posY, 100, 0);
         }
 
-        public void drawScaledForeground(GuiGraphics guiGraphics, int mouseX, int mouseY, float scale) {
-            drawScaledForeground(guiGraphics, mouseX, mouseY, scale, scale);
-        }
-        public void drawScaledForeground(GuiGraphics guiGraphics, int mouseX, int mouseY, float scale_x, float scale_y) {
-            super.drawForeground(guiGraphics, mouseX, mouseY);
-
-            if (itemStack.isEmpty())
-                return;
-
-            PoseStack poseStack = guiGraphics.pose();
-
-            poseStack.pushPose();
-
-            // Scale down to 75% size
-            poseStack.scale(scale_x, scale_y, 1);
-
-            // Adjust position to account for scaling
-            int scaledX = (int) ( (getGuiLeft() + posX) / (scale_x));
-            int scaledY = (int) ((getGuiTop() + posY) / (scale_y));
-
-
-            guiGraphics.renderItem(itemStack, scaledX, scaledY, 100, 0);
-            poseStack.popPose();
-        }
 
         @Override
         public void drawTooltip(GuiGraphics guiGraphics, int mouseX, int mouseY) {
@@ -582,7 +584,7 @@ public class HeartScreen extends WootContainerScreen<HeartMenu> {
             if (isLocked || fluidStack.isEmpty())
                 return;
 
-            drawFluid(guiGraphics, getRectangle().left() + posX, getRectangle().top() + posY, fluidStack, 16, 16);
+            drawFluid(guiGraphics, getGuiLeft() + posX, getGuiTop() + posY, fluidStack, 16, 16);
         }
 
         @Override
