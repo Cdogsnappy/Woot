@@ -2,19 +2,24 @@ package ipsis.woot.datagen.modules;
 
 import ipsis.woot.Woot;
 import ipsis.woot.crafting.dyesqueezer.DyeSqueezerRecipeBuilder;
+import ipsis.woot.crafting.enchantsqueezer.EnchantSqueezerRecipeBuilder;
+import ipsis.woot.fluilds.FluidSetup;
 import ipsis.woot.modules.generic.GenericSetup;
 import ipsis.woot.modules.squeezer.DyeMakeup;
+import ipsis.woot.modules.squeezer.SqueezerConfiguration;
 import ipsis.woot.modules.squeezer.SqueezerSetup;
 import net.minecraft.advancements.critereon.InventoryChangeTrigger;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.common.Tags;
+import net.neoforged.neoforge.fluids.FluidStack;
 
 
 import java.util.Locale;
@@ -121,5 +126,10 @@ public class Squeezer {
                     d.dyeMakeup.getWhite())
                     .save(recipeOutput, d.name);
         }
+        EnchantSqueezerRecipeBuilder.enchantSqueezerRecipe(Ingredient.of(Items.ENCHANTED_BOOK),
+                new FluidStack(FluidSetup.ENCHANT_FLUID.get(), 1000),
+                SqueezerConfiguration.ENCH_SQUEEZER_LVL_1_ENERGY_COST.get())
+                .save(recipeOutput, ResourceLocation.parse("enchanted_book_recipe"));
     }
+
 }

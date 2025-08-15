@@ -52,40 +52,40 @@ public class ClientRegistration {
 
     @SubscribeEvent
     public static void registerItemColors(RegisterColorHandlersEvent.Item event) {
-        Woot.setup.getLogger().debug("registerItemColors");
-        ItemColors items = event.getItemColors();
-        items.register((s, t) -> ((DyePlateItem)s.getItem()).getColor().getMapColor().col, InfuserSetup.WHITE_DYE_PLATE_ITEM.get());
-        items.register((s, t) -> ((DyePlateItem)s.getItem()).getColor().getMapColor().col, InfuserSetup.ORANGE_DYE_PLATE_ITEM.get());
-        items.register((s, t) -> ((DyePlateItem)s.getItem()).getColor().getMapColor().col, InfuserSetup.MAGENTA_DYE_PLATE_ITEM.get());
-        items.register((s, t) -> ((DyePlateItem)s.getItem()).getColor().getMapColor().col, InfuserSetup.LIGHT_BLUE_DYE_PLATE_ITEM.get());
-        items.register((s, t) -> ((DyePlateItem)s.getItem()).getColor().getMapColor().col, InfuserSetup.YELLOW_DYE_PLATE_ITEM.get());
-        items.register((s, t) -> ((DyePlateItem)s.getItem()).getColor().getMapColor().col, InfuserSetup.LIME_DYE_PLATE_ITEM.get());
-        items.register((s, t) -> ((DyePlateItem)s.getItem()).getColor().getMapColor().col, InfuserSetup.PINK_DYE_PLATE_ITEM.get());
-        items.register((s, t) -> ((DyePlateItem)s.getItem()).getColor().getMapColor().col, InfuserSetup.GRAY_DYE_PLATE_ITEM.get());
-        items.register((s, t) -> ((DyePlateItem)s.getItem()).getColor().getMapColor().col, InfuserSetup.LIGHT_GRAY_DYE_PLATE_ITEM.get());
-        items.register((s, t) -> ((DyePlateItem)s.getItem()).getColor().getMapColor().col, InfuserSetup.CYAN_DYE_PLATE_ITEM.get());
-        items.register((s, t) -> ((DyePlateItem)s.getItem()).getColor().getMapColor().col, InfuserSetup.PURPLE_DYE_PLATE_ITEM.get());
-        items.register((s, t) -> ((DyePlateItem)s.getItem()).getColor().getMapColor().col, InfuserSetup.BLUE_DYE_PLATE_ITEM.get());
-        items.register((s, t) -> ((DyePlateItem)s.getItem()).getColor().getMapColor().col, InfuserSetup.BROWN_DYE_PLATE_ITEM.get());
-        items.register((s, t) -> ((DyePlateItem)s.getItem()).getColor().getMapColor().col, InfuserSetup.GREEN_DYE_PLATE_ITEM.get());
-        items.register((s, t) -> ((DyePlateItem)s.getItem()).getColor().getMapColor().col, InfuserSetup.RED_DYE_PLATE_ITEM.get());
-        items.register((s, t) -> ((DyePlateItem)s.getItem()).getColor().getMapColor().col, InfuserSetup.BLACK_DYE_PLATE_ITEM.get());
 
-        items.register((s, t) -> ((DyeCasingItem)s.getItem()).getColor().getMapColor().col, InfuserSetup.WHITE_DYE_CASING_ITEM.get());
-        items.register((s, t) -> ((DyeCasingItem)s.getItem()).getColor().getMapColor().col, InfuserSetup.ORANGE_DYE_CASING_ITEM.get());
-        items.register((s, t) -> ((DyeCasingItem)s.getItem()).getColor().getMapColor().col, InfuserSetup.MAGENTA_DYE_CASING_ITEM.get());
-        items.register((s, t) -> ((DyeCasingItem)s.getItem()).getColor().getMapColor().col, InfuserSetup.LIGHT_BLUE_DYE_CASING_ITEM.get());
-        items.register((s, t) -> ((DyeCasingItem)s.getItem()).getColor().getMapColor().col, InfuserSetup.YELLOW_DYE_CASING_ITEM.get());
-        items.register((s, t) -> ((DyeCasingItem)s.getItem()).getColor().getMapColor().col, InfuserSetup.LIME_DYE_CASING_ITEM.get());
-        items.register((s, t) -> ((DyeCasingItem)s.getItem()).getColor().getMapColor().col, InfuserSetup.PINK_DYE_CASING_ITEM.get());
-        items.register((s, t) -> ((DyeCasingItem)s.getItem()).getColor().getMapColor().col, InfuserSetup.GRAY_DYE_CASING_ITEM.get());
-        items.register((s, t) -> ((DyeCasingItem)s.getItem()).getColor().getMapColor().col, InfuserSetup.LIGHT_GRAY_DYE_CASING_ITEM.get());
-        items.register((s, t) -> ((DyeCasingItem)s.getItem()).getColor().getMapColor().col, InfuserSetup.CYAN_DYE_CASING_ITEM.get());
-        items.register((s, t) -> ((DyeCasingItem)s.getItem()).getColor().getMapColor().col, InfuserSetup.PURPLE_DYE_CASING_ITEM.get());
-        items.register((s, t) -> ((DyeCasingItem)s.getItem()).getColor().getMapColor().col, InfuserSetup.BLUE_DYE_CASING_ITEM.get());
-        items.register((s, t) -> ((DyeCasingItem)s.getItem()).getColor().getMapColor().col, InfuserSetup.BROWN_DYE_CASING_ITEM.get());
-        items.register((s, t) -> ((DyeCasingItem)s.getItem()).getColor().getMapColor().col, InfuserSetup.GREEN_DYE_CASING_ITEM.get());
-        items.register((s, t) -> ((DyeCasingItem)s.getItem()).getColor().getMapColor().col, InfuserSetup.RED_DYE_CASING_ITEM.get());
-        items.register((s, t) -> ((DyeCasingItem)s.getItem()).getColor().getMapColor().col, InfuserSetup.BLACK_DYE_CASING_ITEM.get());
+        Woot.setup.getLogger().debug("registerItemColors");
+
+        event.register((s, t) -> ((DyePlateItem)s.getItem()).getColor().getTextureDiffuseColor(), InfuserSetup.ORANGE_DYE_PLATE_ITEM.get());
+        event.register((s, t) -> ((DyePlateItem)s.getItem()).getColor().getTextureDiffuseColor(), InfuserSetup.MAGENTA_DYE_PLATE_ITEM.get());
+        event.register((s, t) -> ((DyePlateItem)s.getItem()).getColor().getTextureDiffuseColor(), InfuserSetup.LIGHT_BLUE_DYE_PLATE_ITEM.get());
+        event.register((s, t) -> ((DyePlateItem)s.getItem()).getColor().getTextureDiffuseColor(), InfuserSetup.YELLOW_DYE_PLATE_ITEM.get());
+        event.register((s, t) -> ((DyePlateItem)s.getItem()).getColor().getTextureDiffuseColor(), InfuserSetup.LIME_DYE_PLATE_ITEM.get());
+        event.register((s, t) -> ((DyePlateItem)s.getItem()).getColor().getTextureDiffuseColor(), InfuserSetup.PINK_DYE_PLATE_ITEM.get());
+        event.register((s, t) -> ((DyePlateItem)s.getItem()).getColor().getTextureDiffuseColor(), InfuserSetup.GRAY_DYE_PLATE_ITEM.get());
+        event.register((s, t) -> ((DyePlateItem)s.getItem()).getColor().getTextureDiffuseColor(), InfuserSetup.LIGHT_GRAY_DYE_PLATE_ITEM.get());
+        event.register((s, t) -> ((DyePlateItem)s.getItem()).getColor().getTextureDiffuseColor(), InfuserSetup.CYAN_DYE_PLATE_ITEM.get());
+        event.register((s, t) -> ((DyePlateItem)s.getItem()).getColor().getTextureDiffuseColor(), InfuserSetup.PURPLE_DYE_PLATE_ITEM.get());
+        event.register((s, t) -> ((DyePlateItem)s.getItem()).getColor().getTextureDiffuseColor(), InfuserSetup.BLUE_DYE_PLATE_ITEM.get());
+        event.register((s, t) -> ((DyePlateItem)s.getItem()).getColor().getTextureDiffuseColor(), InfuserSetup.BROWN_DYE_PLATE_ITEM.get());
+        event.register((s, t) -> ((DyePlateItem)s.getItem()).getColor().getTextureDiffuseColor(), InfuserSetup.GREEN_DYE_PLATE_ITEM.get());
+        event.register((s, t) -> ((DyePlateItem)s.getItem()).getColor().getTextureDiffuseColor(), InfuserSetup.RED_DYE_PLATE_ITEM.get());
+        event.register((s, t) -> ((DyePlateItem)s.getItem()).getColor().getTextureDiffuseColor(), InfuserSetup.BLACK_DYE_PLATE_ITEM.get());
+
+        event.register((s, t) -> ((DyeCasingItem)s.getItem()).getColor().getTextureDiffuseColor(), InfuserSetup.WHITE_DYE_CASING_ITEM.get());
+        event.register((s, t) -> ((DyeCasingItem)s.getItem()).getColor().getTextureDiffuseColor(), InfuserSetup.ORANGE_DYE_CASING_ITEM.get());
+        event.register((s, t) -> ((DyeCasingItem)s.getItem()).getColor().getTextureDiffuseColor(), InfuserSetup.MAGENTA_DYE_CASING_ITEM.get());
+        event.register((s, t) -> ((DyeCasingItem)s.getItem()).getColor().getTextureDiffuseColor(), InfuserSetup.LIGHT_BLUE_DYE_CASING_ITEM.get());
+        event.register((s, t) -> ((DyeCasingItem)s.getItem()).getColor().getTextureDiffuseColor(), InfuserSetup.YELLOW_DYE_CASING_ITEM.get());
+        event.register((s, t) -> ((DyeCasingItem)s.getItem()).getColor().getTextureDiffuseColor(), InfuserSetup.LIME_DYE_CASING_ITEM.get());
+        event.register((s, t) -> ((DyeCasingItem)s.getItem()).getColor().getTextureDiffuseColor(), InfuserSetup.PINK_DYE_CASING_ITEM.get());
+        event.register((s, t) -> ((DyeCasingItem)s.getItem()).getColor().getTextureDiffuseColor(), InfuserSetup.GRAY_DYE_CASING_ITEM.get());
+        event.register((s, t) -> ((DyeCasingItem)s.getItem()).getColor().getTextureDiffuseColor(), InfuserSetup.LIGHT_GRAY_DYE_CASING_ITEM.get());
+        event.register((s, t) -> ((DyeCasingItem)s.getItem()).getColor().getTextureDiffuseColor(), InfuserSetup.CYAN_DYE_CASING_ITEM.get());
+        event.register((s, t) -> ((DyeCasingItem)s.getItem()).getColor().getTextureDiffuseColor(), InfuserSetup.PURPLE_DYE_CASING_ITEM.get());
+        event.register((s, t) -> ((DyeCasingItem)s.getItem()).getColor().getTextureDiffuseColor(), InfuserSetup.BLUE_DYE_CASING_ITEM.get());
+        event.register((s, t) -> ((DyeCasingItem)s.getItem()).getColor().getTextureDiffuseColor(), InfuserSetup.BROWN_DYE_CASING_ITEM.get());
+        event.register((s, t) -> ((DyeCasingItem)s.getItem()).getColor().getTextureDiffuseColor(), InfuserSetup.GREEN_DYE_CASING_ITEM.get());
+        event.register((s, t) -> ((DyeCasingItem)s.getItem()).getColor().getTextureDiffuseColor(), InfuserSetup.RED_DYE_CASING_ITEM.get());
+        event.register((s, t) -> ((DyeCasingItem)s.getItem()).getColor().getTextureDiffuseColor(), InfuserSetup.BLACK_DYE_CASING_ITEM.get());
     }
 }

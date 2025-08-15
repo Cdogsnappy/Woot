@@ -94,9 +94,11 @@ public class Languages extends LanguageProvider {
         add(FactorySetup.CRUSHER_1_ITEM.get(), "Pressing Engagement I Perk");
         add(FactorySetup.CRUSHER_2_ITEM.get(), "Pressing Engagement II Perk");
         add(FactorySetup.CRUSHER_3_ITEM.get(), "Pressing Engagement III Perk");
+        /**
         add(FactorySetup.FLAYED_1_ITEM.get(), "Flayed I Perk");
         add(FactorySetup.FLAYED_2_ITEM.get(), "Flayed II Perk");
         add(FactorySetup.FLAYED_3_ITEM.get(), "Flayed III Perk");
+         **/
         add(FactorySetup.MOB_SHARD_ITEM.get(), "Mob Shard");
         add(FactorySetup.XP_SHARD_ITEM.get(), "Experience Shard");
         add(FactorySetup.XP_SPLINTER_ITEM.get(), "Experience Splinter");

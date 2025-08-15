@@ -19,7 +19,7 @@ public class ConfigOverride {
     private HashMap<Perk.Group, OverrideKey[]> perkMap = new HashMap<>();
 
     public ConfigOverride() {
-        perkMap.put(Perk.Group.effieciency,
+        perkMap.put(Perk.Group.efficiency,
                 new OverrideKey[]{OverrideKey.PERK_EFFICIENCY_1_REDUCTION, OverrideKey.PERK_EFFICIENCY_2_REDUCTION, OverrideKey.PERK_EFFICIENCY_3_REDUCTION});
         perkMap.put(Perk.Group.mass,
                 new OverrideKey[]{OverrideKey.PERK_MASS_1_COUNT, OverrideKey.PERK_MASS_2_COUNT, OverrideKey.PERK_MASS_3_COUNT});

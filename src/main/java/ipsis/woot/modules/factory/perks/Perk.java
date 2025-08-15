@@ -12,9 +12,9 @@ import java.util.*;
 public enum Perk implements StringRepresentable {
 
     empty(null),
-    efficiency_1(Group.effieciency),
-    efficiency_2(Group.effieciency),
-    efficiency_3(Group.effieciency),
+    efficiency_1(Group.efficiency),
+    efficiency_2(Group.efficiency),
+    efficiency_3(Group.efficiency),
     looting_1(Group.looting),
    looting_2(Group.looting),
     looting_3(Group.looting),
@@ -79,7 +79,7 @@ public enum Perk implements StringRepresentable {
 
     private static final Map<Group, EnumSet<Perk>> perkMap = new HashMap<>();
     static {
-        perkMap.put(Group.effieciency, EFFICIENCY_PERKS);
+        perkMap.put(Group.efficiency, EFFICIENCY_PERKS);
         perkMap.put(Group.looting, LOOTING_PERKS);
         perkMap.put(Group.mass, MASS_PERKS);
         perkMap.put(Group.rate, RATE_PERKS);
@@ -119,7 +119,7 @@ public enum Perk implements StringRepresentable {
     }
 
     public enum Group {
-        effieciency,
+        efficiency,
         looting,
         mass,
         rate,

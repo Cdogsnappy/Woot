@@ -31,7 +31,7 @@ public class CalculatorVersion2 {
         if (setup.hasConatusExotic()) {
             v = FactoryConfiguration.EXOTIC_C.get();
             LOGGER.debug("Calculator: EXOTIC {} conatus efficiency", v);
-        } else if (setup.getAllPerks().containsKey(Perk.Group.effieciency)) {
+        } else if (setup.getAllPerks().containsKey(Perk.Group.efficiency)) {
             v = setup.getAllMobParams().get(fakeMob).getPerkEfficiencyValue();
             LOGGER.debug("Calculator: PERK {} conatus efficiency", v);
         }

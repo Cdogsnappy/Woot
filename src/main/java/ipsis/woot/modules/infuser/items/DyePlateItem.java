@@ -1,9 +1,9 @@
 package ipsis.woot.modules.infuser.items;
 
-import ipsis.woot.Woot;
-import ipsis.woot.setup.ModSetup;
+
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 
 
 public class DyePlateItem extends Item {

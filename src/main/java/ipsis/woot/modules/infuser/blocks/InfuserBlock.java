@@ -75,10 +75,9 @@ public class InfuserBlock extends WootBaseEntityBlock implements WootDebug {
             return ItemInteractionResult.SUCCESS;
 
 
-        if (!(level.getBlockEntity(pos) instanceof InfuserBlockEntity))
+        if (!(level.getBlockEntity(pos) instanceof InfuserBlockEntity infuser))
             throw new IllegalStateException("Tile entity is missing");
 
-        InfuserBlockEntity infuser = (InfuserBlockEntity)level.getBlockEntity(pos);
         ItemStack heldItem = player.getItemInHand(hand);
 
         if (FluidUtil.getFluidHandler(heldItem).isPresent()) {

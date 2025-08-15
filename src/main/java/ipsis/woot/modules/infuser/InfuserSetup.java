@@ -18,6 +18,7 @@ import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -69,6 +70,7 @@ public class InfuserSetup {
     public static final DeferredHolder<Item, DyePlateItem> BLACK_DYE_PLATE_ITEM = getDyePlateItem(ITEMS, DyeColor.BLACK);
 
     private static DeferredHolder<Item, DyePlateItem> getDyePlateItem(DeferredRegister<Item> reg, DyeColor color) {
+
         return reg.register(color.getName() + "_dyeplate", () -> new DyePlateItem(color));
     }
 

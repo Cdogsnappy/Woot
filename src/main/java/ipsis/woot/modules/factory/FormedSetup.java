@@ -191,11 +191,11 @@ public class FormedSetup {
             }
 
             // Efficiency
-            if (perks.containsKey(Perk.Group.effieciency)) {
-                int perkLevel = perks.getOrDefault(Perk.Group.effieciency, 0);
+            if (perks.containsKey(Perk.Group.efficiency)) {
+                int perkLevel = perks.getOrDefault(Perk.Group.efficiency, 0);
                 if (perkLevel > 0)
                     param.setPerkEfficiencyValue(Config.OVERRIDE.getIntegerOrDefault(fakeMob,
-                            Config.OVERRIDE.getKeyByPerk(Perk.Group.effieciency, perkLevel)));
+                            Config.OVERRIDE.getKeyByPerk(Perk.Group.efficiency, perkLevel)));
             }
 
             // Mass

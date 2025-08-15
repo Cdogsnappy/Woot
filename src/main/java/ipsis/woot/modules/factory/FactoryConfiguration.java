@@ -80,9 +80,9 @@ public class FactoryConfiguration {
     public static ModConfigSpec.ConfigValue<List<Integer>> T5_FARM_DROP_SHARD_WEIGHTS;
 
     public static ModConfigSpec.IntValue getPerkIntValue(Perk.Group group, int level) {
-        if (group == Perk.Group.effieciency && level == 1) return EFFICIENCY_1;
-        if (group == Perk.Group.effieciency && level == 2) return EFFICIENCY_2;
-        if (group == Perk.Group.effieciency && level == 3) return EFFICIENCY_3;
+        if (group == Perk.Group.efficiency && level == 1) return EFFICIENCY_1;
+        if (group == Perk.Group.efficiency && level == 2) return EFFICIENCY_2;
+        if (group == Perk.Group.efficiency && level == 3) return EFFICIENCY_3;
         if (group == Perk.Group.mass && level == 1) return MASS_COUNT_1;
         if (group == Perk.Group.mass && level == 2) return MASS_COUNT_2;
         if (group == Perk.Group.mass && level == 3) return MASS_COUNT_3;

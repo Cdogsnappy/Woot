@@ -1,5 +1,6 @@
 package ipsis.woot.modules.squeezer.blocks;
 
+import ipsis.woot.crafting.WootRecipes;
 import ipsis.woot.fluilds.FluidSetup;
 import ipsis.woot.mod.ModNBT;
 import ipsis.woot.modules.squeezer.SqueezerConfiguration;
@@ -24,6 +25,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.level.Level;
@@ -222,11 +224,9 @@ public class EnchantSqueezerBlockEntity extends WootMachineBlockEntity implement
 
     @Override
     protected boolean hasValidInput() {
-        ItemStack itemStack = stackInputHandler.getStackInSlot(INPUT_SLOT);
-        if (itemStack.isEmpty() || (!EnchantmentHelper.isEnchanted(itemStack) && !itemStack.is(Items.ENCHANTED_BOOK)))
-                return false;
+        return level.getRecipeManager().getRecipeFor(WootRecipes.ENCHANT_SQUEEZER_TYPE.get(),
+                new SingleRecipeInput(stackInputHandler.getStackInSlot(INPUT_SLOT)), level).isPresent();
 
-        return true;
     }
 
     @Override
