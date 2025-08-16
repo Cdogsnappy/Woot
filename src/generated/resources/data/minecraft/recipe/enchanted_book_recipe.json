@@ -1,0 +1,11 @@
+{
+  "type": "woot:enchsqueezer",
+  "energy": 1000,
+  "item": {
+    "item": "minecraft:enchanted_book"
+  },
+  "outputFluid": {
+    "amount": 1000,
+    "id": "woot:enchant_fluid"
+  }
+}

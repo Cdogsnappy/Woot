@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "group": "woot",
+  "key": {
+    "c": {
+      "item": "woot:machine_casing"
+    },
+    "s": {
+      "tag": "minecraft:skulls"
+    }
+  },
+  "pattern": [
+    " s ",
+    "scs",
+    " s "
+  ],
+  "result": {
+    "count": 1,
+    "id": "woot:heart"
+  }
+}

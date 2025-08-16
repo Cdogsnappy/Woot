@@ -1,0 +1,19 @@
+{
+  "type": "woot:infuser",
+  "augment": {
+    "item": "minecraft:lapis_block"
+  },
+  "augmentcount": 1,
+  "energy": 16000,
+  "fluidstack": {
+    "amount": 5000,
+    "id": "woot:enchant_fluid"
+  },
+  "ingredient": {
+    "item": "minecraft:book"
+  },
+  "result": {
+    "count": 5,
+    "id": "minecraft:enchanted_book"
+  }
+}

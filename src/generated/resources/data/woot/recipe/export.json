@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "group": "woot",
+  "key": {
+    "c": {
+      "item": "woot:machine_casing"
+    },
+    "h": {
+      "item": "minecraft:hopper"
+    }
+  },
+  "pattern": [
+    "   ",
+    " c ",
+    " h "
+  ],
+  "result": {
+    "count": 1,
+    "id": "woot:export"
+  }
+}

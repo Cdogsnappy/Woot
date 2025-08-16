@@ -1,0 +1,16 @@
+{
+  "type": "woot:fluidconvertor",
+  "catalyst": {
+    "item": "minecraft:rotten_flesh"
+  },
+  "catalystcount": 1,
+  "energy": 1000,
+  "inputFluid": {
+    "amount": 1000,
+    "id": "minecraft:water"
+  },
+  "outputFluid": {
+    "amount": 1000,
+    "id": "woot:mob_essence_fluid"
+  }
+}

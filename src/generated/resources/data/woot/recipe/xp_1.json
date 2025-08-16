@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "group": "woot",
+  "key": {
+    "1": {
+      "item": "minecraft:enchanting_table"
+    },
+    "2": {
+      "item": "minecraft:lapis_lazuli"
+    },
+    "e": {
+      "item": "woot:ench_plate_1"
+    }
+  },
+  "pattern": [
+    " 1 ",
+    " e ",
+    " 2 "
+  ],
+  "result": {
+    "count": 1,
+    "id": "woot:xp_1"
+  }
+}

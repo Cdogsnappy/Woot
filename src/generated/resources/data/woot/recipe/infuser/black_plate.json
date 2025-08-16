@@ -1,0 +1,17 @@
+{
+  "type": "woot:infuser",
+  "augment": [],
+  "augmentcount": 0,
+  "energy": 400,
+  "fluidstack": {
+    "amount": 72,
+    "id": "woot:puredye_fluid"
+  },
+  "ingredient": {
+    "item": "woot:black_dyecasing"
+  },
+  "result": {
+    "count": 1,
+    "id": "woot:black_dyeplate"
+  }
+}

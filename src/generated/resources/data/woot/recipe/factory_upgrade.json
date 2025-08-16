@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "group": "woot",
+  "key": {
+    "p": {
+      "item": "woot:purple_dyeplate"
+    },
+    "s": {
+      "tag": "c:stones"
+    }
+  },
+  "pattern": [
+    " s ",
+    "sps",
+    " s "
+  ],
+  "result": {
+    "count": 1,
+    "id": "woot:factory_upgrade"
+  }
+}

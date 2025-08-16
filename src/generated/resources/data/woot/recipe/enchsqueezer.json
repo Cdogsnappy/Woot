@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "group": "woot",
+  "key": {
+    "b": {
+      "item": "minecraft:bucket"
+    },
+    "c": {
+      "item": "woot:machine_casing"
+    },
+    "p": {
+      "item": "minecraft:piston"
+    },
+    "t": {
+      "item": "minecraft:book"
+    }
+  },
+  "pattern": [
+    "tpt",
+    "tct",
+    "tbt"
+  ],
+  "result": {
+    "count": 1,
+    "id": "woot:enchsqueezer"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "name": "Head Start",
+  "category": "woot:perks",
+  "icon": "woot:headless_1",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "The $(item)Head Start$(0) perk drops skulls. Higher levels of this perk give a better chance of the drop."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(li)Tier I - 25%% chance$(li)Tier II - 50%% chance$(li)Tier III - 80%% chance"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "woot:headless_1",
+      "recipe2": "woot:headless_2"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "woot:headless_3"
+    }
+  ]
+}

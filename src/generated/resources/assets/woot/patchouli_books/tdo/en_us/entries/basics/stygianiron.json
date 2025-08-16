@@ -1,0 +1,21 @@
+{
+  "name": "Stygian Iron",
+  "category": "woot:basics",
+  "icon": "woot:si_ingot",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "text",
+      "text": "The main resource in Woot is $(item)Stygian Iron$(0). You will need this to create the machines, tools and factory components"
+    },
+    {
+      "type": "crafting",
+      "recipe": "woot:si_dust_1",
+      "recipe2": "woot:si_dust_2"
+    },
+    {
+      "type": "smelting",
+      "recipe": "woot:si_ingot"
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "group": "woot",
+  "key": {
+    "b": {
+      "tag": "c:dyes/black"
+    },
+    "g": {
+      "tag": "c:glass_blocks"
+    },
+    "r": {
+      "tag": "c:dyes/red"
+    },
+    "t": {
+      "item": "minecraft:torch"
+    },
+    "w": {
+      "tag": "c:dyes/white"
+    },
+    "y": {
+      "tag": "c:dyes/yellow"
+    }
+  },
+  "pattern": [
+    "grg",
+    "ytb",
+    "gwg"
+  ],
+  "result": {
+    "count": 1,
+    "id": "woot:layout"
+  }
+}

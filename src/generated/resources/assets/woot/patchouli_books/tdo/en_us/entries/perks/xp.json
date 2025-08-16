@@ -1,0 +1,24 @@
+{
+  "name": "Wisdom",
+  "category": "woot:perks",
+  "icon": "woot:xp_1",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "By default the factory does not generate experience from mob kills. With the $(item)Wisdom$(0) perk, the factory will generate $(item)Experience Shards$(0) and $(item)Experience Splinters$(0). Higher levels of this perk will generate more experience items."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(li)Tier I - 100%%$(li)Tier II - 125%%$(li)Tier III - 150%%"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "woot:xp_1",
+      "recipe2": "woot:xp_2"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "woot:xp_3"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "name": "Enchant Liquifier",
+  "category": "woot:machines",
+  "icon": "woot:enchsqueezer",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "The $(item)Enchant Liquifier$(0) takes enchanted items (books, swords etc), extracts the enchantments from them and creates Liquid Enchant fluid. Higher level enchants create more fluid."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Items can be inserted from any side. Liquid Enchant can be extracted from any side.  The $(item)Enchant Liquifier$(0) will automatically output to an adjacent fluid handler."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(li) Enchant I 500mb $(li) Enchant II 1000mb $(li) Enchant III 1500mb $(li) Enchant IV 2000mb $(li) Enchant V 2500mb $(li) Each extra level 500mb"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "woot:enchsqueezer"
+    }
+  ]
+}

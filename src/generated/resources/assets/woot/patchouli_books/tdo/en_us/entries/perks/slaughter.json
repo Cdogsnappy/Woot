@@ -1,0 +1,24 @@
+{
+  "name": "Tumbling Doll Of Flesh",
+  "category": "woot:perks",
+  "icon": "woot:slaughter_1",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "This perk generates Industrial Foregoing pink slime and liquid meat in tanks adjacent to the Loot Exporter. Higher levels of this perk will increase the generated amount of the fluids."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(li)Tier I - 100%%$(li)Tier II - 120%%$(li)Tier III - 140%%"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "woot:slaughter_1",
+      "recipe2": "woot:slaughter_2"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "woot:slaughter_3"
+    }
+  ]
+}

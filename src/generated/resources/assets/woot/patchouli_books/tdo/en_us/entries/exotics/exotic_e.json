@@ -1,0 +1,11 @@
+{
+  "name": "Enochian Key: LAT",
+  "category": "woot:exotics",
+  "icon": "woot:exotic_e",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "This exotic spawns 10 mobs for each controller."
+    }
+  ]
+}

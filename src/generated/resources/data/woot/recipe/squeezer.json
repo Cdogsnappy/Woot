@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "group": "woot",
+  "key": {
+    "b": {
+      "item": "minecraft:bucket"
+    },
+    "c": {
+      "item": "woot:machine_casing"
+    },
+    "d": {
+      "tag": "c:dyes"
+    },
+    "p": {
+      "item": "minecraft:piston"
+    }
+  },
+  "pattern": [
+    "dpd",
+    "dcd",
+    "dbd"
+  ],
+  "result": {
+    "count": 1,
+    "id": "woot:squeezer"
+  }
+}

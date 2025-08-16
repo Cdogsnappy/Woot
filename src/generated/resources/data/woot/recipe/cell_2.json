@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "group": "woot",
+  "ingredients": [
+    {
+      "item": "woot:cell_1"
+    },
+    {
+      "item": "woot:ench_plate_1"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "woot:cell_2"
+  }
+}

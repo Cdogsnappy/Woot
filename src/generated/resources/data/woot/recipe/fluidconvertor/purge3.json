@@ -1,0 +1,16 @@
+{
+  "type": "woot:fluidconvertor",
+  "catalyst": {
+    "item": "minecraft:ender_pearl"
+  },
+  "catalystcount": 1,
+  "energy": 1000,
+  "inputFluid": {
+    "amount": 1000,
+    "id": "minecraft:water"
+  },
+  "outputFluid": {
+    "amount": 4000,
+    "id": "woot:mob_essence_fluid"
+  }
+}

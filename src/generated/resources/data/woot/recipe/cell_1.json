@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "group": "woot",
+  "key": {
+    "c": {
+      "item": "woot:machine_casing"
+    },
+    "g": {
+      "tag": "c:glass_blocks"
+    },
+    "i": {
+      "item": "minecraft:iron_bars"
+    }
+  },
+  "pattern": [
+    "igi",
+    "gcg",
+    "igi"
+  ],
+  "result": {
+    "count": 1,
+    "id": "woot:cell_1"
+  }
+}

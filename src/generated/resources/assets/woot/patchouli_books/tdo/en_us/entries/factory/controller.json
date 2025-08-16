@@ -1,0 +1,15 @@
+{
+  "name": "Mob Controller",
+  "category": "woot:factory_blocks",
+  "icon": "woot:controller",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "The $(item)Mob Controller$(0) tells the factory which mob you would like to spawn. However not all factories are created equal. Each $(item)Mob Controller$(0) requires a minimum tier of factory to use. The tier can be seen by right clicking on a $(item)Mob Controller$(0)"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "The $(item)Mob Controller$(0) is created on the $(item)Stygian Anvil$(0) by combining a fully programmed $(item)Mob Shard$(0) with a $(item)Prism$(0) and $(item)Stygian Iron Plate$(0)."
+    }
+  ]
+}

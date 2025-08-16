@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "a": {
+      "item": "minecraft:anvil"
+    },
+    "i": {
+      "item": "woot:si_ingot"
+    },
+    "o": {
+      "tag": "c:obsidians"
+    }
+  },
+  "pattern": [
+    "iii",
+    " a ",
+    "ooo"
+  ],
+  "result": {
+    "count": 1,
+    "id": "woot:anvil"
+  }
+}

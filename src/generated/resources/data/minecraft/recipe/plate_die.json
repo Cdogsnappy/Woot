@@ -1,0 +1,15 @@
+{
+  "type": "woot:anvil",
+  "baseItem": {
+    "item": "minecraft:stone_slab"
+  },
+  "ingredients": [
+    {
+      "item": "minecraft:obsidian"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "woot:plate_die"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "name": "Ingredients",
+  "category": "woot:basics",
+  "icon": "woot:import",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "text",
+      "text": "Some mobs require ingredients to drop their loot and these must be provided in chests/tanks beside the $(item)Ingredient Importer$(0).ALL ingredients for ALL mobs be provided or no loot will be produced."
+    }
+  ]
+}

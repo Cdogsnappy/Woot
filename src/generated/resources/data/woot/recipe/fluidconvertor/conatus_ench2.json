@@ -1,0 +1,16 @@
+{
+  "type": "woot:fluidconvertor",
+  "catalyst": {
+    "item": "minecraft:end_stone"
+  },
+  "catalystcount": 1,
+  "energy": 1000,
+  "inputFluid": {
+    "amount": 1000,
+    "id": "woot:enchant_fluid"
+  },
+  "outputFluid": {
+    "amount": 1450,
+    "id": "woot:conatus_fluid"
+  }
+}

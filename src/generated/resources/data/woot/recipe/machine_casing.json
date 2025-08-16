@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "group": "woot",
+  "key": {
+    "c": {
+      "tag": "c:chests"
+    },
+    "p": {
+      "item": "woot:si_plate"
+    }
+  },
+  "pattern": [
+    " p ",
+    "pcp",
+    " p "
+  ],
+  "result": {
+    "count": 1,
+    "id": "woot:machine_casing"
+  }
+}

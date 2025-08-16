@@ -1,0 +1,18 @@
+{
+  "type": "woot:anvil",
+  "baseItem": {
+    "item": "woot:mobshard"
+  },
+  "ingredients": [
+    {
+      "item": "woot:prism"
+    },
+    {
+      "item": "woot:si_plate"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "woot:controller"
+  }
+}

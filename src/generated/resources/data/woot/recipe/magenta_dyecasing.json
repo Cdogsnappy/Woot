@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "group": "woot",
+  "ingredients": [
+    {
+      "tag": "c:dyes/magenta"
+    },
+    {
+      "item": "woot:dye_die"
+    },
+    {
+      "item": "woot:hammer"
+    }
+  ],
+  "result": {
+    "count": 16,
+    "id": "woot:magenta_dyecasing"
+  }
+}

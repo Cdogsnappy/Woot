@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "group": "woot",
+  "key": {
+    "h": {
+      "item": "woot:hammer"
+    },
+    "i": {
+      "tag": "c:ingots/iron"
+    },
+    "n": {
+      "tag": "c:netherracks"
+    },
+    "s": {
+      "item": "minecraft:soul_sand"
+    }
+  },
+  "pattern": [
+    " i ",
+    "nhn",
+    " s "
+  ],
+  "result": {
+    "count": 3,
+    "id": "woot:si_dust"
+  }
+}

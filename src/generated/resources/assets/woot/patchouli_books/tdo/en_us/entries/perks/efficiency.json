@@ -1,0 +1,24 @@
+{
+  "name": "Stoke The Boiler",
+  "category": "woot:perks",
+  "icon": "woot:efficiency_1",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "This perk decreases the amount of Conatus Fluid required by the factory. Higher levels of this perk will decrease the fluid requirement further."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(li)Tier I - 15%% decrease$(li)Tier II - 25%% decrease$(li)Tier III - 30%% decrease"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "woot:efficiency_1",
+      "recipe2": "woot:efficiency_2"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "woot:efficiency_3"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "type": "woot:dye_squeezer",
+  "dyes": [
+    54,
+    9,
+    9,
+    0
+  ],
+  "energy": 1000,
+  "ingredient": {
+    "item": "minecraft:cocoa_beans"
+  }
+}

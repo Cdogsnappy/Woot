@@ -1,0 +1,16 @@
+{
+  "name":  "YA Hammer",
+  "category": "woot:tools",
+  "icon": "woot:hammer",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "The $(item)YA Hammer$(0) has two main usages. The first is for crafting on the anvil. The second is for use in vanilla crafting. The $(item)YA Hammer$(0) is never consumed when used in recipes."
+    },
+    {
+      "type": "patchouli:crafting",
+      "text": "Yet Another Hammer",
+      "recipe": "woot:hammer"
+    }
+  ]
+}

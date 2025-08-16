@@ -1,0 +1,17 @@
+{
+  "type": "woot:infuser",
+  "augment": [],
+  "augmentcount": 0,
+  "energy": 1000,
+  "fluidstack": {
+    "amount": 1000,
+    "id": "woot:puredye_fluid"
+  },
+  "ingredient": {
+    "tag": "c:glass_blocks"
+  },
+  "result": {
+    "count": 1,
+    "id": "woot:prism"
+  }
+}

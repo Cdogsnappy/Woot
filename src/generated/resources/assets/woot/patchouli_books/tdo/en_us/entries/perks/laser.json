@@ -1,0 +1,24 @@
+{
+  "name": "Frickin Laser Breams",
+  "category": "woot:perks",
+  "icon": "woot:laser_1",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "This perk generates Industrial Foregoing ether gas in tanks adjacent to the Loot Exporter. Higher levels of this perk will increase the generated amount of the gas.As per the original mod, only generates from Withers"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(li)Tier I - 100%%$(li)Tier II - 120%%$(li)Tier III - 140%%"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "woot:laser_1",
+      "recipe2": "woot:laser_2"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "woot:laser_3"
+    }
+  ]
+}

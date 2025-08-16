@@ -1,0 +1,17 @@
+{
+  "type": "woot:infuser",
+  "augment": [],
+  "augmentcount": 0,
+  "energy": 1000,
+  "fluidstack": {
+    "amount": 1000,
+    "id": "minecraft:lava"
+  },
+  "ingredient": {
+    "tag": "c:obsidians"
+  },
+  "result": {
+    "count": 2,
+    "id": "minecraft:magma_block"
+  }
+}

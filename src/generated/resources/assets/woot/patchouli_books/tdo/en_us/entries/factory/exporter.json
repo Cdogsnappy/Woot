@@ -1,0 +1,16 @@
+{
+  "name": "Loot Exporter",
+  "category": "woot:factory_blocks",
+  "icon": "woot:export",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "This block is used by the factory for generating the loot drops. An adjacent chest will pull items out regularly. Otherwise, any fluid and item export methods from other mods should work for extracting outputs."
+
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "woot:export"
+    }
+  ]
+}

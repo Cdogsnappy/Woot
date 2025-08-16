@@ -1,0 +1,11 @@
+{
+  "type": "woot:mobsimulator",
+  "generator": {
+    "type": "woot:my_chunk_generator",
+    "biome_source": {
+      "type": "minecraft:fixed",
+      "biome": "minecraft:ocean"
+    },
+    "settings": "minecraft:overworld"
+  }
+}

@@ -330,13 +330,6 @@ public class FactorySetup {
             PerkItem.LASER_3_REGNAME, () -> new PerkItem(Perk.laser_3));
 
 
-    public static final DeferredHolder<Item, PerkItem> FLAYED_1_ITEM = ITEMS.register(
-            PerkItem.FLAYED_1_REGNAME, () -> new PerkItem(Perk.flayed_1));
-    public static final DeferredHolder<Item, PerkItem> FLAYED_2_ITEM = ITEMS.register(
-            PerkItem.FLAYED_2_REGNAME, () -> new PerkItem(Perk.flayed_2));
-    public static final DeferredHolder<Item, PerkItem> FLAYED_3_ITEM = ITEMS.register(
-            PerkItem.FLAYED_3_REGNAME, () -> new PerkItem(Perk.flayed_3));
-
 
 
     public static final DeferredHolder<Item, MobShardItem> MOB_SHARD_ITEM = ITEMS.register(

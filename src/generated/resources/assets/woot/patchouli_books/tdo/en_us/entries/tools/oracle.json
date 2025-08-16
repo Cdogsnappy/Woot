@@ -1,0 +1,15 @@
+{
+  "name": "Dee's Oracle",
+  "category": "woot:tools",
+  "icon": "woot:oracle",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "$(item)Dee's Oracle$(0) allows you to view any simulated mob, the associated drops and drop chance at each looting level."
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "woot:oracle"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "type": "woot:dye_squeezer",
+  "dyes": [
+    12,
+    12,
+    12,
+    36
+  ],
+  "energy": 1000,
+  "ingredient": {
+    "tag": "c:dyes/gray"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "group": "woot",
+  "key": {
+    "b": {
+      "item": "minecraft:bookshelf"
+    },
+    "c": {
+      "item": "woot:machine_casing"
+    }
+  },
+  "pattern": [
+    " b ",
+    "bcb",
+    " b "
+  ],
+  "result": {
+    "count": 1,
+    "id": "woot:oracle"
+  }
+}

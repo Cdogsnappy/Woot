@@ -1,0 +1,16 @@
+{
+  "type": "woot:fluidconvertor",
+  "catalyst": {
+    "item": "woot:t2shard"
+  },
+  "catalystcount": 1,
+  "energy": 1000,
+  "inputFluid": {
+    "amount": 1000,
+    "id": "woot:mob_essence_fluid"
+  },
+  "outputFluid": {
+    "amount": 2500,
+    "id": "woot:conatus_fluid"
+  }
+}

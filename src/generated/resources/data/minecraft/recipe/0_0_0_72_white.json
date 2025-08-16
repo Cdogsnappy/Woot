@@ -1,0 +1,13 @@
+{
+  "type": "woot:dye_squeezer",
+  "dyes": [
+    0,
+    0,
+    0,
+    72
+  ],
+  "energy": 1000,
+  "ingredient": {
+    "tag": "c:dyes/white"
+  }
+}

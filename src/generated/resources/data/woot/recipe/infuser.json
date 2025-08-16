@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "group": "woot",
+  "key": {
+    "b": {
+      "item": "minecraft:bucket"
+    },
+    "c": {
+      "item": "woot:machine_casing"
+    },
+    "d": {
+      "item": "minecraft:dropper"
+    },
+    "p": {
+      "item": "minecraft:piston"
+    }
+  },
+  "pattern": [
+    " d ",
+    "pcp",
+    " b "
+  ],
+  "result": {
+    "count": 1,
+    "id": "woot:infuser"
+  }
+}

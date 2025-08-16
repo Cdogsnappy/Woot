@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "group": "woot",
+  "ingredients": [
+    {
+      "item": "woot:fluidconvertor"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "woot:fluidconvertor"
+  }
+}

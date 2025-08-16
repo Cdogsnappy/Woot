@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "group": "woot",
+  "key": {
+    "p": {
+      "item": "woot:blue_dyeplate"
+    },
+    "s": {
+      "tag": "c:stones"
+    },
+    "x": {
+      "item": "woot:light_blue_dyeplate"
+    }
+  },
+  "pattern": [
+    " s ",
+    "s s",
+    "psx"
+  ],
+  "result": {
+    "count": 1,
+    "id": "woot:factory_ctr_base_sec"
+  }
+}

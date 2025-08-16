@@ -1,0 +1,13 @@
+{
+  "type": "woot:dye_squeezer",
+  "dyes": [
+    0,
+    72,
+    0,
+    0
+  ],
+  "energy": 1000,
+  "ingredient": {
+    "item": "minecraft:cornflower"
+  }
+}

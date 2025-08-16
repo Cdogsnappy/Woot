@@ -1,0 +1,13 @@
+{
+  "type": "woot:dye_squeezer",
+  "dyes": [
+    36,
+    0,
+    36,
+    0
+  ],
+  "energy": 1000,
+  "ingredient": {
+    "item": "minecraft:orange_tulip"
+  }
+}

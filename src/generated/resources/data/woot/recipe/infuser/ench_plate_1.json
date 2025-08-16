@@ -1,0 +1,19 @@
+{
+  "type": "woot:infuser",
+  "augment": {
+    "tag": "c:ingots/iron"
+  },
+  "augmentcount": 1,
+  "energy": 10000,
+  "fluidstack": {
+    "amount": 1000,
+    "id": "woot:enchant_fluid"
+  },
+  "ingredient": {
+    "item": "woot:si_plate"
+  },
+  "result": {
+    "count": 1,
+    "id": "woot:ench_plate_1"
+  }
+}

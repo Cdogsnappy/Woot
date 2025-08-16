@@ -1,0 +1,13 @@
+{
+  "type": "woot:dye_squeezer",
+  "dyes": [
+    36,
+    18,
+    0,
+    18
+  ],
+  "energy": 1000,
+  "ingredient": {
+    "item": "minecraft:lilac"
+  }
+}

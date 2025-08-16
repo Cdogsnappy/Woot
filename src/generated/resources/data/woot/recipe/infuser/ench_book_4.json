@@ -1,0 +1,19 @@
+{
+  "type": "woot:infuser",
+  "augment": {
+    "item": "minecraft:quartz_block"
+  },
+  "augmentcount": 1,
+  "energy": 8000,
+  "fluidstack": {
+    "amount": 4000,
+    "id": "woot:enchant_fluid"
+  },
+  "ingredient": {
+    "item": "minecraft:book"
+  },
+  "result": {
+    "count": 4,
+    "id": "minecraft:enchanted_book"
+  }
+}

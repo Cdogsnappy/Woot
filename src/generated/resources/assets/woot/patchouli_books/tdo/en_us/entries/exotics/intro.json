@@ -1,0 +1,15 @@
+{
+  "name": "What are exotics for?",
+  "category": "woot:exotics",
+  "icon": "minecraft:book",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Exotics give an extra boost to the factory by providing something in excess of perk abilities. Only one can be applied to a factory and it must be placed on top of the $(item)Heart$(0)."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Exotics can only be applied to Tier V factories. They cannot be crafted and are very rare drops from End City treasure chests."
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "type": "woot:dye_squeezer",
+  "dyes": [
+    0,
+    18,
+    18,
+    36
+  ],
+  "energy": 1000,
+  "ingredient": {
+    "item": "minecraft:sea_pickle"
+  }
+}

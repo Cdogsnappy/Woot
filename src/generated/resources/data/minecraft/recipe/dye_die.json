@@ -1,0 +1,15 @@
+{
+  "type": "woot:anvil",
+  "baseItem": {
+    "item": "minecraft:gunpowder"
+  },
+  "ingredients": [
+    {
+      "item": "minecraft:obsidian"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "woot:dye_die"
+  }
+}

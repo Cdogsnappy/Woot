@@ -1,0 +1,13 @@
+{
+  "type": "woot:dye_squeezer",
+  "dyes": [
+    0,
+    18,
+    0,
+    54
+  ],
+  "energy": 1000,
+  "ingredient": {
+    "tag": "c:dyes/cyan"
+  }
+}

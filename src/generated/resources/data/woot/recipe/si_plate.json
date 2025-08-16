@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "group": "woot",
+  "ingredients": [
+    {
+      "item": "woot:si_ingot"
+    },
+    {
+      "item": "woot:plate_die"
+    },
+    {
+      "item": "woot:hammer"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "woot:si_plate"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "name": "Conatus Fluid",
+  "category": "woot:basics",
+  "icon": "woot:conatus_fluid_bucket",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "text",
+      "text": "The factory is fueled by Conatus Fluid which is stored in the $(item)Conatus Cell$(0) at the base of the factory. This can be created in the $(item)Fluid Vat$(0) from a variety of different sources."
+    }
+  ]
+}
