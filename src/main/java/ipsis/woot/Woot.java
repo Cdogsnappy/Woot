@@ -6,6 +6,7 @@ import net.minecraft.world.item.Item;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.Logging;
 import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.ModList;
 import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
@@ -19,6 +20,8 @@ public class Woot {
 
     public static final String MODID = "woot";
     public static ModSetup setup = new ModSetup();
+
+    public static final boolean INDUSTRIAL_FOREGOING_LOADED = ModList.get().isLoaded("industrialforegoing");
 
     public Woot(IEventBus modEventBus, ModContainer modContainer) {
 

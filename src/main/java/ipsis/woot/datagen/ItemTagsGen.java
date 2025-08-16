@@ -48,7 +48,7 @@ public class ItemTagsGen extends IntrinsicHolderTagsProvider<Item> {
 
     // Straight from forge
     private TagKey<Item> getForgeItemTag(String name) {
-        return TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("forge", name));
+        return TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", name.toLowerCase()));
     }
 
     @Override

@@ -1,6 +1,7 @@
 package ipsis.woot.setup;
 
 import ipsis.woot.Woot;
+import ipsis.woot.fluilds.FluidSetup;
 import ipsis.woot.modules.anvil.AnvilSetup;
 import ipsis.woot.modules.factory.FactorySetup;
 import ipsis.woot.modules.fluidconvertor.FluidConvertorSetup;
@@ -40,6 +41,7 @@ public class WootCreativeModeTab {
                         OracleSetup.getItems().forEach(output::accept);
                         AnvilSetup.getItems().forEach(output::accept);
                         SqueezerSetup.getItems().forEach(output::accept);
+                        FluidSetup.getItems().forEach(output::accept);
 
                     }).build());
 }

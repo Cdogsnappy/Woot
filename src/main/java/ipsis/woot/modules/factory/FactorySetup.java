@@ -79,6 +79,7 @@ public class FactorySetup {
             CONTROLLER_TAG, () ->
                     BlockEntityType.Builder.of(ControllerBlockEntity::new, CONTROLLER_BLOCK.get()).build(null));
 
+
     public static final DeferredHolder<Block, FactoryBlock> FACTORY_A_BLOCK = BLOCKS.register(
             FactoryBlock.FACTORY_A_REGNAME, () -> new FactoryBlock(FactoryComponent.FACTORY_A));
     public static final DeferredHolder<Item, Item> FACTORY_A_BLOCK_ITEM = ITEMS.register(
@@ -158,12 +159,14 @@ public class FactorySetup {
                     new BlockItem(IMPORT_BLOCK.get(), Woot.createStandardProperties()));
 
     public static final DeferredHolder<Block, FactoryBlock> EXPORT_BLOCK = BLOCKS.register(
-            FactoryBlock.EXPORT_REGNAME, () -> new FactoryBlock(FactoryComponent.EXPORT));
+            FactoryBlock.EXPORT_REGNAME, ExporterBlock::new);
     public static final DeferredHolder<Item, Item> EXPORT_BLOCK_ITEM = ITEMS.register(
             FactoryBlock.EXPORT_REGNAME, () ->
                     new BlockItem(EXPORT_BLOCK.get(), Woot.createStandardProperties()));
 
-
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<ExporterBlockEntity>> EXPORTER_BLOCK_ENTITY = BLOCKENTITIES.register(
+            "exporter", () ->
+                    BlockEntityType.Builder.of(ExporterBlockEntity::new, EXPORT_BLOCK.get()).build(null));
 
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<?>> MULTIBLOCK_BLOCK_TILE = BLOCKENTITIES.register(
             "multiblock", () ->
@@ -326,7 +329,7 @@ public class FactorySetup {
     public static final DeferredHolder<Item, PerkItem> LASER_3_ITEM = ITEMS.register(
             PerkItem.LASER_3_REGNAME, () -> new PerkItem(Perk.laser_3));
 
-    /**
+
     public static final DeferredHolder<Item, PerkItem> FLAYED_1_ITEM = ITEMS.register(
             PerkItem.FLAYED_1_REGNAME, () -> new PerkItem(Perk.flayed_1));
     public static final DeferredHolder<Item, PerkItem> FLAYED_2_ITEM = ITEMS.register(
@@ -334,7 +337,7 @@ public class FactorySetup {
     public static final DeferredHolder<Item, PerkItem> FLAYED_3_ITEM = ITEMS.register(
             PerkItem.FLAYED_3_REGNAME, () -> new PerkItem(Perk.flayed_3));
 
-     **/
+
 
     public static final DeferredHolder<Item, MobShardItem> MOB_SHARD_ITEM = ITEMS.register(
             "mobshard", MobShardItem::new);
@@ -349,6 +352,6 @@ public class FactorySetup {
                    BlockEntityType.Builder.of(UpgradeBlockEntity::new, FACTORY_UPGRADE_BLOCK.get()).build(null));
 
     public static List<Item> getItems(){
-        return ITEMS.getEntries().stream().map(i -> i.get()).collect(Collectors.toUnmodifiableList());
+        return ITEMS.getEntries().stream().map(DeferredHolder::get).collect(Collectors.toUnmodifiableList());
     }
 }

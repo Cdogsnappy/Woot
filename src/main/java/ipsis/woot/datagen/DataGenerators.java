@@ -4,6 +4,7 @@ import ipsis.woot.Woot;
 import ipsis.woot.simulator.WorldGenProvider;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.tags.IntrinsicHolderTagsProvider;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -21,12 +22,14 @@ public class DataGenerators {
             generator.addProvider(true, new Recipes(generator.getPackOutput(), event.getLookupProvider()));
             IntrinsicHolderTagsProvider<Block> blockTagsProvider = new BlockTagsGen(generator.getPackOutput(), event.getLookupProvider(), event.getExistingFileHelper());
             generator.addProvider(true, blockTagsProvider);
+            IntrinsicHolderTagsProvider<Item> itemTagsProvider = new ItemTagsGen(generator.getPackOutput(), event.getLookupProvider(), event.getExistingFileHelper());
+            generator.addProvider(true, itemTagsProvider);
             generator.addProvider(true, new WorldGenProvider(generator.getPackOutput(), event.getLookupProvider()));
         }
         if (event.includeClient()) {
             generator.addProvider(true, new Items(generator, event.getExistingFileHelper()));
             generator.addProvider(true, new Blocks(generator, event.getExistingFileHelper()));
-            generator.addProvider(true, new Languages(generator.getPackOutput(), "en_us"));
+            //generator.addProvider(true, new Languages(generator.getPackOutput(), "en_us"));
         }
     }
 }

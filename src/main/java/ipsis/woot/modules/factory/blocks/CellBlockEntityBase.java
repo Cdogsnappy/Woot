@@ -2,9 +2,7 @@ package ipsis.woot.modules.factory.blocks;
 
 import ipsis.woot.fluilds.FluidSetup;
 import ipsis.woot.mod.ModNBT;
-import ipsis.woot.modules.factory.FactorySetup;
 import ipsis.woot.modules.factory.multiblock.MultiBlockBlockEntity;
-import ipsis.woot.modules.squeezer.SqueezerSetup;
 import ipsis.woot.util.WootDebug;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
@@ -12,8 +10,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
@@ -21,7 +17,6 @@ import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
 
 
 import java.util.List;
-import java.util.Optional;
 
 public abstract class CellBlockEntityBase extends MultiBlockBlockEntity implements WootDebug {
 
@@ -38,15 +33,13 @@ public abstract class CellBlockEntityBase extends MultiBlockBlockEntity implemen
     @Override
     public void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        readFromNBT(tag);
+        readFromNBT(registries, tag);
     }
 
-    private void readFromNBT(CompoundTag compound) {
-        if(this.level == null){
-            return;
-        }
+    private void readFromNBT(HolderLookup.Provider registries, CompoundTag compound) {
+
         if (compound.contains(ModNBT.TANK_TAG))
-            tank.readFromNBT(this.level.registryAccess(), compound.getCompound(ModNBT.TANK_TAG));
+            tank.readFromNBT(registries, compound.getCompound(ModNBT.TANK_TAG));
     }
 
     @Override

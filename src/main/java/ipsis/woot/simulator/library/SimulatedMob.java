@@ -16,6 +16,7 @@ import ipsis.woot.util.helper.MathHelper;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.neoforged.neoforge.common.Tags;
 
 import javax.annotation.Nonnull;
@@ -64,7 +65,7 @@ public class SimulatedMob {
     }
 
     public void addSimulatedDrop(int looting, ItemStack itemStack) {
-        if(itemStack.is(Tags.Items.TOOLS)){//Don't add tools to loot, they just suck...
+        if(itemStack.is(Tags.Items.TOOLS) && !(itemStack.is(Items.TRIDENT) || itemStack.is(Items.BOW))){//Don't add tools to loot, they just suck...
             return;
         }
         if (itemStack.isEmpty() || itemStack.getCount() == 0)

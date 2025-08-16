@@ -1,6 +1,7 @@
 package ipsis.woot.datagen.modules;
 
 import ipsis.woot.Woot;
+import ipsis.woot.config.ConfigDefaults;
 import ipsis.woot.crafting.dyesqueezer.DyeSqueezerRecipeBuilder;
 import ipsis.woot.crafting.enchantsqueezer.EnchantSqueezerRecipeBuilder;
 import ipsis.woot.fluilds.FluidSetup;
@@ -128,7 +129,7 @@ public class Squeezer {
         }
         EnchantSqueezerRecipeBuilder.enchantSqueezerRecipe(Ingredient.of(Items.ENCHANTED_BOOK),
                 new FluidStack(FluidSetup.ENCHANT_FLUID.get(), 1000),
-                SqueezerConfiguration.ENCH_SQUEEZER_LVL_1_ENERGY_COST.get())
+                        ConfigDefaults.Squeezer.ENCH_SQUEEZER_LVL_1_ENERGY_COST_DEF)
                 .save(recipeOutput, ResourceLocation.parse("enchanted_book_recipe"));
     }
 

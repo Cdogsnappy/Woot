@@ -19,6 +19,9 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 
 public class FluidSetup {
 
@@ -164,6 +167,10 @@ public class FluidSetup {
         ITEMS.register(eventBus);
         FLUIDS.register(eventBus);
         FLUID_TYPES.register(eventBus);
+    }
+
+    public static List<Item> getItems(){
+        return ITEMS.getEntries().stream().map(DeferredHolder::get).collect(Collectors.toUnmodifiableList());
     }
 
 }

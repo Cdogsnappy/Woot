@@ -48,6 +48,6 @@ public class FluidConvertorSetup {
             FLUID_CONVERTOR_TAG, () -> IMenuTypeExtension.create(FluidConvertorMenu::new));
 
     public static List<Item> getItems(){
-        return ITEMS.getEntries().stream().map(i -> i.get()).collect(Collectors.toUnmodifiableList());
+        return ITEMS.getEntries().stream().map(DeferredHolder::get).collect(Collectors.toUnmodifiableList());
     }
 }

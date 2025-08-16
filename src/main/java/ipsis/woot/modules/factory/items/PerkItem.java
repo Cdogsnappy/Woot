@@ -119,14 +119,13 @@ public class PerkItem extends Item {
             return new ItemStack(FactorySetup.LASER_2_ITEM.get());
         else if (perk == Perk.laser_3)
             return new ItemStack(FactorySetup.LASER_3_ITEM.get());
-        /**
+
         else if (perk == Perk.flayed_1)
             return new ItemStack(FactorySetup.FLAYED_1_ITEM.get());
         else if (perk == Perk.flayed_2)
             return new ItemStack(FactorySetup.FLAYED_2_ITEM.get());
         else if (perk == Perk.flayed_3)
             return new ItemStack(FactorySetup.FLAYED_3_ITEM.get());
-         **/
 
         return ItemStack.EMPTY;
     }

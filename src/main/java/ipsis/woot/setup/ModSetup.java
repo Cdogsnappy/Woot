@@ -100,6 +100,7 @@ public class ModSetup {
         Cell2BlockEntity.registerCapabilities(event);
         Cell3BlockEntity.registerCapabilities(event);
         Cell4BlockEntity.registerCapabilities(event);
+        ExporterBlockEntity.registerCapabilities(event);
 
 
     }

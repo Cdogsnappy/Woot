@@ -54,6 +54,6 @@ public class AnvilSetup {
             "dye_die", () -> new DieItem(DieItem.DieType.DYE));
 
     public static List<Item> getItems(){
-        return ITEMS.getEntries().stream().map(i -> i.get()).collect(Collectors.toUnmodifiableList());
+        return ITEMS.getEntries().stream().map(DeferredHolder::get).collect(Collectors.toUnmodifiableList());
     }
 }

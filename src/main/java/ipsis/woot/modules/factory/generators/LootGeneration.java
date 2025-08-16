@@ -1,6 +1,7 @@
 package ipsis.woot.modules.factory.generators;
 
 import ipsis.woot.modules.factory.FormedSetup;
+import ipsis.woot.modules.factory.blocks.ExporterBlockEntity;
 import ipsis.woot.modules.factory.blocks.HeartBlockEntity;
 import ipsis.woot.modules.factory.items.XpShardBaseItem;
 import ipsis.woot.modules.factory.perks.Perk;
@@ -18,6 +19,7 @@ import net.minecraft.util.random.WeightedEntry;
 import net.minecraft.util.random.WeightedRandom;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.items.IItemHandler;
 import org.apache.logging.log4j.LogManager;
@@ -42,11 +44,11 @@ public class LootGeneration {
 
     public void generate(HeartBlockEntity heartTileEntity, FormedSetup setup) {
 
+        ExporterBlockEntity export = (ExporterBlockEntity)heartTileEntity.getLevel().getBlockEntity(setup.getExportPos());
+
         /**
          * Get the output options
          */
-        List<Optional<IItemHandler>> itemHandlers = setup.getExportHandlers();
-        List<Optional<IFluidHandler>> fluidHandlers = setup.getExportFluidHandlers();
 
         int looting = setup.getLootingLevel();
 
@@ -91,7 +93,8 @@ public class LootGeneration {
                     rolledDrops.add(WoolGenerator.getWoolDrop(fakeMobKey.getMob()));
             }
         }
-        StorageHelper.insertItems(rolledDrops, itemHandlers);
+        export.insertStacks(rolledDrops);
+
 
 
         // Experience
@@ -106,7 +109,7 @@ public class LootGeneration {
 
             // Unused xp just thrown away
             List<ItemStack> shards = XpShardBaseItem.getShards(genXp);
-            StorageHelper.insertItems(shards, itemHandlers);
+            export.insertStacks(shards);
         }
 
         // Shard gen
@@ -133,7 +136,7 @@ public class LootGeneration {
             }
 
             // Unused shards just thrown away
-            StorageHelper.insertItems(dropShards, itemHandlers);
+            export.insertStacks(dropShards);
         }
 
         // Skull gen
@@ -144,10 +147,29 @@ public class LootGeneration {
                 return Collections.nCopies(mobCount, m);
             }).flatMap(List::stream).collect(Collectors.toList());
             countAdjustedMobParams.forEach(m -> skulls.add(SKULL_GENERATOR.getSkullDrop(m, setup.getAllMobParams().get(m).getPerkHeadlessValue())));
-            StorageHelper.insertItems(skulls, itemHandlers);
+            export.insertStacks(skulls);
         }
 
         // Industrial Foregoing
+        if (setup.getAllPerks().containsKey(Perk.Group.slaughter) || setup.getAllPerks().containsKey(Perk.Group.crusher) || setup.getAllPerks().containsKey(Perk.Group.laser)) {
+            IndustrialForegoingGenerator.GeneratedFluids fluids = IndustrialForegoingGenerator.getFluids(setup, setup.getWorld());
+            if (setup.getAllPerks().containsKey(Perk.Group.slaughter) && !fluids.meat.isEmpty() && !fluids.pink.isEmpty()) {
+                List<FluidStack> slaughterFluids = new ArrayList<>();
+                slaughterFluids.add(fluids.meat);
+                slaughterFluids.add(fluids.pink);
+                export.insertFluids(slaughterFluids);
+            }
+            if (setup.getAllPerks().containsKey(Perk.Group.crusher) && !fluids.essence.isEmpty()) {
+                List<FluidStack> crusherFluids = new ArrayList<>();
+                crusherFluids.add(fluids.essence);
+                export.insertFluids(crusherFluids);
+            }
+            if (setup.getAllPerks().containsKey(Perk.Group.laser) && !fluids.ether.isEmpty()) {
+                List<FluidStack> etherFluids = new ArrayList<>();
+                etherFluids.add(fluids.ether);
+                export.insertFluids(etherFluids);
+            }
+        }
 
 
     }

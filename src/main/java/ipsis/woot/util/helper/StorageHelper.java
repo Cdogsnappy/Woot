@@ -6,6 +6,7 @@ import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
+import net.neoforged.neoforge.items.ItemStackHandler;
 
 
 import java.util.ArrayList;
@@ -15,20 +16,18 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class StorageHelper {
 
-    public static void insertItems(List<ItemStack> items, List<Optional<IItemHandler>> hdlrs) {
+    public static void insertItems(ItemStackHandler handler, List<Optional<IItemHandler>> hdlrs) {
 
-        if (items.isEmpty() || hdlrs.isEmpty())
-            return;
 
         for (Optional<IItemHandler> hdlr : hdlrs) {
             hdlr.ifPresent(h -> {
-                for (int i = 0; i < items.size(); i++) {
-                    ItemStack itemStack = items.get(i);
+                for (int i = 0; i < handler.getSlots(); i++) {
+                    ItemStack itemStack = handler.getStackInSlot(i);
                     if (itemStack.isEmpty())
                         continue;
 
                     ItemStack remainder = ItemHandlerHelper.insertItemStacked(h, itemStack.copy(), false);
-                    items.set(i, remainder);
+                    handler.setStackInSlot(i, remainder);
                 }
             });
         }

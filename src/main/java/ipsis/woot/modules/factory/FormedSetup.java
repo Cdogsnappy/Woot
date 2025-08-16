@@ -123,33 +123,7 @@ public class FormedSetup {
         return handlers;
     }
 
-    public List<Optional<IFluidHandler>> getExportFluidHandlers() {
-        List<Optional<IFluidHandler>> handlers = new ArrayList<>();
-        for (Direction facing : Direction.values()) {
-            if (!world.isLoaded(exportPos.offset(facing.getNormal())))
-                continue;
-            BlockEntity te = world.getBlockEntity(exportPos.offset(facing.getNormal()));
-            if (te == null)
-                continue;
 
-            handlers.add(Optional.ofNullable(world.getCapability(Capabilities.FluidHandler.BLOCK, te.getBlockPos(), facing.getOpposite())));
-        }
-        return handlers;
-    }
-
-    public List<Optional<IItemHandler>> getExportHandlers() {
-        List<Optional<IItemHandler>> handlers = new ArrayList<>();
-        for (Direction facing : Direction.values()) {
-            if (!world.isLoaded(importPos.offset(facing.getNormal())))
-                continue;
-            BlockEntity te = world.getBlockEntity(importPos.offset(facing.getNormal()));
-            if (te == null)
-                continue;
-
-            handlers.add(Optional.ofNullable(world.getCapability(Capabilities.ItemHandler.BLOCK, te.getBlockPos(), facing.getOpposite())));
-        }
-        return handlers;
-    }
 
     public int getMaxSpawnTime() {
         int max = 0;

@@ -49,6 +49,6 @@ public class GenericSetup {
             "machine_casing", () -> new GenericItem(GenericItem.GenericItemType.MACHINE_CASING));
 
     public static List<Item> getItems(){
-        return ITEMS.getEntries().stream().map(i -> i.get()).collect(Collectors.toUnmodifiableList());
+        return ITEMS.getEntries().stream().map(DeferredHolder::get).collect(Collectors.toUnmodifiableList());
     }
 }
