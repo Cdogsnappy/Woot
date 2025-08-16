@@ -26,8 +26,10 @@ import java.util.Optional;
 public class ExporterBlockEntity extends MultiBlockBlockEntity {
 
     static int LAZY_TICK = 40;
+    static int FLUID_ROTATION_TICK = 200;
 
     int tick=0;
+    int cycleTick = 0;
 
     ExporterFluidTank fluidOutputHandler;
     ItemStackHandler stackOutputHandler;
@@ -42,9 +44,15 @@ public class ExporterBlockEntity extends MultiBlockBlockEntity {
 
     public void tick() {
         tick++;
+        cycleTick++;
+        if(cycleTick > FLUID_ROTATION_TICK){
+            fluidOutputHandler.tanks.add(fluidOutputHandler.tanks.removeFirst());
+            cycleTick = 0;
+        }
         if(tick < LAZY_TICK){
             return;
         }
+
         tick = 0;
         List<Optional<IItemHandler>> handlers = new ArrayList<>();
         for (Direction facing : Direction.values()) {

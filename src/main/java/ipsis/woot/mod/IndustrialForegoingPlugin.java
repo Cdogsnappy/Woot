@@ -21,10 +21,10 @@ public class IndustrialForegoingPlugin {
             Woot.INDUSTRIAL_FOREGOING_LOADED ? BuiltInRegistries.FLUID.get(ResourceLocation.fromNamespaceAndPath("industrialforegoing", "essence")) : null;
 
     private static final Supplier<Fluid> ETHER_FLUID = () ->
-            Woot.INDUSTRIAL_FOREGOING_LOADED ? BuiltInRegistries.FLUID.get(ResourceLocation.fromNamespaceAndPath("industrialforegoing", "pink_slime")) : null;
+            Woot.INDUSTRIAL_FOREGOING_LOADED ? BuiltInRegistries.FLUID.get(ResourceLocation.fromNamespaceAndPath("industrialforegoing", "ether_gas")) : null;
 
     private static final Supplier<Fluid> PINK_SLIME_FLUID = () ->
-            Woot.INDUSTRIAL_FOREGOING_LOADED ? BuiltInRegistries.FLUID.get(ResourceLocation.fromNamespaceAndPath("industrialforegoing", "ether_gas")) : null;
+            Woot.INDUSTRIAL_FOREGOING_LOADED ? BuiltInRegistries.FLUID.get(ResourceLocation.fromNamespaceAndPath("industrialforegoing", "pink_slime")) : null;
 
 
     public static FluidStack getLiquidMeatAmount(FakeMob fakeMob, Level world) {

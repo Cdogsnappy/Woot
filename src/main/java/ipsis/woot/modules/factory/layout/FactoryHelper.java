@@ -9,11 +9,13 @@ import ipsis.woot.util.helper.StringHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.common.NeoForge;
@@ -96,14 +98,8 @@ public class FactoryHelper {
                 ItemStack takenStack = PlayerHelper.takeFactoryComponent(playerEntity, correctItemStacks);
                 if (!takenStack.isEmpty()) {
 
-                    BlockSnapshot blockSnapshot = BlockSnapshot.create(world.dimension(), world, pos);
-                    world.setBlock(pb.getBlockPos(), placeBlock.defaultBlockState(), 11);
-                    BlockEvent.EntityPlaceEvent event = new BlockEvent.EntityPlaceEvent(blockSnapshot, currState, playerEntity);
-                    event = NeoForge.EVENT_BUS.post(event);
-                    if(event.getBlockSnapshot().getFlags() != 11){
-                        blockSnapshot.restore(11);
-                        return BuildResult.ERROR;
-                    }
+                    world.setBlock(pb.getBlockPos(), placeBlock.defaultBlockState(), Block.UPDATE_ALL | Block.UPDATE_CLIENTS);
+                    ((ServerLevel)world).sendBlockUpdated(pb.getBlockPos(), placeBlock.defaultBlockState(), Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
                 }
                 return BuildResult.SUCCESS;
             } else {

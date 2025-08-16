@@ -156,6 +156,9 @@ public class InternItem extends Item {
     }
 
     public InteractionResult useOnFirst(UseOnContext context) {
+        if(context.getLevel().isClientSide){
+            return InteractionResult.SUCCESS;
+        }
 
         InteractionResult result = InteractionResult.PASS;
         ItemStack itemStack = context.getItemInHand();

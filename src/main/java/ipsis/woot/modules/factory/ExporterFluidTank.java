@@ -2,6 +2,7 @@ package ipsis.woot.modules.factory;
 
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.IFluidTank;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
@@ -15,6 +16,7 @@ public class ExporterFluidTank implements IFluidHandler, IFluidTank
     public List<FluidTank> tanks = new ArrayList<>();
     int numTanks;
     int capacity;
+    int cycle = 0;
 
     public ExporterFluidTank(int tankNum, int capacity){
 
@@ -29,17 +31,17 @@ public class ExporterFluidTank implements IFluidHandler, IFluidTank
     }
     @Override
     public FluidStack getFluid() {
-        return null;
+        return tanks.getFirst().getFluid();
     }
 
     @Override
     public int getFluidAmount() {
-        return 0;
+        return tanks.getFirst().getFluidAmount();
     }
 
     @Override
     public int getCapacity() {
-        return 0;
+        return capacity;
     }
 
     @Override
@@ -105,8 +107,13 @@ public class ExporterFluidTank implements IFluidHandler, IFluidTank
     }
 
     @Override
-    public FluidStack drain(int i, FluidAction fluidAction) {
-        return tanks.getFirst().drain(i, fluidAction);
+    public FluidStack drain(int max, FluidAction fluidAction) {
+        for(int i = 0; i < numTanks; ++i){
+            if(!tanks.get(i).isEmpty()){
+                return tanks.get(i).drain(max, fluidAction);
+            }
+        }
+        return FluidStack.EMPTY;
     }
 
 
@@ -114,9 +121,10 @@ public class ExporterFluidTank implements IFluidHandler, IFluidTank
         numTanks = nbt.getInt("num");
         capacity = nbt.getInt("cap");
         tanks = new ArrayList<>();
+        ListTag tanksTag = nbt.getList("tanks", 9);
         for(int i = 0; i < numTanks; ++i){
             FluidTank toAdd = new FluidTank(capacity/numTanks);
-            toAdd.readFromNBT(lookupProvider, nbt);
+            toAdd.readFromNBT(lookupProvider, tanksTag.getCompound(i));
             tanks.add(toAdd);
         }
         return this;
@@ -126,11 +134,13 @@ public class ExporterFluidTank implements IFluidHandler, IFluidTank
     public CompoundTag writeToNBT(HolderLookup.Provider lookupProvider, CompoundTag nbt) {
         nbt.putInt("num", numTanks);
         nbt.putInt("cap", capacity);
+        ListTag tanksTag = new ListTag();
         for(int i = 0; i < numTanks; ++i){
             if(!tanks.get(i).isEmpty()) {
-                tanks.get(i).writeToNBT(lookupProvider, nbt);
+                tanksTag.add(tanks.get(i).writeToNBT(lookupProvider, new CompoundTag()));
             }
         }
+        nbt.put("tanks", tanksTag);
 
         return nbt;
     }
