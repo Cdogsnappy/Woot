@@ -3,6 +3,7 @@ package ipsis.woot.modules.factory.calculators;
 import ipsis.woot.Woot;
 import ipsis.woot.crafting.WootRecipes;
 import ipsis.woot.crafting.factory.FactoryRecipe;
+import ipsis.woot.datagen.modules.Factory;
 import ipsis.woot.modules.factory.FactoryConfiguration;
 import ipsis.woot.modules.factory.FormedSetup;
 import ipsis.woot.modules.factory.blocks.ControllerBlockEntity;
@@ -11,9 +12,11 @@ import ipsis.woot.modules.factory.perks.Perk;
 import ipsis.woot.util.FakeMob;
 import ipsis.woot.util.FluidStackHelper;
 import ipsis.woot.util.ItemStackHelper;
+import net.minecraft.core.Holder;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.neoforged.neoforge.fluids.FluidStack;
 import org.apache.logging.log4j.LogManager;
@@ -72,7 +75,7 @@ public class CalculatorVersion2 {
     /**
      * Returns all the items, with exotic reductions and mass settings, to spawn the count of fakemob
      */
-    public static List<ItemStack> getRecipeItems(FakeMob fakeMob, NonNullList<ItemStack> recipeItems, FormedSetup setup) {
+    public static List<ItemStack> getRecipeItems(FakeMob fakeMob, List<ItemStack> recipeItems, FormedSetup setup) {
         int mobCount = setup.getAllMobParams().get(fakeMob).getMobCount(setup.getAllPerks().containsKey(Perk.Group.mass), setup.hasMassExotic());
         List<ItemStack> items = new ArrayList<>();
         if (setup.hasItemIngredientExotic()) {
@@ -103,7 +106,7 @@ public class CalculatorVersion2 {
     /**
      * Returns all the fluids, with exotic reductions and mass settings, to spawn the count of fakemob
      */
-    public static List<FluidStack> getRecipeFluids(FakeMob fakeMob, NonNullList<FluidStack> recipeFluids, FormedSetup setup) {
+    public static List<FluidStack> getRecipeFluids(FakeMob fakeMob, List<FluidStack> recipeFluids, FormedSetup setup) {
         int mobCount = setup.getAllMobParams().get(fakeMob).getMobCount(setup.getAllPerks().containsKey(Perk.Group.mass), setup.hasMassExotic());
         List<FluidStack> fluids = new ArrayList<>();
         if (setup.hasFluidIngredientExotic()) {
@@ -161,21 +164,26 @@ public class CalculatorVersion2 {
          * Impacted by exotic A and exotic B
          */
         for (FakeMob fakeMob : setup.getAllMobs()) {
-            ItemStack controller = ControllerBlockEntity.getItemStack(fakeMob);
-            List<RecipeHolder<FactoryRecipe>> recipes = setup.getWorld().getRecipeManager().getRecipesFor(
-                    WootRecipes.FACTORY_RECIPE_TYPE.get(), new SingleRecipeInput(controller),setup.getWorld());
-
-            for (RecipeHolder<FactoryRecipe> factoryRecipe : recipes) {
-                if (factoryRecipe.value().getFakeMob().equals(fakeMob)) {
-                    List<ItemStack> recipeItems = getRecipeItems(fakeMob, (NonNullList<ItemStack>) factoryRecipe.value().getItems(), setup);
-                    List<FluidStack> recipeFluids = getRecipeFluids(fakeMob, (NonNullList<FluidStack>) factoryRecipe.value().getFluids(), setup);
-                    recipeItems.forEach(i -> recipe.addItem(i.copy()));
-                    recipeFluids.forEach(i -> recipe.addFluid(i.copy()));
-                    break;
-                }
+            FactoryRecipe factoryRecipe = getRecipeForMob(setup.getWorld().getRecipeManager(), fakeMob);
+            if (factoryRecipe != null) {
+                List<ItemStack> recipeItems = getRecipeItems(fakeMob,  factoryRecipe.getItems(), setup);
+                List<FluidStack> recipeFluids = getRecipeFluids(fakeMob, factoryRecipe.getFluids(), setup);
+                recipeItems.forEach(i -> recipe.addItem(i.copy()));
+                recipeFluids.forEach(i -> recipe.addFluid(i.copy()));
             }
+
         }
 
         return recipe;
+    }
+
+    public static FactoryRecipe getRecipeForMob(RecipeManager recipeManager, FakeMob mob){
+        List<RecipeHolder<FactoryRecipe>> recipes = recipeManager.getAllRecipesFor(WootRecipes.FACTORY_RECIPE_TYPE.get());
+        for(RecipeHolder<FactoryRecipe> recipe : recipes){
+            if(recipe.value().fakeMob().equals(mob)){
+                return recipe.value();
+            }
+        }
+        return null;
     }
 }

@@ -21,6 +21,7 @@ import net.neoforged.neoforge.fluids.FluidStack;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -89,7 +90,7 @@ public record FactoryRecipe(List<ItemStack> items, List<FluidStack> fluids, Fake
 
         public static final MapCodec<FactoryRecipe> CODEC = RecordCodecBuilder.mapCodec(inst -> inst.group(
                 ItemStack.CODEC.listOf().fieldOf("ingredient").forGetter(FactoryRecipe::items),
-                FluidStack.CODEC.listOf().fieldOf("fluids").forGetter(FactoryRecipe::fluids),
+                FluidStack.CODEC.listOf().optionalFieldOf("fluids", Collections.emptyList()).forGetter(FactoryRecipe::fluids),
                 FakeMob.CODEC.fieldOf("fakeMob").forGetter(FactoryRecipe::fakeMob),
                 Drop.CODEC.listOf().fieldOf("drop").forGetter(FactoryRecipe::drops)
 

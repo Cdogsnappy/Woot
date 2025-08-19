@@ -1,0 +1,51 @@
+{
+  "type": "woot:factory",
+  "drop": [
+    {
+      "dropchance": [
+        100.0,
+        100.0,
+        100.0,
+        100.0
+      ],
+      "itemstack": {
+        "count": 1,
+        "id": "minecraft:dragon_egg"
+      },
+      "stacksizes": [
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "dropchance": [
+        100.0,
+        100.0,
+        100.0,
+        100.0
+      ],
+      "itemstack": {
+        "count": 1,
+        "id": "minecraft:dragon_breath"
+      },
+      "stacksizes": [
+        2,
+        4,
+        6,
+        8
+      ]
+    }
+  ],
+  "fakeMob": {
+    "entityKey": "minecraft:ender_dragon",
+    "tag": ""
+  },
+  "ingredient": [
+    {
+      "count": 4,
+      "id": "minecraft:end_crystal"
+    }
+  ]
+}

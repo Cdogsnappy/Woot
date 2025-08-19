@@ -44,7 +44,7 @@ public class FakeMob {
 
     public static final Codec<FakeMob> CODEC = Codec.lazyInitialized(() -> RecordCodecBuilder.create(inst ->
         inst.group(ExtraCodecs.NON_EMPTY_STRING.fieldOf("entityKey").forGetter(FakeMob::getEntityKey),
-                ExtraCodecs.NON_EMPTY_STRING.fieldOf("tag").forGetter(FakeMob::getTag)).apply(inst, FakeMob::new)
+                Codec.STRING.fieldOf("tag").forGetter(FakeMob::getTag)).apply(inst, FakeMob::new)
     ));
 
 
@@ -68,6 +68,11 @@ public class FakeMob {
 
     public FakeMob(FakeMob fakeMob) {
         this(fakeMob.getEntityKey(), fakeMob.getTag());
+    }
+
+
+    public boolean equals(FakeMob other){
+        return this.entityKey.equals(other.entityKey);
     }
 
     public FakeMob(Mob mobEntity) {

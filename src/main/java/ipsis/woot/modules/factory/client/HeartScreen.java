@@ -142,6 +142,10 @@ public class HeartScreen extends WootContainerScreen<HeartMenu> {
         if((mouseX > getGuiLeft() + MOBS_X && mouseX < getGuiLeft() + MOBS_X + 18*mobElements.size()) && (mouseY > getGuiTop() + MOBS_Y && mouseY < getGuiTop() + MOBS_Y + 18*mobElements.size())){
             mobElements.get((mouseX - (getGuiLeft() + MOBS_X))/18).drawTooltip(guiGraphics, mouseX, mouseY);
         }
+
+        if((mouseX > getGuiLeft() + RECIPE_X && mouseX < getGuiLeft() + RECIPE_X + 18*recipeElements.size()) && (mouseY > getGuiTop() + RECIPE_Y && mouseY < getGuiTop() + RECIPE_Y + 18)){
+            recipeElements.get((mouseX - (getGuiLeft() + RECIPE_X))/18).drawTooltip(guiGraphics, mouseX, mouseY);
+        }
         if((mouseX > getGuiLeft() + PERKS_X && mouseX < getGuiLeft() + PERKS_X + 18*upgradeElements.size()) && (mouseY > getGuiTop() + PERKS_Y && mouseY < getGuiTop() + PERKS_Y + 18*upgradeElements.size())){
             upgradeElements.get((mouseX - (getGuiLeft() + PERKS_X))/18).drawTooltip(guiGraphics, mouseX, mouseY);
         }

@@ -62,6 +62,8 @@ public record HeartStaticDataReply(FormedSetup formedSetup, HeartRecipe recipe, 
             setup.mobInfo.put(mob, new ClientFactorySetup.Mob(MobSimulator.getInstance().getDropSummary(mob)));
 
         });
+        setup.itemIng = recipe.recipeItems();
+        setup.fluidIng = recipe.recipeFluids();
 
     }
 

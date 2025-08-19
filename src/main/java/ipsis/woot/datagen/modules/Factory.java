@@ -14,6 +14,7 @@ import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -327,18 +328,45 @@ public class Factory {
                 .unlockedBy("cobblestone", InventoryChangeTrigger.TriggerInstance.hasItems(Blocks.COBBLESTONE))
                 .save(recipeOutput);
 
-        /* Now using modded drops as well
+
         FactoryRecipeBuilder.factoryRecipe(new FakeMob("minecraft:ender_dragon"))
-                .requires(new ItemStack(Items.END_CRYSTAL, 4))
+                .addIngredient(new ItemStack(Items.END_CRYSTAL, 4))
                 .addDrop(new FactoryRecipe.Drop(
                         new ItemStack(Blocks.DRAGON_EGG),
-                        1, 1, 1, 1,
-                        100.0F, 100.0F, 100.0F, 100.0F))
+                        Arrays.asList(1, 1, 1, 1),
+                        Arrays.asList(100.0F, 100.0F, 100.0F, 100.0F)))
                 .addDrop(new FactoryRecipe.Drop(
                         new ItemStack(Items.DRAGON_BREATH),
-                        2, 4, 6, 8,
-                        100.0F, 100.0F, 100.0F, 100.0F))
-                .save(recipeOutput, "ender_dragon"); */
+                        Arrays.asList(2, 4, 6, 8),
+                        Arrays.asList(100.0F, 100.0F, 100.0F, 100.0F)))
+                .save(recipeOutput, ResourceLocation.parse("woot:ender_dragon"));
+
+
+
+        FactoryRecipeBuilder.factoryRecipe(new FakeMob("minecraft:wither"))
+                .addIngredient(new ItemStack(Items.WITHER_SKELETON_SKULL, 3))
+                .addIngredient(new ItemStack(Blocks.SOUL_SAND, 4))
+                .save(recipeOutput, "woot:wither");
+
+        float chance = 100.0F/16.0F;
+        FactoryRecipeBuilder.factoryRecipe(new FakeMob("minecraft:sheep"))
+                .addDrop(new FactoryRecipe.Drop(new ItemStack(Items.BLACK_WOOL), Arrays.asList(1, 1, 1, 1), Arrays.asList(chance, chance, chance, chance)))
+                .addDrop(new FactoryRecipe.Drop(new ItemStack(Items.BLUE_WOOL), Arrays.asList(1, 1, 1, 1), Arrays.asList(chance, chance, chance, chance)))
+                .addDrop(new FactoryRecipe.Drop(new ItemStack(Items.BROWN_WOOL), Arrays.asList(1, 1, 1, 1), Arrays.asList(chance, chance, chance, chance)))
+                .addDrop(new FactoryRecipe.Drop(new ItemStack(Items.CYAN_WOOL), Arrays.asList(1, 1, 1, 1), Arrays.asList(chance, chance, chance, chance)))
+                .addDrop(new FactoryRecipe.Drop(new ItemStack(Items.GRAY_WOOL), Arrays.asList(1, 1, 1, 1), Arrays.asList(chance, chance, chance, chance)))
+                .addDrop(new FactoryRecipe.Drop(new ItemStack(Items.GREEN_WOOL), Arrays.asList(1, 1, 1, 1), Arrays.asList(chance, chance, chance, chance)))
+                .addDrop(new FactoryRecipe.Drop(new ItemStack(Items.LIGHT_BLUE_WOOL), Arrays.asList(1, 1, 1, 1), Arrays.asList(chance, chance, chance, chance)))
+                .addDrop(new FactoryRecipe.Drop(new ItemStack(Items.LIGHT_GRAY_WOOL), Arrays.asList(1, 1, 1, 1), Arrays.asList(chance, chance, chance, chance)))
+                .addDrop(new FactoryRecipe.Drop(new ItemStack(Items.LIME_WOOL), Arrays.asList(1, 1, 1, 1), Arrays.asList(chance, chance, chance, chance)))
+                .addDrop(new FactoryRecipe.Drop(new ItemStack(Items.MAGENTA_WOOL), Arrays.asList(1, 1, 1, 1), Arrays.asList(chance, chance, chance, chance)))
+                .addDrop(new FactoryRecipe.Drop(new ItemStack(Items.ORANGE_WOOL), Arrays.asList(1, 1, 1, 1), Arrays.asList(chance, chance, chance, chance)))
+                .addDrop(new FactoryRecipe.Drop(new ItemStack(Items.PINK_WOOL), Arrays.asList(1, 1, 1, 1), Arrays.asList(chance, chance, chance, chance)))
+                .addDrop(new FactoryRecipe.Drop(new ItemStack(Items.PURPLE_WOOL), Arrays.asList(1, 1, 1, 1), Arrays.asList(chance, chance, chance, chance)))
+                .addDrop(new FactoryRecipe.Drop(new ItemStack(Items.RED_WOOL), Arrays.asList(1, 1, 1, 1),  Arrays.asList(chance, chance, chance, chance)))
+                .addDrop(new FactoryRecipe.Drop(new ItemStack(Items.WHITE_WOOL), Arrays.asList(1, 1, 1, 1), Arrays.asList(chance, chance, chance, chance)))
+                .addDrop(new FactoryRecipe.Drop(new ItemStack(Items.YELLOW_WOOL), Arrays.asList(1, 1, 1, 1), Arrays.asList(chance, chance, chance, chance)))
+                .save(recipeOutput, "sheep");
 
 
     }

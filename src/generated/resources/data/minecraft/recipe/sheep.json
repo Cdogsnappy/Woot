@@ -1,0 +1,298 @@
+{
+  "type": "woot:factory",
+  "drop": [
+    {
+      "dropchance": [
+        6.25,
+        6.25,
+        6.25,
+        6.25
+      ],
+      "itemstack": {
+        "count": 1,
+        "id": "minecraft:black_wool"
+      },
+      "stacksizes": [
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "dropchance": [
+        6.25,
+        6.25,
+        6.25,
+        6.25
+      ],
+      "itemstack": {
+        "count": 1,
+        "id": "minecraft:blue_wool"
+      },
+      "stacksizes": [
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "dropchance": [
+        6.25,
+        6.25,
+        6.25,
+        6.25
+      ],
+      "itemstack": {
+        "count": 1,
+        "id": "minecraft:brown_wool"
+      },
+      "stacksizes": [
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "dropchance": [
+        6.25,
+        6.25,
+        6.25,
+        6.25
+      ],
+      "itemstack": {
+        "count": 1,
+        "id": "minecraft:cyan_wool"
+      },
+      "stacksizes": [
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "dropchance": [
+        6.25,
+        6.25,
+        6.25,
+        6.25
+      ],
+      "itemstack": {
+        "count": 1,
+        "id": "minecraft:gray_wool"
+      },
+      "stacksizes": [
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "dropchance": [
+        6.25,
+        6.25,
+        6.25,
+        6.25
+      ],
+      "itemstack": {
+        "count": 1,
+        "id": "minecraft:green_wool"
+      },
+      "stacksizes": [
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "dropchance": [
+        6.25,
+        6.25,
+        6.25,
+        6.25
+      ],
+      "itemstack": {
+        "count": 1,
+        "id": "minecraft:light_blue_wool"
+      },
+      "stacksizes": [
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "dropchance": [
+        6.25,
+        6.25,
+        6.25,
+        6.25
+      ],
+      "itemstack": {
+        "count": 1,
+        "id": "minecraft:light_gray_wool"
+      },
+      "stacksizes": [
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "dropchance": [
+        6.25,
+        6.25,
+        6.25,
+        6.25
+      ],
+      "itemstack": {
+        "count": 1,
+        "id": "minecraft:lime_wool"
+      },
+      "stacksizes": [
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "dropchance": [
+        6.25,
+        6.25,
+        6.25,
+        6.25
+      ],
+      "itemstack": {
+        "count": 1,
+        "id": "minecraft:magenta_wool"
+      },
+      "stacksizes": [
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "dropchance": [
+        6.25,
+        6.25,
+        6.25,
+        6.25
+      ],
+      "itemstack": {
+        "count": 1,
+        "id": "minecraft:orange_wool"
+      },
+      "stacksizes": [
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "dropchance": [
+        6.25,
+        6.25,
+        6.25,
+        6.25
+      ],
+      "itemstack": {
+        "count": 1,
+        "id": "minecraft:pink_wool"
+      },
+      "stacksizes": [
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "dropchance": [
+        6.25,
+        6.25,
+        6.25,
+        6.25
+      ],
+      "itemstack": {
+        "count": 1,
+        "id": "minecraft:purple_wool"
+      },
+      "stacksizes": [
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "dropchance": [
+        6.25,
+        6.25,
+        6.25,
+        6.25
+      ],
+      "itemstack": {
+        "count": 1,
+        "id": "minecraft:red_wool"
+      },
+      "stacksizes": [
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "dropchance": [
+        6.25,
+        6.25,
+        6.25,
+        6.25
+      ],
+      "itemstack": {
+        "count": 1,
+        "id": "minecraft:white_wool"
+      },
+      "stacksizes": [
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "dropchance": [
+        6.25,
+        6.25,
+        6.25,
+        6.25
+      ],
+      "itemstack": {
+        "count": 1,
+        "id": "minecraft:yellow_wool"
+      },
+      "stacksizes": [
+        1,
+        1,
+        1,
+        1
+      ]
+    }
+  ],
+  "fakeMob": {
+    "entityKey": "minecraft:sheep",
+    "tag": ""
+  },
+  "ingredient": []
+}

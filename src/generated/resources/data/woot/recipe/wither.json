@@ -1,0 +1,18 @@
+{
+  "type": "woot:factory",
+  "drop": [],
+  "fakeMob": {
+    "entityKey": "minecraft:wither",
+    "tag": ""
+  },
+  "ingredient": [
+    {
+      "count": 3,
+      "id": "minecraft:wither_skeleton_skull"
+    },
+    {
+      "count": 4,
+      "id": "minecraft:soul_sand"
+    }
+  ]
+}
